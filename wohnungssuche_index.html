@@ -1,0 +1,1516 @@
+<!doctype html>
+<html lang="de">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#111827">
+  <title>Wohnungssuche – Luca & Gessi</title>
+
+  <link rel="preconnect" href="https://unpkg.com">
+  <link rel="preconnect" href="https://tile.openstreetmap.org">
+  <link rel="stylesheet"
+        href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+        integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY="
+        crossorigin="">
+
+  <style>
+    :root {
+      --bg: #f5f7fb;
+      --surface: #ffffff;
+      --surface-2: #f0f3f8;
+      --text: #182033;
+      --muted: #6b7280;
+      --line: #dfe4ec;
+      --primary: #2563eb;
+      --primary-soft: #e8f0ff;
+      --good: #12834a;
+      --good-soft: #e8f7ef;
+      --bad: #c73535;
+      --bad-soft: #fdecec;
+      --warn: #9a6700;
+      --warn-soft: #fff5d6;
+      --shadow: 0 10px 28px rgba(19, 31, 54, .08);
+      --radius: 18px;
+      --safe-bottom: env(safe-area-inset-bottom, 0px);
+    }
+
+    * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+    body {
+      margin: 0;
+      background: var(--bg);
+      color: var(--text);
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    button, input, select, textarea { font: inherit; }
+    button { cursor: pointer; }
+    a { color: inherit; }
+
+    .app {
+      width: min(1180px, 100%);
+      margin: 0 auto;
+      padding: 16px 14px calc(98px + var(--safe-bottom));
+    }
+
+    .topbar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      margin-bottom: 14px;
+    }
+
+    .brand h1 {
+      margin: 0;
+      font-size: clamp(22px, 5vw, 32px);
+      letter-spacing: -.03em;
+    }
+
+    .brand p {
+      margin: 3px 0 0;
+      color: var(--muted);
+      font-size: 13px;
+    }
+
+    .profile-picker {
+      display: flex;
+      gap: 5px;
+      padding: 4px;
+      background: var(--surface-2);
+      border: 1px solid var(--line);
+      border-radius: 999px;
+    }
+
+    .profile-btn {
+      border: 0;
+      background: transparent;
+      border-radius: 999px;
+      padding: 8px 12px;
+      color: var(--muted);
+      font-weight: 700;
+    }
+
+    .profile-btn.active {
+      background: var(--surface);
+      color: var(--text);
+      box-shadow: 0 2px 8px rgba(0,0,0,.08);
+    }
+
+    .summary-grid {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 9px;
+      margin-bottom: 12px;
+    }
+
+    .metric {
+      background: var(--surface);
+      border: 1px solid var(--line);
+      border-radius: 15px;
+      padding: 11px 12px;
+      min-width: 0;
+    }
+
+    .metric strong {
+      display: block;
+      font-size: 22px;
+      letter-spacing: -.03em;
+    }
+
+    .metric span {
+      color: var(--muted);
+      font-size: 12px;
+    }
+
+    .map-shell {
+      overflow: hidden;
+      background: var(--surface);
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      margin-bottom: 12px;
+    }
+
+    #map {
+      width: 100%;
+      height: clamp(285px, 42vh, 430px);
+      background: #e7ebf1;
+    }
+
+    .map-caption {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      padding: 10px 12px;
+      color: var(--muted);
+      font-size: 13px;
+    }
+
+    .map-caption button {
+      border: 0;
+      background: var(--primary-soft);
+      color: var(--primary);
+      border-radius: 10px;
+      padding: 7px 10px;
+      font-weight: 700;
+    }
+
+    .toolbar {
+      background: var(--surface);
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      padding: 12px;
+      margin-bottom: 12px;
+    }
+
+    .search-row {
+      display: grid;
+      grid-template-columns: minmax(0, 1.5fr) repeat(3, minmax(115px, .7fr)) auto;
+      gap: 8px;
+    }
+
+    .control {
+      width: 100%;
+      min-height: 44px;
+      border: 1px solid var(--line);
+      background: var(--surface);
+      color: var(--text);
+      border-radius: 12px;
+      padding: 10px 12px;
+      outline: none;
+    }
+
+    .control:focus {
+      border-color: var(--primary);
+      box-shadow: 0 0 0 3px var(--primary-soft);
+    }
+
+    .primary-btn, .secondary-btn, .danger-btn {
+      min-height: 44px;
+      border-radius: 12px;
+      padding: 10px 14px;
+      font-weight: 800;
+      border: 1px solid transparent;
+    }
+
+    .primary-btn { background: var(--primary); color: white; }
+    .secondary-btn { background: var(--surface-2); color: var(--text); border-color: var(--line); }
+    .danger-btn { background: var(--bad-soft); color: var(--bad); }
+
+    .list-head {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 12px;
+      margin: 16px 2px 10px;
+    }
+
+    .list-head h2 { margin: 0; font-size: 19px; }
+    .list-head span { color: var(--muted); font-size: 13px; }
+
+    .properties {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 12px;
+    }
+
+    .property-card {
+      background: var(--surface);
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      padding: 15px;
+      box-shadow: 0 5px 18px rgba(19, 31, 54, .05);
+      transition: border-color .2s, transform .2s;
+      min-width: 0;
+    }
+
+    .property-card.highlight {
+      border-color: var(--primary);
+      box-shadow: 0 0 0 3px var(--primary-soft);
+    }
+
+    .card-top {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: 10px;
+    }
+
+    .card-title {
+      margin: 0;
+      font-size: 18px;
+      line-height: 1.25;
+      letter-spacing: -.02em;
+      overflow-wrap: anywhere;
+    }
+
+    .location {
+      color: var(--muted);
+      margin-top: 3px;
+      font-size: 14px;
+    }
+
+    .favorite-btn {
+      flex: 0 0 auto;
+      width: 43px;
+      height: 43px;
+      border: 1px solid var(--line);
+      background: var(--surface);
+      border-radius: 13px;
+      font-size: 22px;
+    }
+
+    .favorite-btn.active {
+      background: var(--warn-soft);
+      border-color: #eed586;
+    }
+
+    .price {
+      font-size: 25px;
+      font-weight: 850;
+      margin: 14px 0 8px;
+      letter-spacing: -.035em;
+    }
+
+    .facts {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 7px;
+      margin-bottom: 10px;
+    }
+
+    .chip {
+      display: inline-flex;
+      align-items: center;
+      min-height: 28px;
+      padding: 5px 9px;
+      border-radius: 999px;
+      background: var(--surface-2);
+      color: #374151;
+      font-size: 12px;
+      font-weight: 700;
+    }
+
+    .chip.good { background: var(--good-soft); color: var(--good); }
+    .chip.warn { background: var(--warn-soft); color: var(--warn); }
+    .chip.bad { background: var(--bad-soft); color: var(--bad); }
+
+    .ai-box {
+      background: var(--primary-soft);
+      border-radius: 13px;
+      padding: 10px 11px;
+      margin: 10px 0;
+      font-size: 13px;
+      line-height: 1.4;
+    }
+
+    .ai-box strong { display: block; margin-bottom: 3px; }
+
+    .voting {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
+      margin: 12px 0;
+    }
+
+    .person-vote {
+      border: 1px solid var(--line);
+      border-radius: 14px;
+      padding: 9px;
+    }
+
+    .person-vote-label {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 7px;
+      font-size: 13px;
+      font-weight: 800;
+    }
+
+    .vote-buttons {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 6px;
+    }
+
+    .vote-btn {
+      height: 40px;
+      border-radius: 11px;
+      border: 1px solid var(--line);
+      background: var(--surface);
+      font-size: 20px;
+    }
+
+    .vote-btn.up.active { background: var(--good-soft); border-color: #9bd7b7; }
+    .vote-btn.down.active { background: var(--bad-soft); border-color: #f0aaaa; }
+
+    .notes {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
+      margin-top: 10px;
+    }
+
+    .note-wrap label {
+      display: block;
+      font-size: 12px;
+      font-weight: 800;
+      color: var(--muted);
+      margin: 0 0 5px 2px;
+    }
+
+    .note {
+      width: 100%;
+      min-height: 83px;
+      resize: vertical;
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      padding: 10px;
+      background: var(--surface);
+      color: var(--text);
+      outline: none;
+    }
+
+    .note:focus {
+      border-color: var(--primary);
+      box-shadow: 0 0 0 3px var(--primary-soft);
+    }
+
+    .card-actions {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) auto auto;
+      gap: 7px;
+      margin-top: 10px;
+    }
+
+    .status-select { min-width: 0; }
+
+    .link-btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 42px;
+      border: 1px solid var(--line);
+      border-radius: 11px;
+      padding: 8px 11px;
+      text-decoration: none;
+      font-weight: 800;
+      background: var(--surface);
+    }
+
+    .empty {
+      grid-column: 1 / -1;
+      padding: 34px 18px;
+      text-align: center;
+      background: var(--surface);
+      border: 1px dashed var(--line);
+      border-radius: var(--radius);
+      color: var(--muted);
+    }
+
+    .bottom-nav {
+      position: fixed;
+      z-index: 1000;
+      left: 50%;
+      bottom: 0;
+      transform: translateX(-50%);
+      width: min(680px, 100%);
+      padding: 8px 10px calc(8px + var(--safe-bottom));
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 5px;
+      background: rgba(255,255,255,.94);
+      border-top: 1px solid var(--line);
+      backdrop-filter: blur(16px);
+    }
+
+    .nav-btn {
+      min-height: 54px;
+      border: 0;
+      background: transparent;
+      border-radius: 14px;
+      color: var(--muted);
+      font-size: 11px;
+      font-weight: 800;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 3px;
+    }
+
+    .nav-btn span:first-child { font-size: 20px; }
+    .nav-btn.active { background: var(--primary-soft); color: var(--primary); }
+
+    .modal {
+      position: fixed;
+      z-index: 3000;
+      inset: 0;
+      display: none;
+      align-items: flex-end;
+      justify-content: center;
+      background: rgba(17, 24, 39, .56);
+      padding: 14px;
+    }
+
+    .modal.open { display: flex; }
+
+    .modal-panel {
+      width: min(760px, 100%);
+      max-height: 90vh;
+      overflow: auto;
+      border-radius: 22px 22px 16px 16px;
+      background: var(--surface);
+      padding: 16px;
+      box-shadow: var(--shadow);
+    }
+
+    .modal-head {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 12px;
+      margin-bottom: 10px;
+    }
+
+    .modal-head h2 { margin: 0; font-size: 20px; }
+    .modal-head p { margin: 3px 0 0; color: var(--muted); font-size: 13px; }
+
+    .icon-btn {
+      width: 42px;
+      height: 42px;
+      border-radius: 12px;
+      border: 1px solid var(--line);
+      background: var(--surface);
+    }
+
+    .import-text {
+      width: 100%;
+      min-height: 290px;
+      border: 1px solid var(--line);
+      border-radius: 14px;
+      padding: 12px;
+      font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+      font-size: 13px;
+      resize: vertical;
+    }
+
+    .modal-actions {
+      display: flex;
+      justify-content: flex-end;
+      gap: 8px;
+      margin-top: 10px;
+    }
+
+    .toast {
+      position: fixed;
+      z-index: 5000;
+      left: 50%;
+      bottom: calc(86px + var(--safe-bottom));
+      transform: translate(-50%, 20px);
+      width: min(92%, 520px);
+      padding: 12px 14px;
+      border-radius: 14px;
+      background: #182033;
+      color: white;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity .2s, transform .2s;
+      text-align: center;
+      font-size: 14px;
+      box-shadow: var(--shadow);
+    }
+
+    .toast.show { opacity: 1; transform: translate(-50%, 0); }
+    .toast.error { background: #8f2323; }
+
+    .loading {
+      position: fixed;
+      z-index: 4500;
+      inset: 0;
+      display: none;
+      place-items: center;
+      background: rgba(245,247,251,.76);
+      backdrop-filter: blur(3px);
+    }
+
+    .loading.show { display: grid; }
+    .spinner {
+      width: 44px;
+      height: 44px;
+      border: 4px solid #dbe4f5;
+      border-top-color: var(--primary);
+      border-radius: 50%;
+      animation: spin .8s linear infinite;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    .leaflet-popup-content { margin: 12px 14px; }
+    .popup-title { font-weight: 850; margin-bottom: 4px; }
+    .popup-meta { color: #6b7280; font-size: 12px; margin-bottom: 8px; }
+    .popup-btn {
+      border: 0;
+      border-radius: 9px;
+      background: #2563eb;
+      color: white;
+      padding: 7px 9px;
+      font-weight: 800;
+    }
+
+    @media (max-width: 800px) {
+      .app { padding-top: 12px; }
+      .summary-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+      .search-row { grid-template-columns: 1fr 1fr; }
+      .search-row .wide { grid-column: 1 / -1; }
+      .properties { grid-template-columns: 1fr; }
+      .property-card { padding: 13px; }
+      .topbar { align-items: flex-start; }
+      .brand p { max-width: 190px; }
+    }
+
+    @media (max-width: 520px) {
+      .app { padding-left: 10px; padding-right: 10px; }
+      .profile-btn { padding: 7px 10px; font-size: 13px; }
+      .metric { padding: 10px; }
+      .metric strong { font-size: 20px; }
+      #map { height: 310px; }
+      .search-row { grid-template-columns: 1fr; }
+      .search-row .wide { grid-column: auto; }
+      .voting, .notes { grid-template-columns: 1fr; }
+      .card-actions { grid-template-columns: 1fr 1fr; }
+      .card-actions .status-select { grid-column: 1 / -1; }
+      .modal { padding: 0; }
+      .modal-panel { border-radius: 22px 22px 0 0; max-height: 94vh; }
+    }
+
+    @media (prefers-color-scheme: dark) {
+      :root {
+        --bg: #0f1420;
+        --surface: #171e2c;
+        --surface-2: #20293a;
+        --text: #eef2f8;
+        --muted: #9aa5b6;
+        --line: #303b4e;
+        --primary: #73a2ff;
+        --primary-soft: #1d3154;
+        --good: #66d99a;
+        --good-soft: #183c2b;
+        --bad: #ff8f8f;
+        --bad-soft: #472324;
+        --warn: #f4ca65;
+        --warn-soft: #443817;
+        --shadow: 0 10px 28px rgba(0,0,0,.28);
+      }
+      .bottom-nav { background: rgba(23,30,44,.94); }
+      .chip { color: #d1d8e4; }
+      .loading { background: rgba(15,20,32,.75); }
+    }
+  </style>
+</head>
+<body>
+  <main class="app">
+    <header class="topbar">
+      <div class="brand">
+        <h1>Unser Zuhause 🏡</h1>
+        <p>Wohnungssuche von Luca &amp; Gessi</p>
+      </div>
+
+      <div class="profile-picker" aria-label="Aktives Profil">
+        <button class="profile-btn" data-profile="luca" type="button">Luca</button>
+        <button class="profile-btn" data-profile="gessi" type="button">Gessi</button>
+      </div>
+    </header>
+
+    <section class="summary-grid" aria-label="Zusammenfassung">
+      <div class="metric"><strong id="metricVisible">0</strong><span>angezeigt</span></div>
+      <div class="metric"><strong id="metricBothLike">0</strong><span>beide 👍</span></div>
+      <div class="metric"><strong id="metricFavorites">0</strong><span>Favoriten</span></div>
+      <div class="metric"><strong id="metricAvgPrice">–</strong><span>Ø Preis</span></div>
+    </section>
+
+    <section class="map-shell">
+      <div id="map" role="region" aria-label="Karte der Wohnungen"></div>
+      <div class="map-caption">
+        <span id="mapCaption">Wohnungen mit Kartenposition</span>
+        <button id="fitMapBtn" type="button">Alle anzeigen</button>
+      </div>
+    </section>
+
+    <section class="toolbar">
+      <div class="search-row">
+        <input id="searchInput" class="control wide" type="search" placeholder="Ort, Titel oder Adresse suchen …">
+        <select id="priceFilter" class="control" aria-label="Maximalpreis">
+          <option value="">Preis: alle</option>
+          <option value="1000000">bis CHF 1 Mio.</option>
+          <option value="1200000">bis CHF 1.2 Mio.</option>
+          <option value="1400000">bis CHF 1.4 Mio.</option>
+        </select>
+        <select id="roomsFilter" class="control" aria-label="Mindestzimmer">
+          <option value="">Zimmer: alle</option>
+          <option value="4.5">ab 4.5</option>
+          <option value="5.5">ab 5.5</option>
+        </select>
+        <select id="sortFilter" class="control" aria-label="Sortierung">
+          <option value="newest">Neueste zuerst</option>
+          <option value="priceAsc">Preis aufsteigend</option>
+          <option value="priceDesc">Preis absteigend</option>
+          <option value="ratingDesc">KI-Bewertung</option>
+        </select>
+        <button id="resetFiltersBtn" class="secondary-btn" type="button">Reset</button>
+      </div>
+    </section>
+
+    <div class="list-head">
+      <h2 id="viewTitle">Alle Wohnungen</h2>
+      <span id="resultCount">0 Treffer</span>
+    </div>
+
+    <section id="propertyList" class="properties" aria-live="polite"></section>
+  </main>
+
+  <nav class="bottom-nav" aria-label="Hauptnavigation">
+    <button class="nav-btn active" data-view="main" type="button"><span>🏠</span><span>Alle</span></button>
+    <button class="nav-btn" data-view="favorites" type="button"><span>⭐</span><span>Favoriten</span></button>
+    <button class="nav-btn" data-view="archive" type="button"><span>🗂️</span><span>Archiv</span></button>
+    <button class="nav-btn" data-view="import" type="button"><span>📥</span><span>Import</span></button>
+  </nav>
+
+  <div id="importModal" class="modal" role="dialog" aria-modal="true" aria-labelledby="importTitle">
+    <section class="modal-panel">
+      <div class="modal-head">
+        <div>
+          <h2 id="importTitle">ChatGPT-Update importieren</h2>
+          <p>JSON-Block einfügen. Bestehende Bewertungen, Favoriten und Notizen bleiben erhalten.</p>
+        </div>
+        <button id="closeImportBtn" class="icon-btn" type="button" aria-label="Schliessen">✕</button>
+      </div>
+
+      <textarea id="importText" class="import-text" spellcheck="false" placeholder='[
+  {
+    "external_id": "homegate-123",
+    "source": "Homegate",
+    "title": "4.5-Zimmer-Wohnung",
+    "location": "Othmarsingen",
+    "address": "Wilhalde 42, 5504 Othmarsingen",
+    "latitude": 47.401,
+    "longitude": 8.214,
+    "price_chf": 1040000,
+    "rooms": 4.5,
+    "living_area_m2": 119,
+    "move_in": "April 2027",
+    "listing_url": "https://...",
+    "minergie": true,
+    "building_right": false,
+    "ai_rating": 9.1,
+    "ai_recommendation_reason": "Sehr gutes Preis-Flächen-Verhältnis."
+  }
+]'></textarea>
+
+      <div class="modal-actions">
+        <button id="sampleBtn" class="secondary-btn" type="button">Beispiel einsetzen</button>
+        <button id="runImportBtn" class="primary-btn" type="button">Jetzt importieren</button>
+      </div>
+    </section>
+  </div>
+
+  <div id="toast" class="toast" role="status" aria-live="polite"></div>
+  <div id="loading" class="loading" aria-hidden="true"><div class="spinner"></div></div>
+
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
+          integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo="
+          crossorigin=""></script>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+  <script>
+    const SUPABASE_URL = "https://ogxozfrnokjeoikngcvp.supabase.co";
+    const SUPABASE_KEY = "sb_publishable_2UwF0H-4eW_A0KHUMQydlA_XDvWoXxY";
+
+    const db = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY, {
+      auth: {
+        persistSession: false,
+        autoRefreshToken: false,
+        detectSessionInUrl: false
+      }
+    });
+
+    const state = {
+      profile: localStorage.getItem("wohnung_profile") || "luca",
+      view: "main",
+      properties: [],
+      votes: [],
+      notes: [],
+      favorites: [],
+      filtered: [],
+      markers: new Map(),
+      map: null,
+      markerLayer: null
+    };
+
+    const el = {
+      propertyList: document.getElementById("propertyList"),
+      viewTitle: document.getElementById("viewTitle"),
+      resultCount: document.getElementById("resultCount"),
+      metricVisible: document.getElementById("metricVisible"),
+      metricBothLike: document.getElementById("metricBothLike"),
+      metricFavorites: document.getElementById("metricFavorites"),
+      metricAvgPrice: document.getElementById("metricAvgPrice"),
+      mapCaption: document.getElementById("mapCaption"),
+      searchInput: document.getElementById("searchInput"),
+      priceFilter: document.getElementById("priceFilter"),
+      roomsFilter: document.getElementById("roomsFilter"),
+      sortFilter: document.getElementById("sortFilter"),
+      resetFiltersBtn: document.getElementById("resetFiltersBtn"),
+      fitMapBtn: document.getElementById("fitMapBtn"),
+      importModal: document.getElementById("importModal"),
+      importText: document.getElementById("importText"),
+      closeImportBtn: document.getElementById("closeImportBtn"),
+      runImportBtn: document.getElementById("runImportBtn"),
+      sampleBtn: document.getElementById("sampleBtn"),
+      toast: document.getElementById("toast"),
+      loading: document.getElementById("loading")
+    };
+
+    const STATUS_LABELS = {
+      interesting: "Interessant",
+      contacted: "Kontakt aufgenommen",
+      viewing_planned: "Besichtigung geplant",
+      viewed: "Besichtigt",
+      rejected: "Abgelehnt",
+      purchased: "Gekauft",
+      archived: "Archiviert"
+    };
+
+    function escapeHtml(value) {
+      return String(value ?? "")
+        .replaceAll("&", "&amp;")
+        .replaceAll("<", "&lt;")
+        .replaceAll(">", "&gt;")
+        .replaceAll('"', "&quot;")
+        .replaceAll("'", "&#039;");
+    }
+
+    function formatPrice(value) {
+      if (value === null || value === undefined || value === "") return "Preis offen";
+      return new Intl.NumberFormat("de-CH", {
+        style: "currency",
+        currency: "CHF",
+        maximumFractionDigits: 0
+      }).format(Number(value));
+    }
+
+    function formatDate(value) {
+      if (!value) return "";
+      const date = new Date(value);
+      if (Number.isNaN(date.getTime())) return value;
+      return new Intl.DateTimeFormat("de-CH", {
+        day: "2-digit",
+        month: "2-digit",
+        year: "numeric"
+      }).format(date);
+    }
+
+    function showToast(message, isError = false) {
+      el.toast.textContent = message;
+      el.toast.classList.toggle("error", isError);
+      el.toast.classList.add("show");
+      clearTimeout(showToast.timer);
+      showToast.timer = setTimeout(() => el.toast.classList.remove("show"), 3000);
+    }
+
+    function setLoading(active) {
+      el.loading.classList.toggle("show", active);
+      el.loading.setAttribute("aria-hidden", String(!active));
+    }
+
+    function getVote(propertyId, person) {
+      return state.votes.find(v => v.property_id === propertyId && v.person === person)?.vote ?? null;
+    }
+
+    function getNote(propertyId, person) {
+      return state.notes.find(n => n.property_id === propertyId && n.person === person)?.note ?? "";
+    }
+
+    function isFavorite(propertyId, person) {
+      return Boolean(state.favorites.find(f =>
+        f.property_id === propertyId &&
+        f.person === person &&
+        f.is_favorite === true
+      ));
+    }
+
+    function isFavoriteByAnyone(propertyId) {
+      return isFavorite(propertyId, "luca") || isFavorite(propertyId, "gessi");
+    }
+
+    function isLikedByBoth(propertyId) {
+      return getVote(propertyId, "luca") === 1 && getVote(propertyId, "gessi") === 1;
+    }
+
+    function initMap() {
+      state.map = L.map("map", { zoomControl: true }).setView([47.39, 8.43], 10);
+
+      L.tileLayer("https://tile.openstreetmap.org/{z}/{x}/{y}.png", {
+        maxZoom: 19,
+        attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
+      }).addTo(state.map);
+
+      state.markerLayer = L.layerGroup().addTo(state.map);
+    }
+
+    function renderMap() {
+      state.markerLayer.clearLayers();
+      state.markers.clear();
+
+      const propertiesWithCoordinates = state.filtered.filter(p =>
+        Number.isFinite(Number(p.latitude)) &&
+        Number.isFinite(Number(p.longitude))
+      );
+
+      for (const property of propertiesWithCoordinates) {
+        const marker = L.marker([Number(property.latitude), Number(property.longitude)]);
+        const lucaVote = getVote(property.id, "luca");
+        const gessiVote = getVote(property.id, "gessi");
+
+        marker.bindPopup(`
+          <div class="popup-title">${escapeHtml(property.title)}</div>
+          <div class="popup-meta">
+            ${escapeHtml(property.location || property.address || "")}<br>
+            ${escapeHtml(formatPrice(property.price_chf))} ·
+            ${property.rooms ?? "–"} Zi. ·
+            ${property.living_area_m2 ?? "–"} m²<br>
+            Luca ${lucaVote === 1 ? "👍" : lucaVote === -1 ? "👎" : "–"}
+            · Gessi ${gessiVote === 1 ? "👍" : gessiVote === -1 ? "👎" : "–"}
+          </div>
+          <button class="popup-btn" type="button" data-scroll-property="${property.id}">
+            Wohnung anzeigen
+          </button>
+        `);
+
+        marker.on("popupopen", () => {
+          setTimeout(() => {
+            document.querySelector(`[data-scroll-property="${property.id}"]`)
+              ?.addEventListener("click", () => focusProperty(property.id));
+          }, 0);
+        });
+
+        marker.addTo(state.markerLayer);
+        state.markers.set(property.id, marker);
+      }
+
+      el.mapCaption.textContent =
+        `${propertiesWithCoordinates.length} von ${state.filtered.length} Wohnungen auf der Karte`;
+
+      if (propertiesWithCoordinates.length > 0) {
+        fitMapToVisible();
+      } else {
+        state.map.setView([47.39, 8.43], 10);
+      }
+
+      setTimeout(() => state.map.invalidateSize(), 50);
+    }
+
+    function fitMapToVisible() {
+      const markers = [...state.markers.values()];
+      if (!markers.length) return;
+
+      if (markers.length === 1) {
+        state.map.setView(markers[0].getLatLng(), 14);
+        return;
+      }
+
+      const group = L.featureGroup(markers);
+      state.map.fitBounds(group.getBounds().pad(0.17));
+    }
+
+    function focusProperty(propertyId) {
+      const card = document.getElementById(`property-${propertyId}`);
+      if (card) {
+        card.scrollIntoView({ behavior: "smooth", block: "center" });
+        card.classList.add("highlight");
+        setTimeout(() => card.classList.remove("highlight"), 1800);
+      }
+
+      const marker = state.markers.get(propertyId);
+      if (marker) {
+        state.map.setView(marker.getLatLng(), Math.max(state.map.getZoom(), 14));
+        marker.openPopup();
+      }
+    }
+
+    function applyFilters() {
+      const query = el.searchInput.value.trim().toLowerCase();
+      const maxPrice = Number(el.priceFilter.value || 0);
+      const minRooms = Number(el.roomsFilter.value || 0);
+
+      let items = state.properties.filter(property => {
+        if (state.view === "main" && property.is_archived) return false;
+        if (state.view === "archive" && !property.is_archived) return false;
+        if (state.view === "favorites" && (property.is_archived || !isFavoriteByAnyone(property.id))) return false;
+
+        const haystack = [
+          property.title,
+          property.location,
+          property.address,
+          property.municipality,
+          property.canton
+        ].filter(Boolean).join(" ").toLowerCase();
+
+        if (query && !haystack.includes(query)) return false;
+        if (maxPrice && Number(property.price_chf || Infinity) > maxPrice) return false;
+        if (minRooms && Number(property.rooms || 0) < minRooms) return false;
+
+        return true;
+      });
+
+      switch (el.sortFilter.value) {
+        case "priceAsc":
+          items.sort((a, b) => Number(a.price_chf || Infinity) - Number(b.price_chf || Infinity));
+          break;
+        case "priceDesc":
+          items.sort((a, b) => Number(b.price_chf || 0) - Number(a.price_chf || 0));
+          break;
+        case "ratingDesc":
+          items.sort((a, b) => Number(b.ai_rating || 0) - Number(a.ai_rating || 0));
+          break;
+        default:
+          items.sort((a, b) => new Date(b.imported_at || b.created_at) - new Date(a.imported_at || a.created_at));
+      }
+
+      state.filtered = items;
+      renderAll();
+    }
+
+    function renderAll() {
+      renderSummary();
+      renderProperties();
+      renderMap();
+
+      const titles = {
+        main: "Alle Wohnungen",
+        favorites: "Favoriten von Luca & Gessi",
+        archive: "Archiv"
+      };
+
+      el.viewTitle.textContent = titles[state.view] || "Wohnungen";
+      el.resultCount.textContent = `${state.filtered.length} ${state.filtered.length === 1 ? "Treffer" : "Treffer"}`;
+    }
+
+    function renderSummary() {
+      const prices = state.filtered.map(p => Number(p.price_chf)).filter(Number.isFinite);
+      const avg = prices.length ? prices.reduce((a, b) => a + b, 0) / prices.length : null;
+
+      el.metricVisible.textContent = state.filtered.length;
+      el.metricBothLike.textContent = state.filtered.filter(p => isLikedByBoth(p.id)).length;
+      el.metricFavorites.textContent = state.filtered.filter(p => isFavoriteByAnyone(p.id)).length;
+      el.metricAvgPrice.textContent = avg
+        ? `${Math.round(avg / 1000).toLocaleString("de-CH")}k`
+        : "–";
+    }
+
+    function propertyCardHtml(property) {
+      const lucaVote = getVote(property.id, "luca");
+      const gessiVote = getVote(property.id, "gessi");
+      const lucaNote = getNote(property.id, "luca");
+      const gessiNote = getNote(property.id, "gessi");
+      const ownFavorite = isFavorite(property.id, state.profile);
+      const bothFavorite = isFavorite(property.id, "luca") && isFavorite(property.id, "gessi");
+
+      const minergieChip = property.minergie === true
+        ? '<span class="chip good">Minergie</span>'
+        : property.minergie === false
+          ? '<span class="chip">Kein Minergie</span>'
+          : "";
+
+      const buildingRightChip = property.building_right
+        ? '<span class="chip warn">Baurecht</span>'
+        : '<span class="chip good">Kein Baurecht</span>';
+
+      const archivedChip = property.is_archived
+        ? '<span class="chip bad">Archiviert</span>'
+        : "";
+
+      const listingLink = property.listing_url
+        ? `<a class="link-btn" href="${escapeHtml(property.listing_url)}" target="_blank" rel="noopener noreferrer">Inserat ↗</a>`
+        : `<span class="link-btn" aria-disabled="true">Kein Link</span>`;
+
+      const aiText = property.ai_recommendation_reason || property.ai_summary || "Noch keine KI-Einschätzung.";
+      const aiRating = property.ai_rating !== null && property.ai_rating !== undefined
+        ? `${Number(property.ai_rating).toFixed(1)}/10`
+        : "offen";
+
+      return `
+        <article class="property-card" id="property-${property.id}">
+          <div class="card-top">
+            <div>
+              <h3 class="card-title">${escapeHtml(property.title)}</h3>
+              <div class="location">${escapeHtml(property.location || property.address || "Ort offen")}</div>
+            </div>
+            <button class="favorite-btn ${ownFavorite ? "active" : ""}"
+                    type="button"
+                    data-action="favorite"
+                    data-id="${property.id}"
+                    aria-label="${ownFavorite ? "Aus Favoriten entfernen" : "Als Favorit speichern"}">
+              ${bothFavorite ? "💛" : ownFavorite ? "⭐" : "☆"}
+            </button>
+          </div>
+
+          <div class="price">${escapeHtml(formatPrice(property.price_chf))}</div>
+
+          <div class="facts">
+            ${property.rooms != null ? `<span class="chip">${property.rooms} Zimmer</span>` : ""}
+            ${property.living_area_m2 != null ? `<span class="chip">${property.living_area_m2} m²</span>` : ""}
+            ${property.move_in ? `<span class="chip">Einzug: ${escapeHtml(property.move_in)}</span>` : ""}
+            ${minergieChip}
+            ${buildingRightChip}
+            ${archivedChip}
+          </div>
+
+          <div class="ai-box">
+            <strong>KI-Bewertung: ${escapeHtml(aiRating)}</strong>
+            ${escapeHtml(aiText)}
+          </div>
+
+          <div class="voting">
+            ${voteBlockHtml("luca", "Luca", property.id, lucaVote)}
+            ${voteBlockHtml("gessi", "Gessi", property.id, gessiVote)}
+          </div>
+
+          <div class="notes">
+            <div class="note-wrap">
+              <label for="note-luca-${property.id}">Lucas Notiz</label>
+              <textarea class="note"
+                        id="note-luca-${property.id}"
+                        data-action="note"
+                        data-person="luca"
+                        data-id="${property.id}"
+                        placeholder="Lucas Gedanken …">${escapeHtml(lucaNote)}</textarea>
+            </div>
+            <div class="note-wrap">
+              <label for="note-gessi-${property.id}">Gessis Notiz</label>
+              <textarea class="note"
+                        id="note-gessi-${property.id}"
+                        data-action="note"
+                        data-person="gessi"
+                        data-id="${property.id}"
+                        placeholder="Gessis Gedanken …">${escapeHtml(gessiNote)}</textarea>
+            </div>
+          </div>
+
+          <div class="card-actions">
+            <select class="control status-select" data-action="status" data-id="${property.id}" aria-label="Status">
+              ${Object.entries(STATUS_LABELS).map(([value, label]) =>
+                `<option value="${value}" ${property.status === value ? "selected" : ""}>${label}</option>`
+              ).join("")}
+            </select>
+
+            <button class="secondary-btn" type="button" data-action="locate" data-id="${property.id}">
+              Karte
+            </button>
+
+            ${listingLink}
+          </div>
+
+          <div style="margin-top:9px;color:var(--muted);font-size:12px;">
+            Importiert: ${escapeHtml(formatDate(property.imported_at || property.created_at))}
+          </div>
+        </article>
+      `;
+    }
+
+    function voteBlockHtml(person, label, propertyId, vote) {
+      return `
+        <div class="person-vote">
+          <div class="person-vote-label">
+            <span>${label}</span>
+            <span>${vote === 1 ? "👍" : vote === -1 ? "👎" : "–"}</span>
+          </div>
+          <div class="vote-buttons">
+            <button class="vote-btn up ${vote === 1 ? "active" : ""}"
+                    type="button"
+                    data-action="vote"
+                    data-id="${propertyId}"
+                    data-person="${person}"
+                    data-vote="1"
+                    aria-label="${label}: Daumen hoch">👍</button>
+            <button class="vote-btn down ${vote === -1 ? "active" : ""}"
+                    type="button"
+                    data-action="vote"
+                    data-id="${propertyId}"
+                    data-person="${person}"
+                    data-vote="-1"
+                    aria-label="${label}: Daumen runter">👎</button>
+          </div>
+        </div>
+      `;
+    }
+
+    function renderProperties() {
+      if (!state.filtered.length) {
+        el.propertyList.innerHTML = `
+          <div class="empty">
+            <strong>Keine Wohnungen gefunden.</strong><br>
+            Passe die Filter an oder importiere neue Inserate.
+          </div>`;
+        return;
+      }
+
+      el.propertyList.innerHTML = state.filtered.map(propertyCardHtml).join("");
+    }
+
+    async function loadData() {
+      setLoading(true);
+
+      try {
+        const [
+          propertiesResult,
+          votesResult,
+          notesResult,
+          favoritesResult
+        ] = await Promise.all([
+          db.from("properties").select("*"),
+          db.from("property_votes").select("*"),
+          db.from("property_notes").select("*"),
+          db.from("property_favorites").select("*")
+        ]);
+
+        for (const result of [propertiesResult, votesResult, notesResult, favoritesResult]) {
+          if (result.error) throw result.error;
+        }
+
+        state.properties = propertiesResult.data || [];
+        state.votes = votesResult.data || [];
+        state.notes = notesResult.data || [];
+        state.favorites = favoritesResult.data || [];
+
+        applyFilters();
+      } catch (error) {
+        console.error(error);
+        showToast(`Daten konnten nicht geladen werden: ${error.message}`, true);
+      } finally {
+        setLoading(false);
+      }
+    }
+
+    async function saveVote(propertyId, person, desiredVote) {
+      const current = getVote(propertyId, person);
+      const nextVote = current === desiredVote ? null : desiredVote;
+
+      const existing = state.votes.find(v => v.property_id === propertyId && v.person === person);
+
+      if (existing && nextVote === null) {
+        const { error } = await db.from("property_votes").delete().eq("id", existing.id);
+        if (error) throw error;
+        state.votes = state.votes.filter(v => v.id !== existing.id);
+      } else {
+        const { data, error } = await db
+          .from("property_votes")
+          .upsert(
+            { property_id: propertyId, person, vote: nextVote },
+            { onConflict: "property_id,person" }
+          )
+          .select()
+          .single();
+
+        if (error) throw error;
+        state.votes = state.votes.filter(v => !(v.property_id === propertyId && v.person === person));
+        state.votes.push(data);
+      }
+
+      applyFilters();
+    }
+
+    async function saveFavorite(propertyId) {
+      const person = state.profile;
+      const existing = state.favorites.find(f => f.property_id === propertyId && f.person === person);
+
+      if (existing) {
+        const { error } = await db.from("property_favorites").delete().eq("id", existing.id);
+        if (error) throw error;
+        state.favorites = state.favorites.filter(f => f.id !== existing.id);
+      } else {
+        const { data, error } = await db
+          .from("property_favorites")
+          .insert({ property_id: propertyId, person, is_favorite: true })
+          .select()
+          .single();
+
+        if (error) throw error;
+        state.favorites.push(data);
+      }
+
+      applyFilters();
+    }
+
+    async function saveNote(propertyId, person, note) {
+      const { data, error } = await db
+        .from("property_notes")
+        .upsert(
+          { property_id: propertyId, person, note },
+          { onConflict: "property_id,person" }
+        )
+        .select()
+        .single();
+
+      if (error) throw error;
+
+      state.notes = state.notes.filter(n => !(n.property_id === propertyId && n.person === person));
+      state.notes.push(data);
+      showToast(`${person === "luca" ? "Lucas" : "Gessis"} Notiz gespeichert`);
+    }
+
+    async function saveStatus(propertyId, status) {
+      const patch = status === "archived"
+        ? { status, is_archived: true }
+        : { status, is_archived: false };
+
+      const { data, error } = await db
+        .from("properties")
+        .update(patch)
+        .eq("id", propertyId)
+        .select()
+        .single();
+
+      if (error) throw error;
+
+      state.properties = state.properties.map(p => p.id === propertyId ? data : p);
+      applyFilters();
+      showToast("Status gespeichert");
+    }
+
+    function slugify(value) {
+      return String(value || "")
+        .toLowerCase()
+        .normalize("NFD")
+        .replace(/[\u0300-\u036f]/g, "")
+        .replace(/[^a-z0-9]+/g, "-")
+        .replace(/^-|-$/g, "")
+        .slice(0, 90);
+    }
+
+    function normalizeImportItem(item) {
+      const listingUrl = item.listing_url || item.url || item.link || null;
+      const externalId = item.external_id ||
+        item.source_listing_id ||
+        (listingUrl ? `url-${slugify(listingUrl)}` : `manual-${slugify(`${item.title}-${item.location}-${item.address}`)}`);
+
+      return {
+        external_id: externalId,
+        source: item.source || null,
+        source_listing_id: item.source_listing_id || null,
+        title: item.title || "Wohnung ohne Titel",
+        location: item.location || item.ort || null,
+        municipality: item.municipality || null,
+        canton: item.canton || null,
+        postal_code: item.postal_code ? String(item.postal_code) : null,
+        address: item.address || item.adresse || null,
+        latitude: item.latitude ?? item.lat ?? null,
+        longitude: item.longitude ?? item.lng ?? item.lon ?? null,
+        price_chf: item.price_chf ?? item.price ?? null,
+        rooms: item.rooms ?? item.zimmer ?? null,
+        living_area_m2: item.living_area_m2 ?? item.area_m2 ?? item.flaeche ?? null,
+        move_in: item.move_in || item.einzug || null,
+        listing_url: listingUrl,
+        minergie: item.minergie ?? null,
+        minergie_details: item.minergie_details || null,
+        building_right: Boolean(item.building_right ?? item.baurecht ?? false),
+        building_right_details: item.building_right_details || null,
+        building_right_cost_chf_monthly: item.building_right_cost_chf_monthly ?? null,
+        travel_time_gessi_minutes: item.travel_time_gessi_minutes ?? null,
+        ai_rating: item.ai_rating ?? null,
+        ai_summary: item.ai_summary || null,
+        ai_recommendation_reason: item.ai_recommendation_reason || item.recommendation_reason || null,
+        advantages: Array.isArray(item.advantages) ? item.advantages : null,
+        disadvantages: Array.isArray(item.disadvantages) ? item.disadvantages : null,
+        status: item.status || "interesting",
+        is_archived: Boolean(item.is_archived ?? false),
+        archive_reason: item.archive_reason || null,
+        last_seen_at: new Date().toISOString(),
+        imported_at: new Date().toISOString()
+      };
+    }
+
+    async function importProperties() {
+      let parsed;
+
+      try {
+        parsed = JSON.parse(el.importText.value.trim());
+      } catch {
+        showToast("Der eingefügte Text ist kein gültiges JSON.", true);
+        return;
+      }
+
+      const rawItems = Array.isArray(parsed)
+        ? parsed
+        : Array.isArray(parsed.properties)
+          ? parsed.properties
+          : [];
+
+      if (!rawItems.length) {
+        showToast("Keine Wohnungen im JSON gefunden.", true);
+        return;
+      }
+
+      const items = rawItems.map(normalizeImportItem);
+      setLoading(true);
+
+      try {
+        const { error } = await db
+          .from("properties")
+          .upsert(items, { onConflict: "external_id" });
+
+        if (error) throw error;
+
+        await db.from("import_logs").insert({
+          imported_by: state.profile,
+          new_properties: items.length,
+          import_note: "Import über GitHub-Pages-App"
+        });
+
+        el.importModal.classList.remove("open");
+        el.importText.value = "";
+        showToast(`${items.length} Wohnung(en) importiert`);
+        await loadData();
+      } catch (error) {
+        console.error(error);
+        showToast(`Import fehlgeschlagen: ${error.message}`, true);
+      } finally {
+        setLoading(false);
+      }
+    }
+
+    let noteTimer;
+    el.propertyList.addEventListener("click", async event => {
+      const target = event.target.closest("[data-action]");
+      if (!target) return;
+
+      const action = target.dataset.action;
+      const propertyId = target.dataset.id;
+
+      try {
+        if (action === "vote") {
+          await saveVote(propertyId, target.dataset.person, Number(target.dataset.vote));
+        } else if (action === "favorite") {
+          await saveFavorite(propertyId);
+        } else if (action === "locate") {
+          focusProperty(propertyId);
+          window.scrollTo({ top: 0, behavior: "smooth" });
+        }
+      } catch (error) {
+        console.error(error);
+        showToast(error.message, true);
+      }
+    });
+
+    el.propertyList.addEventListener("change", async event => {
+      const target = event.target;
+      const action = target.dataset.action;
+      if (!action) return;
+
+      try {
+        if (action === "status") {
+          await saveStatus(target.dataset.id, target.value);
+        }
+      } catch (error) {
+        console.error(error);
+        showToast(error.message, true);
+      }
+    });
+
+    el.propertyList.addEventListener("input", event => {
+      const target = event.target;
+      if (target.dataset.action !== "note") return;
+
+      clearTimeout(noteTimer);
+      noteTimer = setTimeout(async () => {
+        try {
+          await saveNote(target.dataset.id, target.dataset.person, target.value.trim());
+        } catch (error) {
+          console.error(error);
+          showToast(error.message, true);
+        }
+      }, 700);
+    });
+
+    document.querySelectorAll(".profile-btn").forEach(button => {
+      button.addEventListener("click", () => {
+        state.profile = button.dataset.profile;
+        localStorage.setItem("wohnung_profile", state.profile);
+        document.querySelectorAll(".profile-btn").forEach(btn =>
+          btn.classList.toggle("active", btn.dataset.profile === state.profile)
+        );
+        renderProperties();
+        showToast(`Profil: ${state.profile === "luca" ? "Luca" : "Gessi"}`);
+      });
+    });
+
+    document.querySelectorAll(".nav-btn").forEach(button => {
+      button.addEventListener("click", () => {
+        if (button.dataset.view === "import") {
+          el.importModal.classList.add("open");
+          return;
+        }
+
+        state.view = button.dataset.view;
+        document.querySelectorAll(".nav-btn").forEach(btn =>
+          btn.classList.toggle("active", btn.dataset.view === state.view)
+        );
+        applyFilters();
+        window.scrollTo({ top: 0, behavior: "smooth" });
+      });
+    });
+
+    [el.searchInput, el.priceFilter, el.roomsFilter, el.sortFilter]
+      .forEach(control => control.addEventListener("input", applyFilters));
+
+    el.resetFiltersBtn.addEventListener("click", () => {
+      el.searchInput.value = "";
+      el.priceFilter.value = "";
+      el.roomsFilter.value = "";
+      el.sortFilter.value = "newest";
+      applyFilters();
+    });
+
+    el.fitMapBtn.addEventListener("click", fitMapToVisible);
+    el.closeImportBtn.addEventListener("click", () => el.importModal.classList.remove("open"));
+    el.importModal.addEventListener("click", event => {
+      if (event.target === el.importModal) el.importModal.classList.remove("open");
+    });
+    el.runImportBtn.addEventListener("click", importProperties);
+
+    el.sampleBtn.addEventListener("click", () => {
+      el.importText.value = JSON.stringify([
+        {
+          external_id: "sample-wilhalde-42",
+          source: "Beispiel",
+          title: "4.5-Zimmer-Wohnung Wilhalde 42",
+          location: "Othmarsingen",
+          address: "Wilhalde 42, 5504 Othmarsingen",
+          latitude: 47.4013,
+          longitude: 8.2136,
+          price_chf: 1040000,
+          rooms: 4.5,
+          living_area_m2: 119,
+          move_in: "April 2027",
+          listing_url: "https://example.com",
+          minergie: true,
+          building_right: false,
+          ai_rating: 9.1,
+          ai_recommendation_reason: "Sehr gutes Verhältnis aus Preis, Fläche und Energiestandard."
+        }
+      ], null, 2);
+    });
+
+    document.querySelectorAll(".profile-btn").forEach(btn =>
+      btn.classList.toggle("active", btn.dataset.profile === state.profile)
+    );
+
+    initMap();
+    loadData();
+  </script>
+</body>
+</html>
