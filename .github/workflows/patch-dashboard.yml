@@ -13,165 +13,172 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - name: Patch index.html safely
-        shell: python
+
+      - name: Patch index.html
         run: |
+          python3 <<'PY'
           from pathlib import Path
-          p = Path('index.html')
-          s = p.read_text(encoding='utf-8')
+          import re
 
-          def replace_once(old, new, label):
-              global s
-              if old not in s:
-                  raise SystemExit(f'Marker not found: {label}')
-              s = s.replace(old, new, 1)
+          path = Path('index.html')
+          text = path.read_text(encoding='utf-8')
 
-          replace_once(
-          '''    .card-actions {
-                display: grid;
-                grid-template-columns: minmax(0, 1fr) auto auto;
-                gap: 7px;
-                margin-top: 10px;
-              }''',
-          '''    .card-actions {
-                display: grid;
-                grid-template-columns: minmax(0, 1fr) auto auto auto;
-                gap: 7px;
-                margin-top: 10px;
-              }
+          def sub_once(pattern, replacement, label, flags=0):
+              global text
+              text, count = re.subn(pattern, replacement, text, count=1, flags=flags)
+              if count != 1:
+                  raise SystemExit(f'Patch failed at: {label} (matches: {count})')
 
-              .delete-btn {
-                min-width: 44px;
-                padding-inline: 11px;
-                border-color: #efc7cc;
-                background: #fff8f8;
-                color: var(--bad);
-              }
+          sub_once(
+              r'(\.card-actions\s*\{\s*display:\s*grid;\s*grid-template-columns:)\s*minmax\(0,\s*1fr\)\s+auto\s+auto;',
+              r'\1 minmax(0, 1fr) auto auto auto;',
+              'desktop card columns', re.S
+          )
 
-              .delete-btn:hover { background: var(--bad-soft); }''', 'card action css')
+          sub_once(
+              r'(\.status-select\s*\{\s*min-width:\s*0;\s*\})',
+              r'''\1
 
-          replace_once(
-          '''      .card-actions { grid-template-columns: 1fr 1fr; }
-                .card-actions .status-select { grid-column: 1 / -1; }''',
-          '''      .card-actions { grid-template-columns: 1fr 1fr 1fr; }
-                .card-actions .status-select { grid-column: 1 / -1; }
-                .card-actions .delete-btn { grid-column: auto; }''', 'mobile card action css')
+    .delete-btn {
+      min-width: 44px;
+      padding-inline: 11px;
+      border-color: #efc7cc;
+      background: #fff8f8;
+      color: var(--bad);
+    }
 
-          replace_once(
-          '''            ${listingLink}
-                    </div>''',
-          '''            ${listingLink}
+    .delete-btn:hover { background: var(--bad-soft); }''',
+              'delete css'
+          )
 
-                      <button class="secondary-btn delete-btn" type="button" data-action="delete-property" data-id="${property.id}" aria-label="Wohnung endgültig löschen" title="Wohnung endgültig löschen">🗑️</button>
-                    </div>''', 'property delete button')
+          text = text.replace(
+              '.card-actions { grid-template-columns: 1fr 1fr; }',
+              '.card-actions { grid-template-columns: 1fr 1fr 1fr; }',
+              1
+          )
 
-          replace_once(
-          '''            <button class="secondary-btn" type="button" data-action="locate" data-id="${project.id}">Karte</button>
-                      ${projectLink}${sourceLink}
-                    </div>''',
-          '''            <button class="secondary-btn" type="button" data-action="locate" data-id="${project.id}">Karte</button>
-                      ${projectLink}${sourceLink}
-                      <button class="secondary-btn delete-btn" type="button" data-action="delete-project" data-id="${project.id}" aria-label="Pipeline-Projekt endgültig löschen" title="Pipeline-Projekt endgültig löschen">🗑️</button>
-                    </div>''', 'pipeline delete button')
+          sub_once(
+              r'(\$\{listingLink\}\s*</div>)',
+              r'''${listingLink}
 
-          replace_once(
-          '''    function commuteHtml(property) {
-                const a = Number(property._drive_minutes_othmarsingen ?? property.drive_minutes_othmarsingen ?? property.othmarsingen_minutes);
-                const b = Number(property._drive_minutes_duebendorf ?? property.drive_minutes_duebendorf ?? property.duebendorf_minutes);''',
-          '''    function firstPositiveNumber(...values) {
-                for (const value of values) {
-                  if (value === null || value === undefined || value === "") continue;
-                  const number = Number(value);
-                  if (Number.isFinite(number) && number > 0) return Math.round(number);
-                }
-                return null;
-              }
+            <button class="secondary-btn delete-btn" type="button" data-action="delete-property" data-id="${property.id}" aria-label="Wohnung endgültig löschen" title="Wohnung endgültig löschen">🗑️</button>
+          </div>''',
+              'property delete button'
+          )
 
-              function commuteValues(item) {
-                return {
-                  othmarsingen: firstPositiveNumber(item._drive_minutes_othmarsingen, item.drive_minutes_othmarsingen, item.travel_time_othmarsingen_minutes, item.travel_minutes_othmarsingen, item.drive_time_othmarsingen_minutes, item.othmarsingen_minutes),
-                  duebendorf: firstPositiveNumber(item._drive_minutes_duebendorf, item.drive_minutes_duebendorf, item.travel_time_duebendorf_minutes, item.travel_minutes_duebendorf, item.drive_time_duebendorf_minutes, item.duebendorf_minutes)
-                };
-              }
+          sub_once(
+              r'(\$\{projectLink\}\$\{sourceLink\}\s*</div>)',
+              r'''${projectLink}${sourceLink}
+            <button class="secondary-btn delete-btn" type="button" data-action="delete-project" data-id="${project.id}" aria-label="Pipeline-Projekt endgültig löschen" title="Pipeline-Projekt endgültig löschen">🗑️</button>
+          </div>''',
+              'pipeline delete button'
+          )
 
-              function commuteHtml(property) {
-                const { othmarsingen: a, duebendorf: b } = commuteValues(property);''', 'commute aliases')
+          sub_once(
+              r'    function commuteHtml\(property\) \{\n      const a = Number\([^\n]+\);\n      const b = Number\([^\n]+\);',
+              '''    function firstPositiveNumber(...values) {
+      for (const value of values) {
+        if (value === null || value === undefined || value === "") continue;
+        const number = Number(value);
+        if (Number.isFinite(number) && number > 0) return Math.round(number);
+      }
+      return null;
+    }
 
-          replace_once(
-          '''        const importedA = Number(property.drive_minutes_othmarsingen ?? property.othmarsingen_minutes);
-                  const importedB = Number(property.drive_minutes_duebendorf ?? property.duebendorf_minutes);
-                  if (Number.isFinite(importedA) && importedA > 0 && Number.isFinite(importedB) && importedB > 0) {''',
-          '''        const { othmarsingen: importedA, duebendorf: importedB } = commuteValues(property);
-                  if (importedA && importedB) {''', 'commute calculation aliases')
+    function commuteValues(item) {
+      return {
+        othmarsingen: firstPositiveNumber(item._drive_minutes_othmarsingen, item.drive_minutes_othmarsingen, item.travel_time_othmarsingen_minutes, item.travel_minutes_othmarsingen, item.drive_time_othmarsingen_minutes, item.othmarsingen_minutes),
+        duebendorf: firstPositiveNumber(item._drive_minutes_duebendorf, item.drive_minutes_duebendorf, item.travel_time_duebendorf_minutes, item.travel_minutes_duebendorf, item.drive_time_duebendorf_minutes, item.duebendorf_minutes)
+      };
+    }
 
-          old_mapping = '''        drive_minutes_othmarsingen: item.drive_minutes_othmarsingen ?? item.othmarsingen_minutes ?? null,
-                  drive_minutes_duebendorf: item.drive_minutes_duebendorf ?? item.duebendorf_minutes ?? null,'''
-          new_mapping = '''        drive_minutes_othmarsingen: firstPositiveNumber(item.drive_minutes_othmarsingen, item.travel_time_othmarsingen_minutes, item.travel_minutes_othmarsingen, item.drive_time_othmarsingen_minutes, item.othmarsingen_minutes),
-                  drive_minutes_duebendorf: firstPositiveNumber(item.drive_minutes_duebendorf, item.travel_time_duebendorf_minutes, item.travel_minutes_duebendorf, item.drive_time_duebendorf_minutes, item.duebendorf_minutes),'''
-          if s.count(old_mapping) < 2:
-              raise SystemExit('Expected both property and pipeline drive mappings')
-          s = s.replace(old_mapping, new_mapping)
+    function commuteHtml(property) {
+      const { othmarsingen: a, duebendorf: b } = commuteValues(property);''',
+              'commute aliases'
+          )
 
-          replace_once(
-          '''    function slugify(value) {''',
-          '''    async function deleteProperty(propertyId) {
-                const property = state.properties.find(item => item.id === propertyId);
-                const label = property?.title || "diesen Eintrag";
-                if (!window.confirm(`„${label}“ wirklich endgültig löschen?\\n\\nBewertungen, Notizen und Favoriten werden ebenfalls entfernt.`)) return;
-                setLoading(true);
-                try {
-                  for (const table of ["property_votes", "property_notes", "property_favorites"]) {
-                    const { error } = await db.from(table).delete().eq("property_id", propertyId);
-                    if (error) throw error;
-                  }
-                  const { error } = await db.from("properties").delete().eq("id", propertyId);
-                  if (error) throw error;
-                  state.properties = state.properties.filter(item => item.id !== propertyId);
-                  state.votes = state.votes.filter(item => item.property_id !== propertyId);
-                  state.notes = state.notes.filter(item => item.property_id !== propertyId);
-                  state.favorites = state.favorites.filter(item => item.property_id !== propertyId);
-                  applyFilters();
-                  showToast("Wohnung endgültig gelöscht");
-                } finally { setLoading(false); }
-              }
+          sub_once(
+              r'        const importedA = Number\([^\n]+\);\n        const importedB = Number\([^\n]+\);\n        if \(Number\.isFinite\(importedA\) && importedA > 0 && Number\.isFinite\(importedB\) && importedB > 0\) \{',
+              '''        const { othmarsingen: importedA, duebendorf: importedB } = commuteValues(property);
+        if (importedA && importedB) {''',
+              'commute calculation'
+          )
 
-              async function deletePipelineProject(projectId) {
-                const project = state.pipelineProjects.find(item => item.id === projectId);
-                const label = project?.project_name || "dieses Pipeline-Projekt";
-                if (!window.confirm(`„${label}“ wirklich endgültig löschen?`)) return;
-                setLoading(true);
-                try {
-                  const { error } = await db.from("pipeline_projects").delete().eq("id", projectId);
-                  if (error) throw error;
-                  state.pipelineProjects = state.pipelineProjects.filter(item => item.id !== projectId);
-                  applyFilters();
-                  showToast("Pipeline-Projekt endgültig gelöscht");
-                } finally { setLoading(false); }
-              }
+          old = 'drive_minutes_othmarsingen: item.drive_minutes_othmarsingen ?? item.othmarsingen_minutes ?? null,\n        drive_minutes_duebendorf: item.drive_minutes_duebendorf ?? item.duebendorf_minutes ?? null,'
+          new = 'drive_minutes_othmarsingen: firstPositiveNumber(item.drive_minutes_othmarsingen, item.travel_time_othmarsingen_minutes, item.travel_minutes_othmarsingen, item.drive_time_othmarsingen_minutes, item.othmarsingen_minutes),\n        drive_minutes_duebendorf: firstPositiveNumber(item.drive_minutes_duebendorf, item.travel_time_duebendorf_minutes, item.travel_minutes_duebendorf, item.drive_time_duebendorf_minutes, item.duebendorf_minutes),'
+          count = text.count(old)
+          if count != 2:
+              raise SystemExit(f'Patch failed at import mappings (matches: {count})')
+          text = text.replace(old, new)
 
-              function slugify(value) {''', 'delete functions')
+          sub_once(
+              r'    function slugify\(value\) \{',
+              '''    async function deleteProperty(propertyId) {
+      const property = state.properties.find(item => item.id === propertyId);
+      const label = property?.title || "diesen Eintrag";
+      if (!window.confirm(`„${label}“ wirklich endgültig löschen?\\n\\nBewertungen, Notizen und Favoriten werden ebenfalls entfernt.`)) return;
 
-          replace_once(
-          '''        } else if (action === "locate") {
-                  focusItem(propertyId);
-                  window.scrollTo({ top: 0, behavior: "smooth" });
-                }''',
-          '''        } else if (action === "locate") {
-                  focusItem(propertyId);
-                  window.scrollTo({ top: 0, behavior: "smooth" });
-                } else if (action === "delete-property") {
-                  await deleteProperty(propertyId);
-                } else if (action === "delete-project") {
-                  await deletePipelineProject(propertyId);
-                }''', 'delete event actions')
+      setLoading(true);
+      try {
+        for (const table of ["property_votes", "property_notes", "property_favorites"]) {
+          const { error } = await db.from(table).delete().eq("property_id", propertyId);
+          if (error) throw error;
+        }
+        const { error } = await db.from("properties").delete().eq("id", propertyId);
+        if (error) throw error;
 
-          p.write_text(s, encoding='utf-8')
-      - name: Commit patched dashboard
+        state.properties = state.properties.filter(item => item.id !== propertyId);
+        state.votes = state.votes.filter(item => item.property_id !== propertyId);
+        state.notes = state.notes.filter(item => item.property_id !== propertyId);
+        state.favorites = state.favorites.filter(item => item.property_id !== propertyId);
+        applyFilters();
+        showToast("Wohnung endgültig gelöscht");
+      } finally {
+        setLoading(false);
+      }
+    }
+
+    async function deletePipelineProject(projectId) {
+      const project = state.pipelineProjects.find(item => item.id === projectId);
+      const label = project?.project_name || "dieses Pipeline-Projekt";
+      if (!window.confirm(`„${label}“ wirklich endgültig löschen?`)) return;
+
+      setLoading(true);
+      try {
+        const { error } = await db.from("pipeline_projects").delete().eq("id", projectId);
+        if (error) throw error;
+        state.pipelineProjects = state.pipelineProjects.filter(item => item.id !== projectId);
+        applyFilters();
+        showToast("Pipeline-Projekt endgültig gelöscht");
+      } finally {
+        setLoading(false);
+      }
+    }
+
+    function slugify(value) {''',
+              'delete functions'
+          )
+
+          sub_once(
+              r'(        \} else if \(action === "locate"\) \{\n          focusItem\(propertyId\);\n          window\.scrollTo\(\{ top: 0, behavior: "smooth" \}\);\n        \})',
+              r'''\1 else if (action === "delete-property") {
+          await deleteProperty(propertyId);
+        } else if (action === "delete-project") {
+          await deletePipelineProject(propertyId);
+        }''',
+              'delete click handlers'
+          )
+
+          path.write_text(text, encoding='utf-8')
+          PY
+
+      - name: Validate and commit
         run: |
+          git diff --check
+          grep -q 'data-action="delete-property"' index.html
+          grep -q 'function commuteValues' index.html
           git config user.name "ChatGPT Dashboard Bot"
           git config user.email "actions@users.noreply.github.com"
           git add index.html
-          git commit -m "Fix distance field handling and add delete actions"
+          git commit -m "Fix distance handling and add delete actions"
           git push
-
-# Triggered after initial workflow registration
