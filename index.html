@@ -426,7 +426,7 @@
       width: min(680px, 100%);
       padding: 8px 10px calc(8px + var(--safe-bottom));
       display: grid;
-      grid-template-columns: repeat(4, 1fr);
+      grid-template-columns: repeat(5, 1fr);
       gap: 5px;
       background: rgba(255,255,255,.94);
       border-top: 1px solid var(--line);
@@ -619,6 +619,67 @@
     .map-shell.no-points #map { min-height:180px; height:180px; }
     .map-shell.no-points .map-empty { display:block; }
 
+
+
+    /* Dezente Emoji-Klickanimation */
+    .emoji-pop {
+      display: inline-block;
+      transform-origin: 50% 65%;
+      animation: emojiWiggle .9s cubic-bezier(.2,.85,.25,1);
+      will-change: transform, filter;
+    }
+    @keyframes emojiWiggle {
+      0%   { transform: translateY(0) scale(1) rotate(0); filter: none; }
+      18%  { transform: translateY(-3px) scale(1.13) rotate(-4deg); filter: drop-shadow(0 5px 5px rgba(183,132,167,.24)); }
+      34%  { transform: translateY(-2px) scale(1.10) rotate(4deg); }
+      50%  { transform: translateY(-2px) scale(1.11) rotate(-3deg); }
+      66%  { transform: translateY(-1px) scale(1.07) rotate(2deg); }
+      82%  { transform: translateY(0) scale(1.03) rotate(-1deg); }
+      100% { transform: translateY(0) scale(1) rotate(0); filter: none; }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      .emoji-pop { animation: none; }
+    }
+
+    .pipeline-card {
+      background: rgba(255,253,253,.96);
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      padding: 15px;
+      box-shadow: 0 5px 18px rgba(19,31,54,.05);
+      min-width: 0;
+    }
+    .pipeline-card .pipeline-status {
+      display:inline-flex;
+      align-items:center;
+      gap:6px;
+      padding:6px 9px;
+      border-radius:999px;
+      background:var(--lavender);
+      color:#6f5b86;
+      font-size:12px;
+      font-weight:850;
+      white-space:nowrap;
+    }
+    .pipeline-meta {
+      display:grid;
+      grid-template-columns:repeat(2,minmax(0,1fr));
+      gap:8px;
+      margin:12px 0;
+    }
+    .pipeline-meta > div {
+      padding:10px;
+      border-radius:13px;
+      background:var(--surface-2);
+      min-width:0;
+    }
+    .pipeline-meta small { display:block; color:var(--muted); margin-bottom:3px; }
+    .pipeline-meta strong { display:block; overflow-wrap:anywhere; }
+    .pipeline-description { color:var(--text); line-height:1.48; font-size:14px; }
+    .project-links { display:flex; flex-wrap:wrap; gap:8px; margin-top:12px; }
+    .source-line { margin-top:10px; color:var(--muted); font-size:12px; }
+    .pipeline-badge { background:var(--blue); color:#56738d; }
+
     .person-vote.locked, .note-wrap.locked { opacity: .56; }
     .person-vote.locked .vote-btn, .note-wrap.locked textarea { cursor: not-allowed; pointer-events:none; }
     .person-vote.locked .vote-buttons, .note-wrap.locked textarea { user-select:none; }
@@ -690,6 +751,7 @@
   <nav class="bottom-nav" aria-label="Hauptnavigation">
     <button class="nav-btn active" data-view="main" type="button"><span>🏠</span><span>Alle</span></button>
     <button class="nav-btn" data-view="favorites" type="button"><span>⭐</span><span>Favoriten</span></button>
+    <button class="nav-btn" data-view="pipeline" type="button"><span>🏗️</span><span>Pipeline</span></button>
     <button class="nav-btn" data-view="archive" type="button"><span>🗂️</span><span>Archiv</span></button>
     <button class="nav-btn" data-view="import" type="button"><span>📥</span><span>Import</span></button>
   </nav>
@@ -717,7 +779,8 @@
         <button id="closeImportBtn" class="icon-btn" type="button" aria-label="Schliessen">✕</button>
       </div>
 
-      <textarea id="importText" class="import-text" spellcheck="false" placeholder='[
+      <textarea id="importText" class="import-text" spellcheck="false" placeholder='{
+  "properties": [
   {
     "external_id": "homegate-123",
     "source": "Homegate",
@@ -738,7 +801,9 @@
     "ai_rating": 9.1,
     "ai_recommendation_reason": "Sehr gutes Preis-Flächen-Verhältnis."
   }
-]'></textarea>
+  ],
+  "pipeline_projects": []
+}'></textarea>
 
       <div class="modal-actions">
         <button id="sampleBtn" class="secondary-btn" type="button">Beispiel einsetzen</button>
@@ -772,6 +837,7 @@
       profile: ["luca", "gessi"].includes(storedProfile) ? storedProfile : null,
       view: "main",
       properties: [],
+      pipelineProjects: [],
       votes: [],
       notes: [],
       favorites: [],
@@ -922,52 +988,44 @@
       state.markerLayer.clearLayers();
       state.markers.clear();
 
-      const propertiesWithCoordinates = state.filtered
-        .map(property => ({ property, coordinates: coordinatesFor(property) }))
-        .filter(item => item.coordinates);
+      const itemsWithCoordinates = state.filtered
+        .map(item => ({ item, coordinates: coordinatesFor(item) }))
+        .filter(entry => entry.coordinates);
 
-      for (const item of propertiesWithCoordinates) {
-        const property = item.property;
-        const marker = L.marker(item.coordinates);
-        const lucaVote = getVote(property.id, "luca");
-        const gessiVote = getVote(property.id, "gessi");
+      for (const entry of itemsWithCoordinates) {
+        const item = entry.item;
+        const isProject = state.view === "pipeline" || item._item_type === "pipeline";
+        const marker = L.marker(entry.coordinates);
+
+        const popupMeta = isProject
+          ? `${escapeHtml(item.municipality || item.location || item.address || "Ort offen")}<br>${escapeHtml(item.project_status || "Status offen")} · ${escapeHtml(item.expected_move_in || "Bezug offen")}`
+          : `${escapeHtml(item.location || item.address || "")}<br>${escapeHtml(formatPrice(item.price_chf))} · ${item.rooms ?? "–"} Zi. · ${item.living_area_m2 ?? "–"} m²<br>Luca ${getVote(item.id, "luca") === 1 ? "👍" : getVote(item.id, "luca") === -1 ? "👎" : "–"} · Gessi ${getVote(item.id, "gessi") === 1 ? "👍" : getVote(item.id, "gessi") === -1 ? "👎" : "–"}`;
 
         marker.bindPopup(`
-          <div class="popup-title">${escapeHtml(property.title)}</div>
-          <div class="popup-meta">
-            ${escapeHtml(property.location || property.address || "")}<br>
-            ${escapeHtml(formatPrice(property.price_chf))} ·
-            ${property.rooms ?? "–"} Zi. ·
-            ${property.living_area_m2 ?? "–"} m²<br>
-            Luca ${lucaVote === 1 ? "👍" : lucaVote === -1 ? "👎" : "–"}
-            · Gessi ${gessiVote === 1 ? "👍" : gessiVote === -1 ? "👎" : "–"}
-          </div>
-          <button class="popup-btn" type="button" data-scroll-property="${property.id}">
-            Wohnung anzeigen
+          <div class="popup-title">${escapeHtml(isProject ? item.project_name : item.title)}</div>
+          <div class="popup-meta">${popupMeta}</div>
+          <button class="popup-btn" type="button" data-scroll-item="${item.id}">
+            ${isProject ? "Projekt anzeigen" : "Wohnung anzeigen"}
           </button>
         `);
 
         marker.on("popupopen", () => {
           setTimeout(() => {
-            document.querySelector(`[data-scroll-property="${property.id}"]`)
-              ?.addEventListener("click", () => focusProperty(property.id));
+            document.querySelector(`[data-scroll-item="${item.id}"]`)
+              ?.addEventListener("click", () => focusItem(item.id));
           }, 0);
         });
 
         marker.addTo(state.markerLayer);
-        state.markers.set(property.id, marker);
+        state.markers.set(item.id, marker);
       }
 
-      el.mapCaption.textContent =
-        `${propertiesWithCoordinates.length} von ${state.filtered.length} Wohnungen auf der Karte`;
+      const noun = state.view === "pipeline" ? "Projekte" : "Wohnungen";
+      el.mapCaption.textContent = `${itemsWithCoordinates.length} von ${state.filtered.length} ${noun} auf der Karte`;
+      document.querySelector(".map-shell")?.classList.toggle("no-points", itemsWithCoordinates.length === 0);
 
-      document.querySelector(".map-shell")?.classList.toggle("no-points", propertiesWithCoordinates.length === 0);
-
-      if (propertiesWithCoordinates.length > 0) {
-        fitMapToVisible();
-      } else {
-        state.map.setView([47.39, 8.43], 10);
-      }
+      if (itemsWithCoordinates.length > 0) fitMapToVisible();
+      else state.map.setView([47.39, 8.43], 10);
 
       setTimeout(() => state.map.invalidateSize(), 50);
     }
@@ -986,7 +1044,7 @@
       state.map.fitBounds(group.getBounds().pad(0.17));
     }
 
-    function focusProperty(propertyId) {
+    function focusItem(propertyId) {
       const card = document.getElementById(`property-${propertyId}`);
       if (card) {
         card.scrollIntoView({ behavior: "smooth", block: "center" });
@@ -1005,39 +1063,54 @@
       const query = el.searchInput.value.trim().toLowerCase();
       const maxPrice = Number(el.priceFilter.value || 0);
       const minRooms = Number(el.roomsFilter.value || 0);
+      const isPipeline = state.view === "pipeline";
 
-      let items = state.properties.filter(property => {
-        if (state.view === "main" && property.is_archived) return false;
-        if (state.view === "archive" && !property.is_archived) return false;
-        if (state.view === "favorites" && (property.is_archived || !isFavoriteByAnyone(property.id))) return false;
+      const sourceItems = isPipeline
+        ? state.pipelineProjects.map(project => ({ ...project, _item_type: "pipeline" }))
+        : state.properties;
 
-        const haystack = [
-          property.title,
-          property.location,
-          property.address,
-          property.municipality,
-          property.canton
-        ].filter(Boolean).join(" ").toLowerCase();
+      let items = sourceItems.filter(item => {
+        if (!isPipeline) {
+          if (state.view === "main" && item.is_archived) return false;
+          if (state.view === "archive" && !item.is_archived) return false;
+          if (state.view === "favorites" && (item.is_archived || !isFavoriteByAnyone(item.id))) return false;
+        } else if (item.is_archived) {
+          return false;
+        }
 
-        if (query && !haystack.includes(query)) return false;
-        if (maxPrice && Number(property.price_chf || Infinity) > maxPrice) return false;
-        if (minRooms && Number(property.rooms || 0) < minRooms) return false;
+        const haystack = isPipeline
+          ? [item.project_name, item.description, item.municipality, item.address, item.developer, item.marketer, item.project_status]
+          : [item.title, item.location, item.address, item.municipality, item.canton];
+
+        if (query && !haystack.filter(Boolean).join(" ").toLowerCase().includes(query)) return false;
+
+        if (isPipeline) {
+          const projectPrice = Number(item.estimated_price_from_chf || item.estimated_price_to_chf || 0);
+          const roomsText = String(item.expected_rooms || "");
+          const roomValues = (roomsText.match(/\d+(?:[.,]\d+)?/g) || []).map(v => Number(v.replace(",", ".")));
+          const maxExpectedRooms = roomValues.length ? Math.max(...roomValues) : 0;
+          if (maxPrice && projectPrice && projectPrice > maxPrice) return false;
+          if (minRooms && maxExpectedRooms && maxExpectedRooms < minRooms) return false;
+        } else {
+          if (maxPrice && Number(item.price_chf || Infinity) > maxPrice) return false;
+          if (minRooms && Number(item.rooms || 0) < minRooms) return false;
+        }
 
         return true;
       });
 
       switch (el.sortFilter.value) {
         case "priceAsc":
-          items.sort((a, b) => Number(a.price_chf || Infinity) - Number(b.price_chf || Infinity));
+          items.sort((a, b) => Number((isPipeline ? a.estimated_price_from_chf : a.price_chf) || Infinity) - Number((isPipeline ? b.estimated_price_from_chf : b.price_chf) || Infinity));
           break;
         case "priceDesc":
-          items.sort((a, b) => Number(b.price_chf || 0) - Number(a.price_chf || 0));
+          items.sort((a, b) => Number((isPipeline ? b.estimated_price_to_chf : b.price_chf) || 0) - Number((isPipeline ? a.estimated_price_to_chf : a.price_chf) || 0));
           break;
         case "ratingDesc":
           items.sort((a, b) => Number(b.ai_rating || 0) - Number(a.ai_rating || 0));
           break;
         default:
-          items.sort((a, b) => new Date(b.imported_at || b.created_at) - new Date(a.imported_at || a.created_at));
+          items.sort((a, b) => new Date(b.imported_at || b.updated_at || b.created_at || 0) - new Date(a.imported_at || a.updated_at || a.created_at || 0));
       }
 
       state.filtered = items;
@@ -1052,6 +1125,7 @@
       const titles = {
         main: "Alle Wohnungen",
         favorites: "Favoriten von Luca & Gessi",
+        pipeline: "Projekt-Pipeline",
         archive: "Archiv"
       };
 
@@ -1060,15 +1134,28 @@
     }
 
     function renderSummary() {
+      if (state.view === "pipeline") {
+        const priced = state.filtered.map(p => Number(p.estimated_price_from_chf)).filter(Number.isFinite).filter(v => v > 0);
+        const avg = priced.length ? priced.reduce((a,b) => a+b,0) / priced.length : null;
+        el.metricVisible.textContent = state.filtered.length;
+        el.metricBothLike.textContent = state.filtered.filter(p => /bewilligt|approved/i.test(String(p.project_status || ""))).length;
+        el.metricFavorites.textContent = state.filtered.filter(p => /vermarkt|marketing|reservation|verkauf/i.test(String(p.project_status || ""))).length;
+        el.metricAvgPrice.textContent = avg ? `${Math.round(avg / 1000).toLocaleString("de-CH")}k` : "–";
+        el.metricBothLike.nextElementSibling.textContent = "bewilligt";
+        el.metricFavorites.nextElementSibling.textContent = "nahe Vermarktung";
+        el.metricAvgPrice.nextElementSibling.textContent = "Ø ab Preis";
+        return;
+      }
+
+      el.metricBothLike.nextElementSibling.textContent = "beide 👍";
+      el.metricFavorites.nextElementSibling.textContent = "Favoriten";
+      el.metricAvgPrice.nextElementSibling.textContent = "Ø Preis";
       const prices = state.filtered.map(p => Number(p.price_chf)).filter(Number.isFinite);
       const avg = prices.length ? prices.reduce((a, b) => a + b, 0) / prices.length : null;
-
       el.metricVisible.textContent = state.filtered.length;
       el.metricBothLike.textContent = state.filtered.filter(p => isLikedByBoth(p.id)).length;
       el.metricFavorites.textContent = state.filtered.filter(p => isFavoriteByAnyone(p.id)).length;
-      el.metricAvgPrice.textContent = avg
-        ? `${Math.round(avg / 1000).toLocaleString("de-CH")}k`
-        : "–";
+      el.metricAvgPrice.textContent = avg ? `${Math.round(avg / 1000).toLocaleString("de-CH")}k` : "–";
     }
 
     function propertyCardHtml(property) {
@@ -1187,6 +1274,66 @@
       `;
     }
 
+    function formatRange(from, to, formatter = value => value) {
+      const a = from !== null && from !== undefined && from !== "" ? formatter(from) : null;
+      const b = to !== null && to !== undefined && to !== "" ? formatter(to) : null;
+      if (a && b && a !== b) return `${a} – ${b}`;
+      return a || b || "offen";
+    }
+
+    function pipelineCardHtml(project) {
+      const sourceUrl = project.source_url || null;
+      const projectUrl = project.project_url || null;
+      const aiText = project.ai_recommendation_reason || project.ai_summary || "Noch keine KI-Einschätzung.";
+      const aiRating = project.ai_rating !== null && project.ai_rating !== undefined ? `${Number(project.ai_rating).toFixed(1)}/10` : "offen";
+      const priceRange = formatRange(project.estimated_price_from_chf, project.estimated_price_to_chf, formatPrice);
+      const areaRange = formatRange(project.expected_living_area_from_m2, project.expected_living_area_to_m2, v => `${v} m²`);
+      const projectLink = projectUrl ? `<a class="link-btn" href="${escapeHtml(projectUrl)}" target="_blank" rel="noopener noreferrer">Projektseite ↗</a>` : "";
+      const sourceLink = sourceUrl && sourceUrl !== projectUrl ? `<a class="link-btn" href="${escapeHtml(sourceUrl)}" target="_blank" rel="noopener noreferrer">Quelle ↗</a>` : "";
+
+      return `
+        <article class="pipeline-card" id="property-${project.id}">
+          <div class="card-top">
+            <div>
+              <h3 class="card-title">${escapeHtml(project.project_name || "Projekt ohne Namen")}</h3>
+              <div class="location">${escapeHtml(project.municipality || project.address || "Ort offen")}</div>
+            </div>
+            <span class="pipeline-status">🏗️ ${escapeHtml(project.project_status || "Status offen")}</span>
+          </div>
+
+          ${project.status_details ? `<div class="ai-box"><strong>Statusdetails</strong>${escapeHtml(project.status_details)}</div>` : ""}
+          ${project.description ? `<p class="pipeline-description">${escapeHtml(project.description)}</p>` : ""}
+
+          <div class="facts">
+            ${project.property_type ? `<span class="chip pipeline-badge">${escapeHtml(project.property_type)}</span>` : ""}
+            ${project.expected_units ? `<span class="chip">ca. ${escapeHtml(project.expected_units)} Einheiten</span>` : ""}
+            ${project.expected_rooms ? `<span class="chip">${escapeHtml(project.expected_rooms)} Zimmer</span>` : ""}
+            ${project.minergie === true ? '<span class="chip good">Minergie</span>' : ""}
+            ${project.energy_standard ? `<span class="chip good">${escapeHtml(project.energy_standard)}</span>` : ""}
+            ${project.building_right ? '<span class="chip warn">Baurecht</span>' : ""}
+          </div>
+
+          <div class="pipeline-meta">
+            <div><small>Preisrahmen</small><strong>${escapeHtml(priceRange)}</strong></div>
+            <div><small>Wohnfläche</small><strong>${escapeHtml(areaRange)}</strong></div>
+            <div><small>Vermarktungsstart</small><strong>${escapeHtml(project.expected_marketing_start || "offen")}</strong></div>
+            <div><small>Bezug</small><strong>${escapeHtml(project.expected_move_in || "offen")}</strong></div>
+            <div><small>Entwickler</small><strong>${escapeHtml(project.developer || "offen")}</strong></div>
+            <div><small>Vermarktung</small><strong>${escapeHtml(project.marketer || "offen")}</strong></div>
+          </div>
+
+          <div class="ai-box"><strong>KI-Bewertung: ${escapeHtml(aiRating)}</strong>${escapeHtml(aiText)}</div>
+
+          ${commuteHtml(project)}
+
+          <div class="project-links">
+            <button class="secondary-btn" type="button" data-action="locate" data-id="${project.id}">Karte</button>
+            ${projectLink}${sourceLink}
+          </div>
+          <div class="source-line">Quelle: ${escapeHtml(project.source || "nicht angegeben")} · Importiert: ${escapeHtml(formatDate(project.imported_at || project.created_at))}</div>
+        </article>`;
+    }
+
     function commuteHtml(property) {
       const a = Number(property._drive_minutes_othmarsingen ?? property.drive_minutes_othmarsingen ?? property.othmarsingen_minutes);
       const b = Number(property._drive_minutes_duebendorf ?? property.drive_minutes_duebendorf ?? property.duebendorf_minutes);
@@ -1252,7 +1399,7 @@
     }
 
     async function calculateCommutes() {
-      const jobs = state.properties.map(async property => {
+      const jobs = [...state.properties, ...state.pipelineProjects].map(async property => {
         const coordinates = coordinatesFor(property);
         if (!coordinates) return;
 
@@ -1294,20 +1441,17 @@
         return;
       }
 
-      el.propertyList.innerHTML = state.filtered.map(propertyCardHtml).join("");
+      el.propertyList.innerHTML = state.filtered
+        .map(item => state.view === "pipeline" ? pipelineCardHtml(item) : propertyCardHtml(item))
+        .join("");
     }
 
     async function loadData() {
       setLoading(true);
-
       try {
-        const [
-          propertiesResult,
-          votesResult,
-          notesResult,
-          favoritesResult
-        ] = await Promise.all([
+        const [propertiesResult, pipelineResult, votesResult, notesResult, favoritesResult] = await Promise.all([
           db.from("properties").select("*"),
+          db.from("pipeline_projects").select("*"),
           db.from("property_votes").select("*"),
           db.from("property_notes").select("*"),
           db.from("property_favorites").select("*")
@@ -1318,6 +1462,8 @@
         }
 
         state.properties = propertiesResult.data || [];
+        state.pipelineProjects = pipelineResult.error ? [] : (pipelineResult.data || []);
+        if (pipelineResult.error) console.warn("Pipeline-Tabelle noch nicht verfügbar:", pipelineResult.error.message);
         state.votes = votesResult.data || [];
         state.notes = notesResult.data || [];
         state.favorites = favoritesResult.data || [];
@@ -1482,53 +1628,112 @@
       };
     }
 
+    function normalizePipelineItem(item) {
+      const sourceUrl = item.source_url || item.url || item.link || null;
+      const projectUrl = item.project_url || null;
+      const externalId = item.external_id || item.source_project_id || (projectUrl ? `url-${slugify(projectUrl)}` : `project-${slugify(`${item.project_name}-${item.municipality}-${item.address}`)}`);
+      return {
+        external_id: externalId,
+        source: item.source || null,
+        source_project_id: item.source_project_id || null,
+        source_url: sourceUrl,
+        project_url: projectUrl,
+        project_name: item.project_name || item.title || "Projekt ohne Namen",
+        description: item.description || null,
+        municipality: item.municipality || item.location || null,
+        canton: item.canton || null,
+        postal_code: item.postal_code ? String(item.postal_code) : null,
+        address: item.address || null,
+        latitude: item.latitude ?? item.lat ?? null,
+        longitude: item.longitude ?? item.lng ?? item.lon ?? null,
+        developer: item.developer || null,
+        marketer: item.marketer || null,
+        architect: item.architect || null,
+        project_status: item.project_status || "unknown",
+        status_details: item.status_details || null,
+        property_type: item.property_type || null,
+        expected_units: item.expected_units ?? null,
+        expected_rooms: item.expected_rooms || null,
+        expected_living_area_from_m2: item.expected_living_area_from_m2 ?? null,
+        expected_living_area_to_m2: item.expected_living_area_to_m2 ?? null,
+        estimated_price_from_chf: item.estimated_price_from_chf ?? null,
+        estimated_price_to_chf: item.estimated_price_to_chf ?? null,
+        expected_marketing_start: item.expected_marketing_start || null,
+        expected_construction_start: item.expected_construction_start || null,
+        expected_move_in: item.expected_move_in || null,
+        minergie: item.minergie ?? null,
+        minergie_details: item.minergie_details || null,
+        energy_standard: item.energy_standard || null,
+        building_right: Boolean(item.building_right ?? false),
+        building_right_details: item.building_right_details || null,
+        ai_rating: item.ai_rating ?? null,
+        ai_summary: item.ai_summary || null,
+        ai_recommendation_reason: item.ai_recommendation_reason || null,
+        advantages: Array.isArray(item.advantages) ? item.advantages : null,
+        disadvantages: Array.isArray(item.disadvantages) ? item.disadvantages : null,
+        is_archived: false,
+        last_seen_at: new Date().toISOString(),
+        imported_at: new Date().toISOString()
+      };
+    }
+
     async function importProperties() {
       let parsed;
+      try { parsed = JSON.parse(el.importText.value.trim()); }
+      catch { showToast("Der eingefügte Text ist kein gültiges JSON.", true); return; }
 
-      try {
-        parsed = JSON.parse(el.importText.value.trim());
-      } catch {
-        showToast("Der eingefügte Text ist kein gültiges JSON.", true);
+      const rawProperties = Array.isArray(parsed) ? parsed : (Array.isArray(parsed.properties) ? parsed.properties : []);
+      const rawProjects = !Array.isArray(parsed) && Array.isArray(parsed.pipeline_projects) ? parsed.pipeline_projects : [];
+      if (!rawProperties.length && !rawProjects.length) {
+        showToast("Keine Wohnungen oder Pipeline-Projekte im JSON gefunden.", true);
         return;
       }
 
-      const rawItems = Array.isArray(parsed)
-        ? parsed
-        : Array.isArray(parsed.properties)
-          ? parsed.properties
-          : [];
-
-      if (!rawItems.length) {
-        showToast("Keine Wohnungen im JSON gefunden.", true);
-        return;
-      }
-
-      const items = rawItems.map(normalizeImportItem);
+      const properties = rawProperties.map(normalizeImportItem);
+      const projects = rawProjects.map(normalizePipelineItem);
       setLoading(true);
 
       try {
-        const { error } = await db
-          .from("properties")
-          .upsert(items, { onConflict: "external_id" });
+        if (properties.length) {
+          const ids = properties.map(x => x.external_id);
+          const { data: existingRows, error: existingError } = await db.from("properties").select("external_id,status,is_archived").in("external_id", ids);
+          if (existingError) throw existingError;
+          const existingMap = new Map((existingRows || []).map(row => [row.external_id, row]));
+          const safeProperties = properties.map(item => {
+            const old = existingMap.get(item.external_id);
+            return old ? { ...item, status: old.status, is_archived: old.is_archived } : { ...item, is_archived: false };
+          });
+          const { error } = await db.from("properties").upsert(safeProperties, { onConflict: "external_id" });
+          if (error) throw error;
+        }
 
-        if (error) throw error;
+        if (projects.length) {
+          const ids = projects.map(x => x.external_id);
+          const { data: existingRows, error: existingError } = await db.from("pipeline_projects").select("external_id,is_archived").in("external_id", ids);
+          if (existingError) throw existingError;
+          const existingMap = new Map((existingRows || []).map(row => [row.external_id, row]));
+          const safeProjects = projects.map(item => {
+            const old = existingMap.get(item.external_id);
+            return old ? { ...item, is_archived: old.is_archived } : { ...item, is_archived: false };
+          });
+          const { error } = await db.from("pipeline_projects").upsert(safeProjects, { onConflict: "external_id" });
+          if (error) throw error;
+        }
 
         await db.from("import_logs").insert({
           imported_by: state.profile,
-          new_properties: items.length,
-          import_note: "Import über GitHub-Pages-App"
+          new_properties: properties.length,
+          import_note: `${properties.length} Wohnungen und ${projects.length} Pipeline-Projekte importiert`
         });
 
         el.importModal.classList.remove("open");
         el.importText.value = "";
-        showToast(`${items.length} Wohnung(en) importiert`);
+        showToast(`${properties.length} Wohnung(en), ${projects.length} Projekt(e) importiert`);
         await loadData();
       } catch (error) {
         console.error(error);
         showToast(`Import fehlgeschlagen: ${error.message}`, true);
-      } finally {
-        setLoading(false);
-      }
+      } finally { setLoading(false); }
     }
 
     let noteTimer;
@@ -1561,6 +1766,7 @@
 
       const action = target.dataset.action;
       const propertyId = target.dataset.id;
+      if (["favorite", "vote", "locate"].includes(action)) animateEmoji(target);
 
       try {
         if (action === "vote") {
@@ -1568,7 +1774,7 @@
         } else if (action === "favorite") {
           await saveFavorite(propertyId);
         } else if (action === "locate") {
-          focusProperty(propertyId);
+          focusItem(propertyId);
           window.scrollTo({ top: 0, behavior: "smooth" });
         }
       } catch (error) {
@@ -1623,8 +1829,18 @@
       button.addEventListener("click", () => selectProfile(button.dataset.profile));
     });
 
+    function animateEmoji(button) {
+      const emoji = button?.querySelector("span:first-child") || button;
+      if (!emoji) return;
+      emoji.classList.remove("emoji-pop");
+      void emoji.offsetWidth;
+      emoji.classList.add("emoji-pop");
+      setTimeout(() => emoji.classList.remove("emoji-pop"), 950);
+    }
+
     document.querySelectorAll(".nav-btn").forEach(button => {
       button.addEventListener("click", () => {
+        animateEmoji(button);
         if (button.dataset.view === "import") {
           el.importModal.classList.add("open");
           return;
@@ -1658,8 +1874,8 @@
     el.runImportBtn.addEventListener("click", importProperties);
 
     el.sampleBtn.addEventListener("click", () => {
-      el.importText.value = JSON.stringify([
-        {
+      el.importText.value = JSON.stringify({
+        properties: [{
           external_id: "sample-wilhalde-42",
           source: "Beispiel",
           title: "4.5-Zimmer-Wohnung Wilhalde 42",
@@ -1678,8 +1894,30 @@
           drive_minutes_duebendorf: 22,
           ai_rating: 9.1,
           ai_recommendation_reason: "Sehr gutes Verhältnis aus Preis, Fläche und Energiestandard."
-        }
-      ], null, 2);
+        }],
+        pipeline_projects: [{
+          external_id: "sample-projekt-neuenhof",
+          source: "Beispiel",
+          source_url: "https://example.com/quelle",
+          project_url: "https://example.com/projekt",
+          project_name: "Wohnprojekt am Limmatbogen",
+          description: "Geplantes Eigentumsprojekt mit voraussichtlichem Bezug ab 2027.",
+          municipality: "Neuenhof",
+          canton: "AG",
+          latitude: 47.4494,
+          longitude: 8.3266,
+          developer: "Beispiel Entwicklerin AG",
+          project_status: "bewilligt",
+          expected_units: 24,
+          expected_rooms: "3.5 bis 5.5",
+          estimated_price_from_chf: 1050000,
+          expected_marketing_start: "Herbst 2026",
+          expected_move_in: "2028",
+          minergie: true,
+          ai_rating: 8.6,
+          ai_recommendation_reason: "Gute Mittellage und passender Zeithorizont."
+        }]
+      }, null, 2);
     });
 
     // Bereits gewähltes Profil auf diesem Gerät merken. Nur beim ersten
