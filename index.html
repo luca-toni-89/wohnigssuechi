@@ -1178,20 +1178,21 @@
     }
 
     function commuteHtml(property) {
-      const a = Number(property.drive_minutes_othmarsingen ?? property.othmarsingen_minutes);
-      const b = Number(property.drive_minutes_duebendorf ?? property.duebendorf_minutes);
+      const a = Number(property._drive_minutes_othmarsingen ?? property.drive_minutes_othmarsingen ?? property.othmarsingen_minutes);
+      const b = Number(property._drive_minutes_duebendorf ?? property.drive_minutes_duebendorf ?? property.duebendorf_minutes);
       const validA = Number.isFinite(a) && a > 0;
       const validB = Number.isFinite(b) && b > 0;
+      const pendingText = property._route_failed ? "nicht verfügbar" : "wird berechnet …";
       const ratio = validA && validB ? Math.max(8, Math.min(92, (a / (a + b)) * 100)) : 50;
       return `
         <div class="commute-box">
           <div class="commute-labels"><span>Othmarsingen</span><span>Dübendorf</span></div>
           <div class="commute-track">
             <div class="commute-line"></div>
-            <span class="commute-middle" style="left:${ratio}%">Mitte</span>
+            <span class="commute-middle" style="left:${ratio}%">WOHNUNG</span>
             <span class="commute-dot" style="left:${ratio}%"></span>
           </div>
-          <div class="commute-times"><span>${validA ? `${a} Min.` : "Fahrzeit offen"}</span><span>${validB ? `${b} Min.` : "Fahrzeit offen"}</span></div>
+          <div class="commute-times"><span>${validA ? `${a} Min.` : pendingText}</span><span>${validB ? `${b} Min.` : pendingText}</span></div>
         </div>`;
     }
 
@@ -1220,6 +1221,53 @@
           </div>
         </div>
       `;
+    }
+
+    const ROUTE_DESTINATIONS = {
+      othmarsingen: [47.4014, 8.2136],
+      duebendorf: [47.3971, 8.6187]
+    };
+
+    async function routeMinutes(from, to) {
+      const url = `https://router.project-osrm.org/route/v1/driving/${from[1]},${from[0]};${to[1]},${to[0]}?overview=false&alternatives=false&steps=false`;
+      const response = await fetch(url);
+      if (!response.ok) throw new Error(`Routing ${response.status}`);
+      const data = await response.json();
+      const seconds = data?.routes?.[0]?.duration;
+      return Number.isFinite(seconds) ? Math.max(1, Math.round(seconds / 60)) : null;
+    }
+
+    async function calculateCommutes() {
+      const jobs = state.properties.map(async property => {
+        const coordinates = coordinatesFor(property);
+        if (!coordinates) return;
+
+        const cacheKey = `wohnung_route_${coordinates[0].toFixed(4)}_${coordinates[1].toFixed(4)}`;
+        try {
+          const cached = JSON.parse(localStorage.getItem(cacheKey) || "null");
+          if (cached && Date.now() - cached.savedAt < 7 * 24 * 60 * 60 * 1000) {
+            property._drive_minutes_othmarsingen = cached.othmarsingen;
+            property._drive_minutes_duebendorf = cached.duebendorf;
+            return;
+          }
+        } catch {}
+
+        try {
+          const [othmarsingen, duebendorf] = await Promise.all([
+            routeMinutes(coordinates, ROUTE_DESTINATIONS.othmarsingen),
+            routeMinutes(coordinates, ROUTE_DESTINATIONS.duebendorf)
+          ]);
+          property._drive_minutes_othmarsingen = othmarsingen;
+          property._drive_minutes_duebendorf = duebendorf;
+          localStorage.setItem(cacheKey, JSON.stringify({ othmarsingen, duebendorf, savedAt: Date.now() }));
+        } catch (error) {
+          console.warn("Fahrzeit konnte nicht berechnet werden", property.title, error);
+          property._route_failed = true;
+        }
+      });
+
+      await Promise.all(jobs);
+      renderProperties();
     }
 
     function renderProperties() {
@@ -1261,6 +1309,7 @@
         state.favorites = favoritesResult.data || [];
 
         applyFilters();
+        calculateCommutes();
       } catch (error) {
         console.error(error);
         showToast(`Daten konnten nicht geladen werden: ${error.message}`, true);
