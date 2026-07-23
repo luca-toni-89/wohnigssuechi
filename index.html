@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-  <meta name="theme-color" content="#111827">
+  <meta name="theme-color" content="#F8F2F7">
   <title>Wohnungssuche – Luca & Gessi</title>
 
   <link rel="preconnect" href="https://unpkg.com">
@@ -15,22 +15,26 @@
 
   <style>
     :root {
-      --bg: #f5f7fb;
-      --surface: #ffffff;
-      --surface-2: #f0f3f8;
-      --text: #182033;
-      --muted: #6b7280;
-      --line: #dfe4ec;
-      --primary: #2563eb;
-      --primary-soft: #e8f0ff;
-      --good: #12834a;
-      --good-soft: #e8f7ef;
-      --bad: #c73535;
-      --bad-soft: #fdecec;
-      --warn: #9a6700;
-      --warn-soft: #fff5d6;
-      --shadow: 0 10px 28px rgba(19, 31, 54, .08);
-      --radius: 18px;
+      --bg: #fbf7fa;
+      --surface: #fffdfd;
+      --surface-2: #f6eef5;
+      --text: #3f3a46;
+      --muted: #817986;
+      --line: #eadfe7;
+      --primary: #b784a7;
+      --primary-soft: #f3e4ee;
+      --good: #618875;
+      --good-soft: #e8f3ed;
+      --bad: #b96f78;
+      --bad-soft: #f8e8ea;
+      --warn: #a38355;
+      --warn-soft: #f7efdf;
+      --peach: #f7e7dc;
+      --mint: #e6f1ec;
+      --lavender: #eee8f7;
+      --blue: #e8f0f7;
+      --shadow: 0 14px 35px rgba(116, 87, 108, .10);
+      --radius: 22px;
       --safe-bottom: env(safe-area-inset-bottom, 0px);
     }
 
@@ -38,7 +42,7 @@
     html { scroll-behavior: smooth; }
     body {
       margin: 0;
-      background: var(--bg);
+      background: radial-gradient(circle at top left, #fff8f4 0, transparent 34%), linear-gradient(180deg, #fbf7fa 0%, #f7f4fb 100%);
       color: var(--text);
       font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
       -webkit-font-smoothing: antialiased;
@@ -136,7 +140,7 @@
     #map {
       width: 100%;
       height: clamp(285px, 42vh, 430px);
-      background: #e7ebf1;
+      background: linear-gradient(135deg, var(--mint), var(--lavender));
     }
 
     .map-caption {
@@ -588,28 +592,32 @@
       .modal-panel { border-radius: 22px 22px 0 0; max-height: 94vh; }
     }
 
-    @media (prefers-color-scheme: dark) {
-      :root {
-        --bg: #0f1420;
-        --surface: #171e2c;
-        --surface-2: #20293a;
-        --text: #eef2f8;
-        --muted: #9aa5b6;
-        --line: #303b4e;
-        --primary: #73a2ff;
-        --primary-soft: #1d3154;
-        --good: #66d99a;
-        --good-soft: #183c2b;
-        --bad: #ff8f8f;
-        --bad-soft: #472324;
-        --warn: #f4ca65;
-        --warn-soft: #443817;
-        --shadow: 0 10px 28px rgba(0,0,0,.28);
-      }
-      .bottom-nav { background: rgba(23,30,44,.94); }
-      .chip { color: #d1d8e4; }
-      .loading { background: rgba(15,20,32,.75); }
-    }
+
+    .metric:nth-child(1){background:var(--peach)}
+    .metric:nth-child(2){background:var(--mint)}
+    .metric:nth-child(3){background:var(--lavender)}
+    .metric:nth-child(4){background:var(--blue)}
+    .property-card { background: rgba(255,253,253,.94); }
+    .profile-gate { position:fixed; inset:0; z-index:3000; display:none; place-items:center; padding:20px; background:rgba(251,247,250,.92); backdrop-filter:blur(14px); }
+    .profile-gate.open { display:grid; }
+    .profile-gate-card { width:min(420px,100%); padding:28px; border:1px solid var(--line); border-radius:28px; background:var(--surface); box-shadow:var(--shadow); text-align:center; }
+    .profile-gate-card .home-icon { font-size:46px; margin-bottom:8px; }
+    .profile-gate-card h2 { margin:0 0 8px; font-size:28px; }
+    .profile-gate-card p { margin:0 0 22px; color:var(--muted); }
+    .profile-choices { display:grid; grid-template-columns:1fr 1fr; gap:12px; }
+    .profile-choice { border:1px solid var(--line); border-radius:20px; padding:20px 12px; font-weight:800; font-size:18px; color:var(--text); }
+    .profile-choice[data-profile="luca"] { background:var(--blue); }
+    .profile-choice[data-profile="gessi"] { background:var(--peach); }
+    .commute-box { margin-top:12px; padding:14px; border:1px solid var(--line); border-radius:18px; background:linear-gradient(135deg,#fffaf7,#f7f2fb); }
+    .commute-labels,.commute-times { display:flex; justify-content:space-between; gap:12px; font-size:12px; font-weight:800; letter-spacing:.05em; text-transform:uppercase; }
+    .commute-times { margin-top:8px; color:var(--muted); font-size:13px; text-transform:none; letter-spacing:0; }
+    .commute-track { position:relative; height:26px; margin-top:8px; }
+    .commute-line { position:absolute; left:4px; right:4px; top:12px; height:3px; border-radius:9px; background:#ddd5dc; }
+    .commute-dot { position:absolute; top:5px; width:17px; height:17px; border:3px solid white; border-radius:50%; background:var(--primary); box-shadow:0 2px 8px rgba(0,0,0,.15); transform:translateX(-50%); }
+    .commute-middle { position:absolute; top:-2px; transform:translateX(-50%); color:var(--primary); font-size:10px; font-weight:900; text-transform:uppercase; }
+    .map-empty { display:none; padding:18px; text-align:center; color:var(--muted); background:var(--surface); }
+    .map-shell.no-points #map { min-height:180px; height:180px; }
+    .map-shell.no-points .map-empty { display:block; }
   </style>
 </head>
 <body>
@@ -635,6 +643,7 @@
 
     <section class="map-shell">
       <div id="map" role="region" aria-label="Karte der Wohnungen"></div>
+      <div id="mapEmpty" class="map-empty">Für diese Wohnungen fehlen noch Koordinaten. Bekannte Orte werden automatisch auf der Karte platziert.</div>
       <div class="map-caption">
         <span id="mapCaption">Wohnungen mit Kartenposition</span>
         <button id="fitMapBtn" type="button">Alle anzeigen</button>
@@ -680,6 +689,19 @@
     <button class="nav-btn" data-view="import" type="button"><span>📥</span><span>Import</span></button>
   </nav>
 
+
+  <div id="profileGate" class="profile-gate open" role="dialog" aria-modal="true" aria-labelledby="profileGateTitle">
+    <section class="profile-gate-card">
+      <div class="home-icon">🏡</div>
+      <h2 id="profileGateTitle">Wer schaut gerade?</h2>
+      <p>So landen Bewertung, Notiz und Favorit garantiert beim richtigen Profil.</p>
+      <div class="profile-choices">
+        <button class="profile-choice" data-profile="luca" type="button">Luca</button>
+        <button class="profile-choice" data-profile="gessi" type="button">Gessi</button>
+      </div>
+    </section>
+  </div>
+
   <div id="importModal" class="modal" role="dialog" aria-modal="true" aria-labelledby="importTitle">
     <section class="modal-panel">
       <div class="modal-head">
@@ -706,6 +728,8 @@
     "listing_url": "https://...",
     "minergie": true,
     "building_right": false,
+    "drive_minutes_othmarsingen": 18,
+    "drive_minutes_duebendorf": 22,
     "ai_rating": 9.1,
     "ai_recommendation_reason": "Sehr gutes Preis-Flächen-Verhältnis."
   }
@@ -739,7 +763,7 @@
     });
 
     const state = {
-      profile: localStorage.getItem("wohnung_profile") || "luca",
+      profile: null,
       view: "main",
       properties: [],
       votes: [],
@@ -760,6 +784,8 @@
       metricFavorites: document.getElementById("metricFavorites"),
       metricAvgPrice: document.getElementById("metricAvgPrice"),
       mapCaption: document.getElementById("mapCaption"),
+      mapEmpty: document.getElementById("mapEmpty"),
+      profileGate: document.getElementById("profileGate"),
       searchInput: document.getElementById("searchInput"),
       priceFilter: document.getElementById("priceFilter"),
       roomsFilter: document.getElementById("roomsFilter"),
@@ -851,8 +877,31 @@
       return getVote(propertyId, "luca") === 1 && getVote(propertyId, "gessi") === 1;
     }
 
+    const PLACE_COORDINATES = {
+      "neuenhof": [47.4494, 8.3266],
+      "killwangen": [47.4328, 8.3475],
+      "künten": [47.3897, 8.3310],
+      "kuenten": [47.3897, 8.3310],
+      "othmarsingen": [47.4014, 8.2136],
+      "dübendorf": [47.3971, 8.6187],
+      "duebendorf": [47.3971, 8.6187]
+    };
+
+    function coordinatesFor(property) {
+      const lat = Number(property.latitude);
+      const lng = Number(property.longitude);
+      if (Number.isFinite(lat) && Number.isFinite(lng) && lat !== 0 && lng !== 0) return [lat, lng];
+      const key = String(property.municipality || property.location || "").trim().toLowerCase();
+      return PLACE_COORDINATES[key] || null;
+    }
+
     function initMap() {
-      state.map = L.map("map", { zoomControl: true }).setView([47.39, 8.43], 10);
+      if (!window.L) {
+        document.querySelector(".map-shell")?.classList.add("no-points");
+        el.mapCaption.textContent = "Karte konnte nicht geladen werden";
+        return;
+      }
+      state.map = L.map("map", { zoomControl: true, preferCanvas: true }).setView([47.39, 8.43], 10);
 
       L.tileLayer("https://tile.openstreetmap.org/{z}/{x}/{y}.png", {
         maxZoom: 19,
@@ -863,16 +912,17 @@
     }
 
     function renderMap() {
+      if (!state.map || !state.markerLayer) return;
       state.markerLayer.clearLayers();
       state.markers.clear();
 
-      const propertiesWithCoordinates = state.filtered.filter(p =>
-        Number.isFinite(Number(p.latitude)) &&
-        Number.isFinite(Number(p.longitude))
-      );
+      const propertiesWithCoordinates = state.filtered
+        .map(property => ({ property, coordinates: coordinatesFor(property) }))
+        .filter(item => item.coordinates);
 
-      for (const property of propertiesWithCoordinates) {
-        const marker = L.marker([Number(property.latitude), Number(property.longitude)]);
+      for (const item of propertiesWithCoordinates) {
+        const property = item.property;
+        const marker = L.marker(item.coordinates);
         const lucaVote = getVote(property.id, "luca");
         const gessiVote = getVote(property.id, "gessi");
 
@@ -905,6 +955,8 @@
       el.mapCaption.textContent =
         `${propertiesWithCoordinates.length} von ${state.filtered.length} Wohnungen auf der Karte`;
 
+      document.querySelector(".map-shell")?.classList.toggle("no-points", propertiesWithCoordinates.length === 0);
+
       if (propertiesWithCoordinates.length > 0) {
         fitMapToVisible();
       } else {
@@ -915,6 +967,7 @@
     }
 
     function fitMapToVisible() {
+      if (!state.map) return;
       const markers = [...state.markers.values()];
       if (!markers.length) return;
 
@@ -1075,6 +1128,8 @@
             ${escapeHtml(aiText)}
           </div>
 
+          ${commuteHtml(property)}
+
           <div class="voting">
             ${voteBlockHtml("luca", "Luca", property.id, lucaVote)}
             ${voteBlockHtml("gessi", "Gessi", property.id, gessiVote)}
@@ -1120,6 +1175,24 @@
           </div>
         </article>
       `;
+    }
+
+    function commuteHtml(property) {
+      const a = Number(property.drive_minutes_othmarsingen ?? property.othmarsingen_minutes);
+      const b = Number(property.drive_minutes_duebendorf ?? property.duebendorf_minutes);
+      const validA = Number.isFinite(a) && a > 0;
+      const validB = Number.isFinite(b) && b > 0;
+      const ratio = validA && validB ? Math.max(8, Math.min(92, (a / (a + b)) * 100)) : 50;
+      return `
+        <div class="commute-box">
+          <div class="commute-labels"><span>Othmarsingen</span><span>Dübendorf</span></div>
+          <div class="commute-track">
+            <div class="commute-line"></div>
+            <span class="commute-middle" style="left:${ratio}%">Mitte</span>
+            <span class="commute-dot" style="left:${ratio}%"></span>
+          </div>
+          <div class="commute-times"><span>${validA ? `${a} Min.` : "Fahrzeit offen"}</span><span>${validB ? `${b} Min.` : "Fahrzeit offen"}</span></div>
+        </div>`;
     }
 
     function voteBlockHtml(person, label, propertyId, vote) {
@@ -1436,16 +1509,19 @@
       }, 700);
     });
 
-    document.querySelectorAll(".profile-btn").forEach(button => {
-      button.addEventListener("click", () => {
-        state.profile = button.dataset.profile;
-        localStorage.setItem("wohnung_profile", state.profile);
-        document.querySelectorAll(".profile-btn").forEach(btn =>
-          btn.classList.toggle("active", btn.dataset.profile === state.profile)
-        );
-        renderProperties();
-        showToast(`Profil: ${state.profile === "luca" ? "Luca" : "Gessi"}`);
-      });
+    function selectProfile(profile) {
+      state.profile = profile;
+      localStorage.setItem("wohnung_profile", profile);
+      document.querySelectorAll(".profile-btn").forEach(btn =>
+        btn.classList.toggle("active", btn.dataset.profile === profile)
+      );
+      el.profileGate.classList.remove("open");
+      renderProperties();
+      showToast(`Profil: ${profile === "luca" ? "Luca" : "Gessi"}`);
+    }
+
+    document.querySelectorAll(".profile-btn, .profile-choice").forEach(button => {
+      button.addEventListener("click", () => selectProfile(button.dataset.profile));
     });
 
     document.querySelectorAll(".nav-btn").forEach(button => {
@@ -1499,15 +1575,13 @@
           listing_url: "https://example.com",
           minergie: true,
           building_right: false,
+          drive_minutes_othmarsingen: 18,
+          drive_minutes_duebendorf: 22,
           ai_rating: 9.1,
           ai_recommendation_reason: "Sehr gutes Verhältnis aus Preis, Fläche und Energiestandard."
         }
       ], null, 2);
     });
-
-    document.querySelectorAll(".profile-btn").forEach(btn =>
-      btn.classList.toggle("active", btn.dataset.profile === state.profile)
-    );
 
     initMap();
     loadData();
