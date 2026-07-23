@@ -952,19 +952,72 @@
     const PLACE_COORDINATES = {
       "neuenhof": [47.4494, 8.3266],
       "killwangen": [47.4328, 8.3475],
+      "wurenlos": [47.4420, 8.3620],
+      "würenlos": [47.4420, 8.3620],
+      "spreitenbach": [47.4227, 8.3659],
+      "wettingen": [47.4668, 8.3267],
+      "baden": [47.4729, 8.3081],
+      "bergdietikon": [47.3899, 8.3898],
+      "dietikon": [47.4054, 8.4034],
+      "urdorf": [47.3851, 8.4258],
+      "schlieren": [47.3967, 8.4476],
+      "geroldswil": [47.4216, 8.4090],
+      "oetwil an der limmat": [47.4280, 8.3945],
+      "oberengstringen": [47.4099, 8.4659],
+      "regensdorf": [47.4347, 8.4683],
+      "buchs zh": [47.4570, 8.4378],
+      "dallikon": [47.4392, 8.4388],
+      "dällikon": [47.4392, 8.4388],
+      "otelfingen": [47.4604, 8.3911],
+      "fislisbach": [47.4384, 8.2903],
+      "niederrohrdorf": [47.4242, 8.3042],
+      "oberrohrdorf": [47.4188, 8.3184],
+      "mellingen": [47.4195, 8.2734],
+      "magenwil": [47.4112, 8.2347],
+      "mägenwil": [47.4112, 8.2347],
+      "wohlenschwil": [47.4130, 8.2568],
+      "birrhard": [47.4343, 8.2475],
+      "birr": [47.4353, 8.2084],
+      "lupfig": [47.4407, 8.2026],
+      "hendschiken": [47.3863, 8.2166],
+      "dintikon": [47.3626, 8.2278],
+      "kunten": [47.3897, 8.3310],
       "künten": [47.3897, 8.3310],
       "kuenten": [47.3897, 8.3310],
       "othmarsingen": [47.4014, 8.2136],
+      "dubendorf": [47.3971, 8.6187],
       "dübendorf": [47.3971, 8.6187],
       "duebendorf": [47.3971, 8.6187]
     };
+
+    function normalizePlace(value) {
+      return String(value || "")
+        .trim()
+        .toLowerCase()
+        .normalize("NFD")
+        .replace(/[\u0300-\u036f]/g, "")
+        .replace(/\b(ch|schweiz)\b/g, "")
+        .replace(/[^a-z0-9 ]+/g, " ")
+        .replace(/\s+/g, " ")
+        .trim();
+    }
 
     function coordinatesFor(property) {
       const lat = Number(property.latitude);
       const lng = Number(property.longitude);
       if (Number.isFinite(lat) && Number.isFinite(lng) && lat !== 0 && lng !== 0) return [lat, lng];
-      const key = String(property.municipality || property.location || "").trim().toLowerCase();
-      return PLACE_COORDINATES[key] || null;
+
+      const candidates = [property.municipality, property.location, property.address]
+        .map(normalizePlace)
+        .filter(Boolean);
+
+      for (const candidate of candidates) {
+        if (PLACE_COORDINATES[candidate]) return PLACE_COORDINATES[candidate];
+        const matchedKey = Object.keys(PLACE_COORDINATES)
+          .find(key => candidate === normalizePlace(key) || candidate.includes(normalizePlace(key)));
+        if (matchedKey) return PLACE_COORDINATES[matchedKey];
+      }
+      return null;
     }
 
     function initMap() {
@@ -992,10 +1045,24 @@
         .map(item => ({ item, coordinates: coordinatesFor(item) }))
         .filter(entry => entry.coordinates);
 
+      const coordinateUsage = new Map();
+
       for (const entry of itemsWithCoordinates) {
         const item = entry.item;
         const isProject = state.view === "pipeline" || item._item_type === "pipeline";
-        const marker = L.marker(entry.coordinates);
+
+        // Inserate derselben Überbauung/Gemeinde dürfen sich nicht exakt überdecken.
+        const base = entry.coordinates;
+        const coordinateKey = `${base[0].toFixed(5)},${base[1].toFixed(5)}`;
+        const duplicateIndex = coordinateUsage.get(coordinateKey) || 0;
+        coordinateUsage.set(coordinateKey, duplicateIndex + 1);
+        const angle = duplicateIndex * 2.3999632297;
+        const radius = duplicateIndex === 0 ? 0 : 0.00042 * Math.ceil(duplicateIndex / 6 + 1);
+        const displayedCoordinates = [
+          base[0] + Math.sin(angle) * radius,
+          base[1] + Math.cos(angle) * radius
+        ];
+        const marker = L.marker(displayedCoordinates);
 
         const popupMeta = isProject
           ? `${escapeHtml(item.municipality || item.location || item.address || "Ort offen")}<br>${escapeHtml(item.project_status || "Status offen")} · ${escapeHtml(item.expected_move_in || "Bezug offen")}`
@@ -1389,45 +1456,77 @@
       duebendorf: [47.3971, 8.6187]
     };
 
-    async function routeMinutes(from, to) {
-      const url = `https://router.project-osrm.org/route/v1/driving/${from[1]},${from[0]};${to[1]},${to[0]}?overview=false&alternatives=false&steps=false`;
-      const response = await fetch(url);
-      if (!response.ok) throw new Error(`Routing ${response.status}`);
-      const data = await response.json();
-      const seconds = data?.routes?.[0]?.duration;
-      return Number.isFinite(seconds) ? Math.max(1, Math.round(seconds / 60)) : null;
+    async function routeTimes(from, timeoutMs = 8500) {
+      const destinations = [ROUTE_DESTINATIONS.othmarsingen, ROUTE_DESTINATIONS.duebendorf];
+      const points = [from, ...destinations].map(point => `${point[1]},${point[0]}`).join(";");
+      const url = `https://router.project-osrm.org/table/v1/driving/${points}?sources=0&destinations=1;2`;
+      const controller = new AbortController();
+      const timer = setTimeout(() => controller.abort(), timeoutMs);
+
+      try {
+        const response = await fetch(url, { signal: controller.signal });
+        if (!response.ok) throw new Error(`Routing ${response.status}`);
+        const data = await response.json();
+        const durations = data?.durations?.[0];
+        if (!Array.isArray(durations) || durations.length < 2) throw new Error("Keine Routendaten");
+        return {
+          othmarsingen: Number.isFinite(durations[0]) ? Math.max(1, Math.round(durations[0] / 60)) : null,
+          duebendorf: Number.isFinite(durations[1]) ? Math.max(1, Math.round(durations[1] / 60)) : null
+        };
+      } finally {
+        clearTimeout(timer);
+      }
     }
 
     async function calculateCommutes() {
-      const jobs = [...state.properties, ...state.pipelineProjects].map(async property => {
-        const coordinates = coordinatesFor(property);
-        if (!coordinates) return;
+      const allItems = [...state.properties, ...state.pipelineProjects];
 
-        const cacheKey = `wohnung_route_${coordinates[0].toFixed(4)}_${coordinates[1].toFixed(4)}`;
+      // Bewusst nacheinander statt 12 gleichzeitiger Requests: Der öffentliche
+      // Routing-Dienst blockiert bzw. drosselt sonst mobile Browser schnell.
+      for (const property of allItems) {
+        const importedA = Number(property.drive_minutes_othmarsingen ?? property.othmarsingen_minutes);
+        const importedB = Number(property.drive_minutes_duebendorf ?? property.duebendorf_minutes);
+        if (Number.isFinite(importedA) && importedA > 0 && Number.isFinite(importedB) && importedB > 0) {
+          property._drive_minutes_othmarsingen = importedA;
+          property._drive_minutes_duebendorf = importedB;
+          property._route_failed = false;
+          continue;
+        }
+
+        const coordinates = coordinatesFor(property);
+        if (!coordinates) {
+          property._route_failed = true;
+          continue;
+        }
+
+        const cacheKey = `wohnung_route_v2_${coordinates[0].toFixed(4)}_${coordinates[1].toFixed(4)}`;
         try {
           const cached = JSON.parse(localStorage.getItem(cacheKey) || "null");
-          if (cached && Date.now() - cached.savedAt < 7 * 24 * 60 * 60 * 1000) {
+          if (cached && Date.now() - cached.savedAt < 14 * 24 * 60 * 60 * 1000) {
             property._drive_minutes_othmarsingen = cached.othmarsingen;
             property._drive_minutes_duebendorf = cached.duebendorf;
-            return;
+            property._route_failed = false;
+            continue;
           }
         } catch {}
 
         try {
-          const [othmarsingen, duebendorf] = await Promise.all([
-            routeMinutes(coordinates, ROUTE_DESTINATIONS.othmarsingen),
-            routeMinutes(coordinates, ROUTE_DESTINATIONS.duebendorf)
-          ]);
-          property._drive_minutes_othmarsingen = othmarsingen;
-          property._drive_minutes_duebendorf = duebendorf;
-          localStorage.setItem(cacheKey, JSON.stringify({ othmarsingen, duebendorf, savedAt: Date.now() }));
+          const times = await routeTimes(coordinates);
+          if (!times.othmarsingen || !times.duebendorf) throw new Error("Unvollständige Routendaten");
+          property._drive_minutes_othmarsingen = times.othmarsingen;
+          property._drive_minutes_duebendorf = times.duebendorf;
+          property._route_failed = false;
+          localStorage.setItem(cacheKey, JSON.stringify({ ...times, savedAt: Date.now() }));
         } catch (error) {
-          console.warn("Fahrzeit konnte nicht berechnet werden", property.title, error);
+          console.warn("Fahrzeit konnte nicht berechnet werden", property.title || property.project_name, error);
           property._route_failed = true;
         }
-      });
 
-      await Promise.all(jobs);
+        // Jede Karte sofort aktualisieren; dadurch bleibt nie endlos
+        // „wird berechnet …“ stehen.
+        renderProperties();
+      }
+
       renderProperties();
     }
 
