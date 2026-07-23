@@ -173,3 +173,5 @@ jobs:
           git add index.html
           git commit -m "Fix distance field handling and add delete actions"
           git push
+
+# Triggered after initial workflow registration
