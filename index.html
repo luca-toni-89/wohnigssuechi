@@ -303,12 +303,15 @@
     .chip.bad { background: var(--bad-soft); color: var(--bad); }
 
     .ai-box {
-      background: var(--primary-soft);
+      background: #fffdf9;
+      border: 1.5px solid #c8ddd2;
+      border-left: 4px solid var(--good);
       border-radius: 13px;
       padding: 10px 11px;
       margin: 10px 0;
       font-size: 13px;
       line-height: 1.4;
+      box-shadow: 0 4px 12px rgba(97, 136, 117, .07);
     }
 
     .ai-box strong { display: block; margin-bottom: 3px; }
@@ -774,7 +777,7 @@
       <div class="modal-head">
         <div>
           <h2 id="importTitle">ChatGPT-Update importieren</h2>
-          <p>JSON-Block einfügen. Bestehende Bewertungen, Favoriten und Notizen bleiben erhalten.</p>
+          <p>JSON-Block einfügen. Fahrzeiten bitte möglichst im JSON mitgeben; Bewertungen, Favoriten und Notizen bleiben erhalten.</p>
         </div>
         <button id="closeImportBtn" class="icon-btn" type="button" aria-label="Schliessen">✕</button>
       </div>
@@ -973,6 +976,11 @@
       "niederrohrdorf": [47.4242, 8.3042],
       "oberrohrdorf": [47.4188, 8.3184],
       "mellingen": [47.4195, 8.2734],
+      "bremgarten": [47.3513, 8.3421],
+      "bremgarten ag": [47.3513, 8.3421],
+      "hermetschwil staffeln": [47.3318, 8.3488],
+      "hermetschwil-staffeln": [47.3318, 8.3488],
+      "staffeln": [47.3318, 8.3488],
       "magenwil": [47.4112, 8.2347],
       "mägenwil": [47.4112, 8.2347],
       "wohlenschwil": [47.4130, 8.2568],
@@ -1406,7 +1414,7 @@
       const b = Number(property._drive_minutes_duebendorf ?? property.drive_minutes_duebendorf ?? property.duebendorf_minutes);
       const validA = Number.isFinite(a) && a > 0;
       const validB = Number.isFinite(b) && b > 0;
-      const pendingText = property._route_failed ? "nicht verfügbar" : "wird berechnet …";
+      const pendingText = property._route_failed ? "im JSON nicht erfasst" : "wird berechnet …";
       const ratio = validA && validB ? Math.max(8, Math.min(92, (a / (a + b)) * 100)) : 50;
       return `
         <div class="commute-box">
@@ -1456,26 +1464,47 @@
       duebendorf: [47.3971, 8.6187]
     };
 
-    async function routeTimes(from, timeoutMs = 8500) {
-      const destinations = [ROUTE_DESTINATIONS.othmarsingen, ROUTE_DESTINATIONS.duebendorf];
-      const points = [from, ...destinations].map(point => `${point[1]},${point[0]}`).join(";");
-      const url = `https://router.project-osrm.org/table/v1/driving/${points}?sources=0&destinations=1;2`;
+    async function fetchJsonWithTimeout(url, timeoutMs = 7000) {
       const controller = new AbortController();
       const timer = setTimeout(() => controller.abort(), timeoutMs);
-
       try {
-        const response = await fetch(url, { signal: controller.signal });
+        const response = await fetch(url, {
+          signal: controller.signal,
+          headers: { "Accept": "application/json" }
+        });
         if (!response.ok) throw new Error(`Routing ${response.status}`);
-        const data = await response.json();
-        const durations = data?.durations?.[0];
-        if (!Array.isArray(durations) || durations.length < 2) throw new Error("Keine Routendaten");
-        return {
-          othmarsingen: Number.isFinite(durations[0]) ? Math.max(1, Math.round(durations[0] / 60)) : null,
-          duebendorf: Number.isFinite(durations[1]) ? Math.max(1, Math.round(durations[1] / 60)) : null
-        };
+        return await response.json();
       } finally {
         clearTimeout(timer);
       }
+    }
+
+    async function routeTimes(from) {
+      const destinations = [ROUTE_DESTINATIONS.othmarsingen, ROUTE_DESTINATIONS.duebendorf];
+      const hosts = [
+        "https://router.project-osrm.org",
+        "https://routing.openstreetmap.de/routed-car"
+      ];
+
+      let lastError = null;
+      for (const host of hosts) {
+        try {
+          const minutes = [];
+          for (const destination of destinations) {
+            const points = `${from[1]},${from[0]};${destination[1]},${destination[0]}`;
+            const data = await fetchJsonWithTimeout(
+              `${host}/route/v1/driving/${points}?overview=false&alternatives=false&steps=false`
+            );
+            const seconds = data?.routes?.[0]?.duration;
+            if (!Number.isFinite(seconds)) throw new Error("Keine Routendaten");
+            minutes.push(Math.max(1, Math.round(seconds / 60)));
+          }
+          return { othmarsingen: minutes[0], duebendorf: minutes[1] };
+        } catch (error) {
+          lastError = error;
+        }
+      }
+      throw lastError || new Error("Routing nicht verfügbar");
     }
 
     async function calculateCommutes() {
@@ -1713,6 +1742,8 @@
         building_right: Boolean(item.building_right ?? item.baurecht ?? false),
         building_right_details: item.building_right_details || null,
         building_right_cost_chf_monthly: item.building_right_cost_chf_monthly ?? null,
+        drive_minutes_othmarsingen: item.drive_minutes_othmarsingen ?? item.othmarsingen_minutes ?? null,
+        drive_minutes_duebendorf: item.drive_minutes_duebendorf ?? item.duebendorf_minutes ?? null,
         travel_time_gessi_minutes: item.travel_time_gessi_minutes ?? null,
         ai_rating: item.ai_rating ?? null,
         ai_summary: item.ai_summary || null,
@@ -1765,6 +1796,8 @@
         energy_standard: item.energy_standard || null,
         building_right: Boolean(item.building_right ?? false),
         building_right_details: item.building_right_details || null,
+        drive_minutes_othmarsingen: item.drive_minutes_othmarsingen ?? item.othmarsingen_minutes ?? null,
+        drive_minutes_duebendorf: item.drive_minutes_duebendorf ?? item.duebendorf_minutes ?? null,
         ai_rating: item.ai_rating ?? null,
         ai_summary: item.ai_summary || null,
         ai_recommendation_reason: item.ai_recommendation_reason || null,
