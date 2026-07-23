@@ -4,7 +4,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
   <meta name="theme-color" content="#F8F2F7">
-  <title>Wohnungssuche – Luca & Gessi</title>
+  <title>Euses Dihei – Gessi & Luca</title>
 
   <link rel="preconnect" href="https://unpkg.com">
   <link rel="preconnect" href="https://tile.openstreetmap.org">
@@ -620,7 +620,8 @@
     .map-shell.no-points .map-empty { display:block; }
 
     .person-vote.locked, .note-wrap.locked { opacity: .56; }
-    .person-vote.locked .vote-btn, .note-wrap.locked textarea { cursor: not-allowed; }
+    .person-vote.locked .vote-btn, .note-wrap.locked textarea { cursor: not-allowed; pointer-events:none; }
+    .person-vote.locked .vote-buttons, .note-wrap.locked textarea { user-select:none; }
     .locked-hint { margin-top: 7px; color: var(--muted); font-size: 12px; font-weight: 700; }
   </style>
 </head>
@@ -694,7 +695,7 @@
   </nav>
 
 
-  <div id="profileGate" class="profile-gate open" role="dialog" aria-modal="true" aria-labelledby="profileGateTitle">
+  <div id="profileGate" class="profile-gate" role="dialog" aria-modal="true" aria-labelledby="profileGateTitle">
     <section class="profile-gate-card">
       <div class="home-icon">🏡</div>
       <h2 id="profileGateTitle">Wer schaut gerade?</h2>
@@ -766,8 +767,9 @@
       }
     });
 
+    const storedProfile = localStorage.getItem("wohnung_profile");
     const state = {
-      profile: null,
+      profile: ["luca", "gessi"].includes(storedProfile) ? storedProfile : null,
       view: "main",
       properties: [],
       votes: [],
@@ -1331,7 +1333,7 @@
     }
 
     async function saveVote(propertyId, person, desiredVote) {
-      if (person !== state.profile) {
+      if (!state.profile || person !== state.profile) {
         showToast(`Du bist als ${state.profile === "luca" ? "Luca" : "Gessi"} angemeldet.`, true);
         return;
       }
@@ -1364,6 +1366,10 @@
 
     async function saveFavorite(propertyId) {
       const person = state.profile;
+      if (!person) {
+        el.profileGate.classList.add("open");
+        return;
+      }
       const existing = state.favorites.find(f => f.property_id === propertyId && f.person === person);
 
       if (existing) {
@@ -1385,7 +1391,7 @@
     }
 
     async function saveNote(propertyId, person, note) {
-      if (person !== state.profile) {
+      if (!state.profile || person !== state.profile) {
         showToast(`Du bist als ${state.profile === "luca" ? "Luca" : "Gessi"} angemeldet.`, true);
         return;
       }
@@ -1526,6 +1532,29 @@
     }
 
     let noteTimer;
+
+    // Harte Profilsperre: Aktionen im Namen der anderen Person werden bereits
+    // vor der normalen Ereignisverarbeitung abgefangen.
+    el.propertyList.addEventListener("click", event => {
+      const target = event.target.closest("[data-person]");
+      if (!target) return;
+      if (!state.profile || target.dataset.person !== state.profile) {
+        event.preventDefault();
+        event.stopImmediatePropagation();
+        showToast(`Du bist als ${state.profile === "gessi" ? "Gessi" : "Luca"} angemeldet.`, true);
+      }
+    }, true);
+
+    el.propertyList.addEventListener("input", event => {
+      const target = event.target;
+      if (target.dataset.action !== "note") return;
+      if (!state.profile || target.dataset.person !== state.profile) {
+        event.preventDefault();
+        event.stopImmediatePropagation();
+        target.blur();
+      }
+    }, true);
+
     el.propertyList.addEventListener("click", async event => {
       const target = event.target.closest("[data-action]");
       if (!target) return;
@@ -1579,6 +1608,7 @@
     });
 
     function selectProfile(profile) {
+      if (!["luca", "gessi"].includes(profile)) return;
       state.profile = profile;
       localStorage.setItem("wohnung_profile", profile);
       document.querySelectorAll(".profile-btn").forEach(btn =>
@@ -1651,6 +1681,17 @@
         }
       ], null, 2);
     });
+
+    // Bereits gewähltes Profil auf diesem Gerät merken. Nur beim ersten
+    // Besuch oder nach dem Löschen der Browserdaten wird erneut gefragt.
+    if (state.profile) {
+      document.querySelectorAll(".profile-btn").forEach(btn =>
+        btn.classList.toggle("active", btn.dataset.profile === state.profile)
+      );
+      el.profileGate.classList.remove("open");
+    } else {
+      el.profileGate.classList.add("open");
+    }
 
     initMap();
     loadData();
