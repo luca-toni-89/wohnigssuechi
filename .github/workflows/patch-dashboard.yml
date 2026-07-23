@@ -1,0 +1,175 @@
+name: Patch dashboard distance fields and delete actions
+
+on:
+  push:
+    paths:
+      - '.github/workflows/patch-dashboard.yml'
+
+permissions:
+  contents: write
+
+jobs:
+  patch:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Patch index.html safely
+        shell: python
+        run: |
+          from pathlib import Path
+          p = Path('index.html')
+          s = p.read_text(encoding='utf-8')
+
+          def replace_once(old, new, label):
+              global s
+              if old not in s:
+                  raise SystemExit(f'Marker not found: {label}')
+              s = s.replace(old, new, 1)
+
+          replace_once(
+          '''    .card-actions {
+                display: grid;
+                grid-template-columns: minmax(0, 1fr) auto auto;
+                gap: 7px;
+                margin-top: 10px;
+              }''',
+          '''    .card-actions {
+                display: grid;
+                grid-template-columns: minmax(0, 1fr) auto auto auto;
+                gap: 7px;
+                margin-top: 10px;
+              }
+
+              .delete-btn {
+                min-width: 44px;
+                padding-inline: 11px;
+                border-color: #efc7cc;
+                background: #fff8f8;
+                color: var(--bad);
+              }
+
+              .delete-btn:hover { background: var(--bad-soft); }''', 'card action css')
+
+          replace_once(
+          '''      .card-actions { grid-template-columns: 1fr 1fr; }
+                .card-actions .status-select { grid-column: 1 / -1; }''',
+          '''      .card-actions { grid-template-columns: 1fr 1fr 1fr; }
+                .card-actions .status-select { grid-column: 1 / -1; }
+                .card-actions .delete-btn { grid-column: auto; }''', 'mobile card action css')
+
+          replace_once(
+          '''            ${listingLink}
+                    </div>''',
+          '''            ${listingLink}
+
+                      <button class="secondary-btn delete-btn" type="button" data-action="delete-property" data-id="${property.id}" aria-label="Wohnung endgültig löschen" title="Wohnung endgültig löschen">🗑️</button>
+                    </div>''', 'property delete button')
+
+          replace_once(
+          '''            <button class="secondary-btn" type="button" data-action="locate" data-id="${project.id}">Karte</button>
+                      ${projectLink}${sourceLink}
+                    </div>''',
+          '''            <button class="secondary-btn" type="button" data-action="locate" data-id="${project.id}">Karte</button>
+                      ${projectLink}${sourceLink}
+                      <button class="secondary-btn delete-btn" type="button" data-action="delete-project" data-id="${project.id}" aria-label="Pipeline-Projekt endgültig löschen" title="Pipeline-Projekt endgültig löschen">🗑️</button>
+                    </div>''', 'pipeline delete button')
+
+          replace_once(
+          '''    function commuteHtml(property) {
+                const a = Number(property._drive_minutes_othmarsingen ?? property.drive_minutes_othmarsingen ?? property.othmarsingen_minutes);
+                const b = Number(property._drive_minutes_duebendorf ?? property.drive_minutes_duebendorf ?? property.duebendorf_minutes);''',
+          '''    function firstPositiveNumber(...values) {
+                for (const value of values) {
+                  if (value === null || value === undefined || value === "") continue;
+                  const number = Number(value);
+                  if (Number.isFinite(number) && number > 0) return Math.round(number);
+                }
+                return null;
+              }
+
+              function commuteValues(item) {
+                return {
+                  othmarsingen: firstPositiveNumber(item._drive_minutes_othmarsingen, item.drive_minutes_othmarsingen, item.travel_time_othmarsingen_minutes, item.travel_minutes_othmarsingen, item.drive_time_othmarsingen_minutes, item.othmarsingen_minutes),
+                  duebendorf: firstPositiveNumber(item._drive_minutes_duebendorf, item.drive_minutes_duebendorf, item.travel_time_duebendorf_minutes, item.travel_minutes_duebendorf, item.drive_time_duebendorf_minutes, item.duebendorf_minutes)
+                };
+              }
+
+              function commuteHtml(property) {
+                const { othmarsingen: a, duebendorf: b } = commuteValues(property);''', 'commute aliases')
+
+          replace_once(
+          '''        const importedA = Number(property.drive_minutes_othmarsingen ?? property.othmarsingen_minutes);
+                  const importedB = Number(property.drive_minutes_duebendorf ?? property.duebendorf_minutes);
+                  if (Number.isFinite(importedA) && importedA > 0 && Number.isFinite(importedB) && importedB > 0) {''',
+          '''        const { othmarsingen: importedA, duebendorf: importedB } = commuteValues(property);
+                  if (importedA && importedB) {''', 'commute calculation aliases')
+
+          old_mapping = '''        drive_minutes_othmarsingen: item.drive_minutes_othmarsingen ?? item.othmarsingen_minutes ?? null,
+                  drive_minutes_duebendorf: item.drive_minutes_duebendorf ?? item.duebendorf_minutes ?? null,'''
+          new_mapping = '''        drive_minutes_othmarsingen: firstPositiveNumber(item.drive_minutes_othmarsingen, item.travel_time_othmarsingen_minutes, item.travel_minutes_othmarsingen, item.drive_time_othmarsingen_minutes, item.othmarsingen_minutes),
+                  drive_minutes_duebendorf: firstPositiveNumber(item.drive_minutes_duebendorf, item.travel_time_duebendorf_minutes, item.travel_minutes_duebendorf, item.drive_time_duebendorf_minutes, item.duebendorf_minutes),'''
+          if s.count(old_mapping) < 2:
+              raise SystemExit('Expected both property and pipeline drive mappings')
+          s = s.replace(old_mapping, new_mapping)
+
+          replace_once(
+          '''    function slugify(value) {''',
+          '''    async function deleteProperty(propertyId) {
+                const property = state.properties.find(item => item.id === propertyId);
+                const label = property?.title || "diesen Eintrag";
+                if (!window.confirm(`„${label}“ wirklich endgültig löschen?\\n\\nBewertungen, Notizen und Favoriten werden ebenfalls entfernt.`)) return;
+                setLoading(true);
+                try {
+                  for (const table of ["property_votes", "property_notes", "property_favorites"]) {
+                    const { error } = await db.from(table).delete().eq("property_id", propertyId);
+                    if (error) throw error;
+                  }
+                  const { error } = await db.from("properties").delete().eq("id", propertyId);
+                  if (error) throw error;
+                  state.properties = state.properties.filter(item => item.id !== propertyId);
+                  state.votes = state.votes.filter(item => item.property_id !== propertyId);
+                  state.notes = state.notes.filter(item => item.property_id !== propertyId);
+                  state.favorites = state.favorites.filter(item => item.property_id !== propertyId);
+                  applyFilters();
+                  showToast("Wohnung endgültig gelöscht");
+                } finally { setLoading(false); }
+              }
+
+              async function deletePipelineProject(projectId) {
+                const project = state.pipelineProjects.find(item => item.id === projectId);
+                const label = project?.project_name || "dieses Pipeline-Projekt";
+                if (!window.confirm(`„${label}“ wirklich endgültig löschen?`)) return;
+                setLoading(true);
+                try {
+                  const { error } = await db.from("pipeline_projects").delete().eq("id", projectId);
+                  if (error) throw error;
+                  state.pipelineProjects = state.pipelineProjects.filter(item => item.id !== projectId);
+                  applyFilters();
+                  showToast("Pipeline-Projekt endgültig gelöscht");
+                } finally { setLoading(false); }
+              }
+
+              function slugify(value) {''', 'delete functions')
+
+          replace_once(
+          '''        } else if (action === "locate") {
+                  focusItem(propertyId);
+                  window.scrollTo({ top: 0, behavior: "smooth" });
+                }''',
+          '''        } else if (action === "locate") {
+                  focusItem(propertyId);
+                  window.scrollTo({ top: 0, behavior: "smooth" });
+                } else if (action === "delete-property") {
+                  await deleteProperty(propertyId);
+                } else if (action === "delete-project") {
+                  await deletePipelineProject(propertyId);
+                }''', 'delete event actions')
+
+          p.write_text(s, encoding='utf-8')
+      - name: Commit patched dashboard
+        run: |
+          git config user.name "ChatGPT Dashboard Bot"
+          git config user.email "actions@users.noreply.github.com"
+          git add index.html
+          git commit -m "Fix distance field handling and add delete actions"
+          git push
