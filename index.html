@@ -4,7 +4,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
   <meta name="theme-color" content="#F8F2F7">
-  <title>Wohnungssuche – Gessi & Luca ❤️</title>
+  <title>Wohnungssuche – Luca & Gessi</title>
 
   <link rel="preconnect" href="https://unpkg.com">
   <link rel="preconnect" href="https://tile.openstreetmap.org">
@@ -618,6 +618,10 @@
     .map-empty { display:none; padding:18px; text-align:center; color:var(--muted); background:var(--surface); }
     .map-shell.no-points #map { min-height:180px; height:180px; }
     .map-shell.no-points .map-empty { display:block; }
+
+    .person-vote.locked, .note-wrap.locked { opacity: .56; }
+    .person-vote.locked .vote-btn, .note-wrap.locked textarea { cursor: not-allowed; }
+    .locked-hint { margin-top: 7px; color: var(--muted); font-size: 12px; font-weight: 700; }
   </style>
 </head>
 <body>
@@ -625,7 +629,7 @@
     <header class="topbar">
       <div class="brand">
         <h1>Euses Dihei 🥰🏡</h1>
-        <p>Wohnungssuche von Gessi &amp; Luca ❤️🔒</p>
+        <p>Wohnungssuche von Gessi &amp;<br>Luca ❤️🔐</p>
       </div>
 
       <div class="profile-picker" aria-label="Aktives Profil">
@@ -1136,23 +1140,27 @@
           </div>
 
           <div class="notes">
-            <div class="note-wrap">
+            <div class="note-wrap ${state.profile !== "luca" ? "locked" : ""}">
               <label for="note-luca-${property.id}">Lucas Notiz</label>
               <textarea class="note"
                         id="note-luca-${property.id}"
                         data-action="note"
                         data-person="luca"
                         data-id="${property.id}"
+                        ${state.profile !== "luca" ? "disabled" : ""}
                         placeholder="Lucas Gedanken …">${escapeHtml(lucaNote)}</textarea>
+              ${state.profile !== "luca" ? '<div class="locked-hint">Nur Luca kann diese Notiz bearbeiten 🔒</div>' : ""}
             </div>
-            <div class="note-wrap">
+            <div class="note-wrap ${state.profile !== "gessi" ? "locked" : ""}">
               <label for="note-gessi-${property.id}">Gessis Notiz</label>
               <textarea class="note"
                         id="note-gessi-${property.id}"
                         data-action="note"
                         data-person="gessi"
                         data-id="${property.id}"
+                        ${state.profile !== "gessi" ? "disabled" : ""}
                         placeholder="Gessis Gedanken …">${escapeHtml(gessiNote)}</textarea>
+              ${state.profile !== "gessi" ? '<div class="locked-hint">Nur Gessi kann diese Notiz bearbeiten 🔒</div>' : ""}
             </div>
           </div>
 
@@ -1197,8 +1205,9 @@
     }
 
     function voteBlockHtml(person, label, propertyId, vote) {
+      const locked = state.profile !== person;
       return `
-        <div class="person-vote">
+        <div class="person-vote ${locked ? "locked" : ""}">
           <div class="person-vote-label">
             <span>${label}</span>
             <span>${vote === 1 ? "👍" : vote === -1 ? "👎" : "–"}</span>
@@ -1210,6 +1219,7 @@
                     data-id="${propertyId}"
                     data-person="${person}"
                     data-vote="1"
+                    ${locked ? "disabled" : ""}
                     aria-label="${label}: Daumen hoch">👍</button>
             <button class="vote-btn down ${vote === -1 ? "active" : ""}"
                     type="button"
@@ -1217,8 +1227,10 @@
                     data-id="${propertyId}"
                     data-person="${person}"
                     data-vote="-1"
+                    ${locked ? "disabled" : ""}
                     aria-label="${label}: Daumen runter">👎</button>
           </div>
+          ${locked ? `<div class="locked-hint">Nur ${label} kann hier bewerten 🔒</div>` : ""}
         </div>
       `;
     }
@@ -1319,6 +1331,10 @@
     }
 
     async function saveVote(propertyId, person, desiredVote) {
+      if (person !== state.profile) {
+        showToast(`Du bist als ${state.profile === "luca" ? "Luca" : "Gessi"} angemeldet.`, true);
+        return;
+      }
       const current = getVote(propertyId, person);
       const nextVote = current === desiredVote ? null : desiredVote;
 
@@ -1369,6 +1385,10 @@
     }
 
     async function saveNote(propertyId, person, note) {
+      if (person !== state.profile) {
+        showToast(`Du bist als ${state.profile === "luca" ? "Luca" : "Gessi"} angemeldet.`, true);
+        return;
+      }
       const { data, error } = await db
         .from("property_notes")
         .upsert(
