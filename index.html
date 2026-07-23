@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-  <meta name="theme-color" content="#F8F2F7">
+  <meta name="theme-color" content="#121923">
   <title>Euses Dihei – Gessi & Luca</title>
 
   <link rel="preconnect" href="https://unpkg.com">
@@ -14,707 +14,862 @@
         crossorigin="">
 
   <style>
-    :root {
-      --bg: #fbf7fa;
-      --surface: #fffdfd;
-      --surface-2: #f6eef5;
-      --text: #3f3a46;
-      --muted: #817986;
-      --line: #eadfe7;
-      --primary: #b784a7;
-      --primary-soft: #f3e4ee;
-      --good: #618875;
-      --good-soft: #e8f3ed;
-      --bad: #b96f78;
-      --bad-soft: #f8e8ea;
-      --warn: #a38355;
-      --warn-soft: #f7efdf;
-      --peach: #f7e7dc;
-      --mint: #e6f1ec;
-      --lavender: #eee8f7;
-      --blue: #e8f0f7;
-      --shadow: 0 14px 35px rgba(116, 87, 108, .10);
-      --radius: 22px;
-      --safe-bottom: env(safe-area-inset-bottom, 0px);
-    }
-
-    * { box-sizing: border-box; }
-    html { scroll-behavior: smooth; }
-    body {
-      margin: 0;
-      background: radial-gradient(circle at top left, #fff8f4 0, transparent 34%), linear-gradient(180deg, #fbf7fa 0%, #f7f4fb 100%);
-      color: var(--text);
-      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-      -webkit-font-smoothing: antialiased;
-    }
-
-    button, input, select, textarea { font: inherit; }
-    button { cursor: pointer; }
-    a { color: inherit; }
-
-    .app {
-      width: min(1180px, 100%);
-      margin: 0 auto;
-      padding: 16px 14px calc(98px + var(--safe-bottom));
-    }
-
-    .topbar {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 12px;
-      margin-bottom: 14px;
-    }
-
-    .brand h1 {
-      margin: 0;
-      font-size: clamp(22px, 5vw, 32px);
-      letter-spacing: -.03em;
-    }
-
-    .brand p {
-      margin: 3px 0 0;
-      color: var(--muted);
-      font-size: 13px;
-    }
-
-    .profile-picker {
-      display: flex;
-      gap: 5px;
-      padding: 4px;
-      background: var(--surface-2);
-      border: 1px solid var(--line);
-      border-radius: 999px;
-    }
-
-    .profile-btn {
-      border: 0;
-      background: transparent;
-      border-radius: 999px;
-      padding: 8px 12px;
-      color: var(--muted);
-      font-weight: 700;
-    }
-
-    .profile-btn.active {
-      background: var(--surface);
-      color: var(--text);
-      box-shadow: 0 2px 8px rgba(0,0,0,.08);
-    }
-
-    .summary-grid {
-      display: grid;
-      grid-template-columns: repeat(4, minmax(0, 1fr));
-      gap: 9px;
-      margin-bottom: 12px;
-    }
-
-    .metric {
-      background: var(--surface);
-      border: 1px solid var(--line);
-      border-radius: 15px;
-      padding: 11px 12px;
-      min-width: 0;
-    }
-
-    .metric strong {
-      display: block;
-      font-size: 22px;
-      letter-spacing: -.03em;
-    }
-
-    .metric span {
-      color: var(--muted);
-      font-size: 12px;
-    }
-
-    .map-shell {
-      overflow: hidden;
-      background: var(--surface);
-      border: 1px solid var(--line);
-      border-radius: var(--radius);
-      box-shadow: var(--shadow);
-      margin-bottom: 12px;
-    }
-
-    #map {
-      width: 100%;
-      height: clamp(285px, 42vh, 430px);
-      background: linear-gradient(135deg, var(--mint), var(--lavender));
-    }
-
-    .map-caption {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 10px;
-      padding: 10px 12px;
-      color: var(--muted);
-      font-size: 13px;
-    }
-
-    .map-caption button {
-      border: 0;
-      background: var(--primary-soft);
-      color: var(--primary);
-      border-radius: 10px;
-      padding: 7px 10px;
-      font-weight: 700;
-    }
-
-    .toolbar {
-      background: var(--surface);
-      border: 1px solid var(--line);
-      border-radius: var(--radius);
-      padding: 12px;
-      margin-bottom: 12px;
-    }
-
-    .search-row {
-      display: grid;
-      grid-template-columns: minmax(0, 1.5fr) repeat(3, minmax(115px, .7fr)) auto;
-      gap: 8px;
-    }
-
-    .control {
-      width: 100%;
-      min-height: 44px;
-      border: 1px solid var(--line);
-      background: var(--surface);
-      color: var(--text);
-      border-radius: 12px;
-      padding: 10px 12px;
-      outline: none;
-    }
-
-    .control:focus {
-      border-color: var(--primary);
-      box-shadow: 0 0 0 3px var(--primary-soft);
-    }
-
-    .primary-btn, .secondary-btn, .danger-btn {
-      min-height: 44px;
-      border-radius: 12px;
-      padding: 10px 14px;
-      font-weight: 800;
-      border: 1px solid transparent;
-    }
-
-    .primary-btn { background: var(--primary); color: white; }
-    .secondary-btn { background: var(--surface-2); color: var(--text); border-color: var(--line); }
-    .danger-btn { background: var(--bad-soft); color: var(--bad); }
-
-    .list-head {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      gap: 12px;
-      margin: 16px 2px 10px;
-    }
-
-    .list-head h2 { margin: 0; font-size: 19px; }
-    .list-head span { color: var(--muted); font-size: 13px; }
-
-    .properties {
-      display: grid;
-      grid-template-columns: repeat(2, minmax(0, 1fr));
-      gap: 12px;
-    }
-
-    .property-card {
-      background: var(--surface);
-      border: 1px solid var(--line);
-      border-radius: var(--radius);
-      padding: 15px;
-      box-shadow: 0 5px 18px rgba(19, 31, 54, .05);
-      transition: border-color .2s, transform .2s;
-      min-width: 0;
-    }
-
-    .property-card.highlight {
-      border-color: var(--primary);
-      box-shadow: 0 0 0 3px var(--primary-soft);
-    }
-
-    .card-top {
-      display: flex;
-      justify-content: space-between;
-      align-items: flex-start;
-      gap: 10px;
-    }
-
-    .card-title {
-      margin: 0;
-      font-size: 18px;
-      line-height: 1.25;
-      letter-spacing: -.02em;
-      overflow-wrap: anywhere;
-    }
-
-    .location {
-      color: var(--muted);
-      margin-top: 3px;
-      font-size: 14px;
-    }
-
-    .favorite-btn {
-      flex: 0 0 auto;
-      width: 43px;
-      height: 43px;
-      border: 1px solid var(--line);
-      background: var(--surface);
-      border-radius: 13px;
-      font-size: 22px;
-    }
-
-    .favorite-btn.active {
-      background: var(--warn-soft);
-      border-color: #eed586;
-    }
-
-    .price {
-      font-size: 25px;
-      font-weight: 850;
-      margin: 14px 0 8px;
-      letter-spacing: -.035em;
-    }
-
-    .facts {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 7px;
-      margin-bottom: 10px;
-    }
-
-    .chip {
-      display: inline-flex;
-      align-items: center;
-      min-height: 28px;
-      padding: 5px 9px;
-      border-radius: 999px;
-      background: var(--surface-2);
-      color: #374151;
-      font-size: 12px;
-      font-weight: 700;
-    }
-
-    .chip.good { background: var(--good-soft); color: var(--good); }
-    .chip.warn { background: var(--warn-soft); color: var(--warn); }
-    .chip.bad { background: var(--bad-soft); color: var(--bad); }
-
-    .ai-box {
-      background: #fffdf9;
-      border: 1.5px solid #c8ddd2;
-      border-left: 4px solid var(--good);
-      border-radius: 13px;
-      padding: 10px 11px;
-      margin: 10px 0;
-      font-size: 13px;
-      line-height: 1.4;
-      box-shadow: 0 4px 12px rgba(97, 136, 117, .07);
-    }
-
-    .ai-box strong { display: block; margin-bottom: 3px; }
-
-    .voting {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 8px;
-      margin: 12px 0;
-    }
-
-    .person-vote {
-      border: 1px solid var(--line);
-      border-radius: 14px;
-      padding: 9px;
-    }
-
-    .person-vote-label {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      gap: 8px;
-      margin-bottom: 7px;
-      font-size: 13px;
-      font-weight: 800;
-    }
-
-    .vote-buttons {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 6px;
-    }
-
-    .vote-btn {
-      height: 40px;
-      border-radius: 11px;
-      border: 1px solid var(--line);
-      background: var(--surface);
-      font-size: 20px;
-    }
-
-    .vote-btn.up.active { background: var(--good-soft); border-color: #9bd7b7; }
-    .vote-btn.down.active { background: var(--bad-soft); border-color: #f0aaaa; }
-
-    .notes {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 8px;
-      margin-top: 10px;
-    }
-
-    .note-wrap label {
-      display: block;
-      font-size: 12px;
-      font-weight: 800;
-      color: var(--muted);
-      margin: 0 0 5px 2px;
-    }
-
-    .note {
-      width: 100%;
-      min-height: 83px;
-      resize: vertical;
-      border: 1px solid var(--line);
-      border-radius: 12px;
-      padding: 10px;
-      background: var(--surface);
-      color: var(--text);
-      outline: none;
-    }
-
-    .note:focus {
-      border-color: var(--primary);
-      box-shadow: 0 0 0 3px var(--primary-soft);
-    }
-
-    .card-actions {
-      display: grid;
-      grid-template-columns: minmax(0, 1fr) auto auto;
-      gap: 7px;
-      margin-top: 10px;
-    }
-
-    .status-select { min-width: 0; }
-
-    .link-btn {
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      min-height: 42px;
-      border: 1px solid var(--line);
-      border-radius: 11px;
-      padding: 8px 11px;
-      text-decoration: none;
-      font-weight: 800;
-      background: var(--surface);
-    }
-
-    .empty {
-      grid-column: 1 / -1;
-      padding: 34px 18px;
-      text-align: center;
-      background: var(--surface);
-      border: 1px dashed var(--line);
-      border-radius: var(--radius);
-      color: var(--muted);
-    }
-
-    .bottom-nav {
-      position: fixed;
-      z-index: 1000;
-      left: 50%;
-      bottom: 0;
-      transform: translateX(-50%);
-      width: min(680px, 100%);
-      padding: 8px 10px calc(8px + var(--safe-bottom));
-      display: grid;
-      grid-template-columns: repeat(5, 1fr);
-      gap: 5px;
-      background: rgba(255,255,255,.94);
-      border-top: 1px solid var(--line);
-      backdrop-filter: blur(16px);
-    }
-
-    .nav-btn {
-      min-height: 54px;
-      border: 0;
-      background: transparent;
-      border-radius: 14px;
-      color: var(--muted);
-      font-size: 11px;
-      font-weight: 800;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      gap: 3px;
-    }
-
-    .nav-btn span:first-child { font-size: 20px; }
-    .nav-btn.active { background: var(--primary-soft); color: var(--primary); }
-
-    .modal {
-      position: fixed;
-      z-index: 3000;
-      inset: 0;
-      display: none;
-      align-items: flex-end;
-      justify-content: center;
-      background: rgba(17, 24, 39, .56);
-      padding: 14px;
-    }
-
-    .modal.open { display: flex; }
-
-    .modal-panel {
-      width: min(760px, 100%);
-      max-height: 90vh;
-      overflow: auto;
-      border-radius: 22px 22px 16px 16px;
-      background: var(--surface);
-      padding: 16px;
-      box-shadow: var(--shadow);
-    }
-
-    .modal-head {
-      display: flex;
-      align-items: flex-start;
-      justify-content: space-between;
-      gap: 12px;
-      margin-bottom: 10px;
-    }
-
-    .modal-head h2 { margin: 0; font-size: 20px; }
-    .modal-head p { margin: 3px 0 0; color: var(--muted); font-size: 13px; }
-
-    .icon-btn {
-      width: 42px;
-      height: 42px;
-      border-radius: 12px;
-      border: 1px solid var(--line);
-      background: var(--surface);
-    }
-
-    .import-text {
-      width: 100%;
-      min-height: 290px;
-      border: 1px solid var(--line);
-      border-radius: 14px;
-      padding: 12px;
-      font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
-      font-size: 13px;
-      resize: vertical;
-    }
-
-    .modal-actions {
-      display: flex;
-      justify-content: flex-end;
-      gap: 8px;
-      margin-top: 10px;
-    }
-
-    .toast {
-      position: fixed;
-      z-index: 5000;
-      left: 50%;
-      bottom: calc(86px + var(--safe-bottom));
-      transform: translate(-50%, 20px);
-      width: min(92%, 520px);
-      padding: 12px 14px;
-      border-radius: 14px;
-      background: #182033;
-      color: white;
-      opacity: 0;
-      pointer-events: none;
-      transition: opacity .2s, transform .2s;
-      text-align: center;
-      font-size: 14px;
-      box-shadow: var(--shadow);
-    }
-
-    .toast.show { opacity: 1; transform: translate(-50%, 0); }
-    .toast.error { background: #8f2323; }
-
-    .loading {
-      position: fixed;
-      z-index: 4500;
-      inset: 0;
-      display: none;
-      place-items: center;
-      background: rgba(245,247,251,.76);
-      backdrop-filter: blur(3px);
-    }
-
-    .loading.show { display: grid; }
-    .spinner {
-      width: 44px;
-      height: 44px;
-      border: 4px solid #dbe4f5;
-      border-top-color: var(--primary);
-      border-radius: 50%;
-      animation: spin .8s linear infinite;
-    }
-    @keyframes spin { to { transform: rotate(360deg); } }
-
-    .leaflet-popup-content { margin: 12px 14px; }
-    .popup-title { font-weight: 850; margin-bottom: 4px; }
-    .popup-meta { color: #6b7280; font-size: 12px; margin-bottom: 8px; }
-    .popup-btn {
-      border: 0;
-      border-radius: 9px;
-      background: #2563eb;
-      color: white;
-      padding: 7px 9px;
-      font-weight: 800;
-    }
-
-    @media (max-width: 800px) {
-      .app { padding-top: 12px; }
-      .summary-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
-      .search-row { grid-template-columns: 1fr 1fr; }
-      .search-row .wide { grid-column: 1 / -1; }
-      .properties { grid-template-columns: 1fr; }
-      .property-card { padding: 13px; }
-      .topbar { align-items: flex-start; }
-      .brand p { max-width: 190px; }
-    }
-
-    @media (max-width: 520px) {
-      .app { padding-left: 10px; padding-right: 10px; }
-      .profile-btn { padding: 7px 10px; font-size: 13px; }
-      .metric { padding: 10px; }
-      .metric strong { font-size: 20px; }
-      #map { height: 310px; }
-      .search-row { grid-template-columns: 1fr; }
-      .search-row .wide { grid-column: auto; }
-      .voting, .notes { grid-template-columns: 1fr; }
-      .card-actions { grid-template-columns: 1fr 1fr; }
-      .card-actions .status-select { grid-column: 1 / -1; }
-      .modal { padding: 0; }
-      .modal-panel { border-radius: 22px 22px 0 0; max-height: 94vh; }
-    }
-
-
-    .metric:nth-child(1){background:var(--peach)}
-    .metric:nth-child(2){background:var(--mint)}
-    .metric:nth-child(3){background:var(--lavender)}
-    .metric:nth-child(4){background:var(--blue)}
-    .property-card { background: rgba(255,253,253,.94); }
-    .profile-gate { position:fixed; inset:0; z-index:3000; display:none; place-items:center; padding:20px; background:rgba(251,247,250,.92); backdrop-filter:blur(14px); }
-    .profile-gate.open { display:grid; }
-    .profile-gate-card { width:min(420px,100%); padding:28px; border:1px solid var(--line); border-radius:28px; background:var(--surface); box-shadow:var(--shadow); text-align:center; }
-    .profile-gate-card .home-icon { font-size:46px; margin-bottom:8px; }
-    .profile-gate-card h2 { margin:0 0 8px; font-size:28px; }
-    .profile-gate-card p { margin:0 0 22px; color:var(--muted); }
-    .profile-choices { display:grid; grid-template-columns:1fr 1fr; gap:12px; }
-    .profile-choice { border:1px solid var(--line); border-radius:20px; padding:20px 12px; font-weight:800; font-size:18px; color:var(--text); }
-    .profile-choice[data-profile="luca"] { background:var(--blue); }
-    .profile-choice[data-profile="gessi"] { background:var(--peach); }
-    .commute-box { margin-top:12px; padding:14px; border:1px solid var(--line); border-radius:18px; background:linear-gradient(135deg,#fffaf7,#f7f2fb); }
-    .commute-labels,.commute-times { display:flex; justify-content:space-between; gap:12px; font-size:12px; font-weight:800; letter-spacing:.05em; text-transform:uppercase; }
-    .commute-times { margin-top:8px; color:var(--muted); font-size:13px; text-transform:none; letter-spacing:0; }
-    .commute-track { position:relative; height:26px; margin-top:8px; }
-    .commute-line { position:absolute; left:4px; right:4px; top:12px; height:3px; border-radius:9px; background:#ddd5dc; }
-    .commute-dot { position:absolute; top:5px; width:17px; height:17px; border:3px solid white; border-radius:50%; background:var(--primary); box-shadow:0 2px 8px rgba(0,0,0,.15); transform:translateX(-50%); }
-    .commute-middle { position:absolute; top:-2px; transform:translateX(-50%); color:var(--primary); font-size:10px; font-weight:900; text-transform:uppercase; }
-    .map-empty { display:none; padding:18px; text-align:center; color:var(--muted); background:var(--surface); }
-    .map-shell.no-points #map { min-height:180px; height:180px; }
-    .map-shell.no-points .map-empty { display:block; }
-
-
-
-    /* Dezente Emoji-Klickanimation */
-    .emoji-pop {
-      display: inline-block;
-      transform-origin: 50% 65%;
-      animation: emojiWiggle .9s cubic-bezier(.2,.85,.25,1);
-      will-change: transform, filter;
-    }
-    @keyframes emojiWiggle {
-      0%   { transform: translateY(0) scale(1) rotate(0); filter: none; }
-      18%  { transform: translateY(-3px) scale(1.13) rotate(-4deg); filter: drop-shadow(0 5px 5px rgba(183,132,167,.24)); }
-      34%  { transform: translateY(-2px) scale(1.10) rotate(4deg); }
-      50%  { transform: translateY(-2px) scale(1.11) rotate(-3deg); }
-      66%  { transform: translateY(-1px) scale(1.07) rotate(2deg); }
-      82%  { transform: translateY(0) scale(1.03) rotate(-1deg); }
-      100% { transform: translateY(0) scale(1) rotate(0); filter: none; }
-    }
-    @media (prefers-reduced-motion: reduce) {
-      .emoji-pop { animation: none; }
-    }
-
-    .pipeline-card {
-      background: rgba(255,253,253,.96);
-      border: 1px solid var(--line);
-      border-radius: var(--radius);
-      padding: 15px;
-      box-shadow: 0 5px 18px rgba(19,31,54,.05);
-      min-width: 0;
-    }
-    .pipeline-card .pipeline-status {
-      display:inline-flex;
-      align-items:center;
-      gap:6px;
-      padding:6px 9px;
-      border-radius:999px;
-      background:var(--lavender);
-      color:#6f5b86;
-      font-size:12px;
-      font-weight:850;
+    :root{
+      --bg:#f4f6f8;
+      --surface:#ffffff;
+      --surface-2:#f8fafb;
+      --surface-dark:#121923;
+      --text:#17202a;
+      --muted:#697480;
+      --line:#e3e8ec;
+      --accent:#7a4f6d;
+      --accent-2:#b784a7;
+      --accent-soft:#f4eaf1;
+      --gold:#b8894f;
+      --gold-soft:#fbf3e8;
+      --good:#5f7d6c;
+      --good-soft:#edf4f0;
+      --bad:#b33a45;
+      --bad-soft:#fdecef;
+      --warn:#9a6519;
+      --warn-soft:#fff5df;
+      --shadow:0 18px 50px rgba(26,39,51,.10);
+      --shadow-soft:0 8px 24px rgba(26,39,51,.07);
+      --radius-xl:28px;
+      --radius-lg:20px;
+      --radius-md:14px;
+      --safe-bottom:env(safe-area-inset-bottom,0px);
+    }
+
+    *{box-sizing:border-box}
+    html{scroll-behavior:smooth}
+    body{
+      margin:0;
+      background:
+        radial-gradient(circle at 12% 0%, rgba(183,132,167,.11), transparent 28rem),
+        radial-gradient(circle at 90% 12%, rgba(184,137,79,.08), transparent 24rem),
+        var(--bg);
+      color:var(--text);
+      font-family:Inter,-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+      -webkit-font-smoothing:antialiased;
+    }
+
+    button,input,select,textarea{font:inherit}
+    button{cursor:pointer}
+    a{color:inherit}
+    .hidden{display:none!important}
+
+    .app{
+      width:min(1240px,100%);
+      margin:0 auto;
+      padding:18px 18px calc(104px + var(--safe-bottom));
+    }
+
+    .hero{
+      position:relative;
+      overflow:hidden;
+      background:linear-gradient(135deg,#fffaf7 0%,#fffdfb 58%,#fbf4f8 100%);
+      color:#3f3946;
+      border-radius:var(--radius-xl);
+      padding:24px;
+      margin-bottom:16px;
+      box-shadow:var(--shadow);
+    }
+
+    .hero::after{
+      content:"";
+      position:absolute;
+      width:260px;
+      height:260px;
+      border-radius:50%;
+      right:-90px;
+      top:-120px;
+      background:radial-gradient(circle,rgba(183,132,167,.18),rgba(183,132,167,0));
+      pointer-events:none;
+    }
+
+    .hero-row{
+      position:relative;
+      z-index:1;
+      display:flex;
+      align-items:flex-start;
+      justify-content:space-between;
+      gap:18px;
+    }
+
+
+    .brand h1{
+      margin:0;
+      font-size:clamp(34px,6vw,54px);
+      line-height:1.04;
+      letter-spacing:-.045em;
+      font-weight:900;
+    }
+
+    .title-emojis{
+      display:inline-block;
+      margin-left:8px;
+      font-size:.82em;
+      letter-spacing:0;
+      vertical-align:.06em;
+    }
+
+    .brand p{
+      margin:10px 0 0;
+      max-width:650px;
+      color:#d9cfd7;
+      font-size:clamp(18px,2.2vw,23px);
+      line-height:1.34;
+      font-weight:500;
+      letter-spacing:-.015em;
+    }
+
+    .subtitle-emojis{
       white-space:nowrap;
+      letter-spacing:0;
     }
-    .pipeline-meta {
+
+    .mobile-break{display:none}
+
+    .profile-picker{
+      flex:0 0 auto;
+      display:flex;
+      gap:5px;
+      padding:5px;
+      background:rgba(122,79,109,.08);
+      border:1px solid rgba(122,79,109,.12);
+      border-radius:999px;
+      backdrop-filter:blur(12px);
+    }
+
+    .profile-btn{
+      border:0;
+      background:transparent;
+      color:#6d6471;
+      border-radius:999px;
+      padding:9px 14px;
+      font-weight:800;
+    }
+
+    .profile-btn.active{
+      background:#4b3447;
+      color:white;
+      box-shadow:0 4px 14px rgba(0,0,0,.18);
+    }
+
+    .summary-grid{
+      display:grid;
+      grid-template-columns:repeat(4,minmax(0,1fr));
+      gap:10px;
+      margin-top:22px;
+    }
+
+    .metric{
+      position:relative;
+      z-index:1;
+      padding:14px 15px;
+      border-radius:16px;
+      background:rgba(255,255,255,.72);
+      border:1px solid rgba(122,79,109,.10);
+      backdrop-filter:blur(10px);
+    }
+
+    .metric strong{
+      display:block;
+      font-size:24px;
+      letter-spacing:-.035em;
+    }
+
+    .metric span{
+      display:block;
+      margin-top:3px;
+      color:#817684;
+      font-size:12px;
+    }
+
+    .map-shell{
+      overflow:hidden;
+      background:var(--surface);
+      border:1px solid var(--line);
+      border-radius:var(--radius-xl);
+      box-shadow:var(--shadow-soft);
+      margin-bottom:16px;
+    }
+
+    #map{
+      width:100%;
+      height:clamp(300px,45vh,460px);
+      background:#dfe8e8;
+    }
+
+    .map-empty{
+      display:none;
+      padding:26px;
+      text-align:center;
+      color:var(--muted);
+    }
+
+    .map-shell.no-points #map{display:none}
+    .map-shell.no-points .map-empty{display:block}
+
+    .map-caption{
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:12px;
+      padding:12px 15px;
+      color:var(--muted);
+      font-size:13px;
+    }
+
+    .map-caption button{
+      border:0;
+      background:var(--accent-soft);
+      color:var(--accent);
+      border-radius:10px;
+      padding:8px 11px;
+      font-weight:850;
+    }
+
+    .toolbar{
+      position:sticky;
+      top:8px;
+      z-index:900;
+      padding:12px;
+      margin-bottom:16px;
+      background:rgba(255,255,255,.88);
+      border:1px solid rgba(227,232,236,.85);
+      border-radius:var(--radius-lg);
+      box-shadow:var(--shadow-soft);
+      backdrop-filter:blur(18px);
+    }
+
+    .search-row{
+      display:grid;
+      grid-template-columns:minmax(200px,1.65fr) repeat(3,minmax(128px,.72fr)) auto;
+      gap:8px;
+    }
+
+    .control{
+      width:100%;
+      min-height:46px;
+      padding:10px 12px;
+      border:1px solid var(--line);
+      border-radius:12px;
+      background:var(--surface);
+      color:var(--text);
+      outline:none;
+      transition:.18s ease;
+    }
+
+    .control:focus{
+      border-color:var(--accent-2);
+      box-shadow:0 0 0 4px rgba(183,132,167,.14);
+    }
+
+    .primary-btn,.secondary-btn,.danger-btn,.ghost-btn{
+      min-height:44px;
+      padding:10px 14px;
+      border-radius:12px;
+      font-weight:850;
+      border:1px solid transparent;
+      transition:transform .16s ease,box-shadow .16s ease,background .16s ease;
+    }
+
+    .primary-btn:hover,.secondary-btn:hover,.danger-btn:hover,.ghost-btn:hover{transform:translateY(-1px)}
+    .primary-btn{background:var(--accent);color:white;box-shadow:0 8px 18px rgba(122,79,109,.20)}
+    .secondary-btn{background:var(--surface-2);color:var(--text);border-color:var(--line)}
+    .danger-btn{background:var(--bad-soft);color:var(--bad);border-color:#f7cbd1}
+    .ghost-btn{background:transparent;color:var(--muted);border-color:var(--line)}
+
+    .list-head{
+      display:flex;
+      align-items:end;
+      justify-content:space-between;
+      gap:12px;
+      margin:20px 3px 11px;
+    }
+
+    .list-head h2{
+      margin:0;
+      font-size:24px;
+      letter-spacing:-.035em;
+    }
+
+    .list-head span{color:var(--muted);font-size:13px}
+
+    .properties{
       display:grid;
       grid-template-columns:repeat(2,minmax(0,1fr));
+      gap:14px;
+    }
+
+    .property-card,.pipeline-card{
+      position:relative;
+      min-width:0;
+      overflow:hidden;
+      background:var(--surface);
+      border:1px solid var(--line);
+      border-radius:var(--radius-lg);
+      padding:18px;
+      box-shadow:var(--shadow-soft);
+      transition:transform .18s ease,border-color .18s ease,box-shadow .18s ease;
+    }
+
+    .property-card:hover,.pipeline-card:hover{
+      transform:translateY(-2px);
+      border-color:#cdd8dd;
+      box-shadow:var(--shadow);
+    }
+
+    .property-card.highlight,.pipeline-card.highlight{
+      border-color:var(--accent-2);
+      box-shadow:0 0 0 4px rgba(183,132,167,.15),var(--shadow);
+    }
+
+    .card-top{
+      display:flex;
+      align-items:flex-start;
+      justify-content:space-between;
+      gap:10px;
+    }
+
+    .card-title{
+      margin:0;
+      font-size:20px;
+      line-height:1.25;
+      letter-spacing:-.025em;
+      overflow-wrap:anywhere;
+    }
+
+    .location{
+      margin-top:5px;
+      color:var(--muted);
+      font-size:14px;
+    }
+
+    .top-actions{
+      display:flex;
+      gap:7px;
+      flex:0 0 auto;
+    }
+
+    .favorite-btn,.icon-danger{
+      width:42px;
+      height:42px;
+      display:inline-grid;
+      place-items:center;
+      border-radius:12px;
+      border:1px solid var(--line);
+      background:var(--surface);
+      font-size:20px;
+      transition:.17s ease;
+    }
+
+    .favorite-btn.active{
+      background:var(--gold-soft);
+      border-color:#edcf99;
+    }
+
+    .icon-danger{
+      color:var(--bad);
+      font-size:17px;
+    }
+
+    .icon-danger:hover{background:var(--bad-soft);border-color:#f4bec6}
+
+    .price{
+      margin:15px 0 9px;
+      font-size:28px;
+      font-weight:900;
+      letter-spacing:-.04em;
+    }
+
+    .facts{
+      display:flex;
+      flex-wrap:wrap;
+      gap:7px;
+      margin-bottom:11px;
+    }
+
+    .chip{
+      display:inline-flex;
+      align-items:center;
+      min-height:29px;
+      padding:5px 9px;
+      border-radius:999px;
+      background:#eef2f4;
+      color:#43505b;
+      font-size:12px;
+      font-weight:800;
+    }
+
+    .chip.good{background:var(--good-soft);color:var(--good)}
+    .chip.warn{background:var(--warn-soft);color:var(--warn)}
+    .chip.bad{background:var(--bad-soft);color:var(--bad)}
+    .pipeline-badge{background:var(--accent-soft);color:var(--accent)}
+
+    .ai-box{
+      margin:12px 0;
+      padding:12px 13px;
+      border-radius:14px;
+      border:1px solid #eadde6;
+      background:linear-gradient(135deg,#fffafd,#f7f1f6);
+      color:#34444b;
+      font-size:13px;
+      line-height:1.48;
+    }
+
+    .ai-box strong{display:block;margin-bottom:4px;color:var(--accent)}
+
+    .commute-box{
+      margin:12px 0;
+      padding:14px 14px 13px;
+      border:1px solid var(--line);
+      border-radius:15px;
+      background:linear-gradient(180deg,#fff,#fbf8fb);
+    }
+
+    .commute-head{
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:10px;
+      margin-bottom:11px;
+      color:var(--muted);
+      font-size:12px;
+      font-weight:850;
+    }
+
+    .commute-labels,
+    .commute-times{
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:10px;
+    }
+
+    .commute-labels{
+      color:#4a414a;
+      font-size:12px;
+      font-weight:850;
+    }
+
+    .commute-times{
+      margin-top:9px;
+      color:var(--text);
+      font-size:13px;
+      font-weight:900;
+    }
+
+    .commute-track{
+      position:relative;
+      height:36px;
+      margin:8px 4px 2px;
+    }
+
+    .commute-line{
+      position:absolute;
+      left:0;
+      right:0;
+      top:17px;
+      height:4px;
+      border-radius:999px;
+      background:linear-gradient(90deg,#eadbe5 0%,#b784a7 50%,#eadbe5 100%);
+    }
+
+    .commute-line::before,
+    .commute-line::after{
+      content:"";
+      position:absolute;
+      top:50%;
+      width:12px;
+      height:12px;
+      border-radius:50%;
+      background:white;
+      border:3px solid var(--accent);
+      transform:translateY(-50%);
+      box-shadow:0 2px 7px rgba(60,38,55,.14);
+    }
+
+    .commute-line::before{left:-1px}
+    .commute-line::after{right:-1px}
+
+    .commute-middle{
+      position:absolute;
+      top:-2px;
+      transform:translateX(-50%);
+      padding:0;
+      background:transparent;
+      color:#4d4050;
+      font-size:9px;
+      font-weight:950;
+      letter-spacing:.06em;
+      white-space:nowrap;
+      text-shadow:0 1px 0 rgba(255,255,255,.9);
+    }
+
+    .commute-dot{
+      position:absolute;
+      top:13px;
+      width:12px;
+      height:12px;
+      border-radius:50%;
+      transform:translateX(-50%);
+      background:var(--accent-2);
+      border:3px solid white;
+      box-shadow:0 0 0 2px var(--accent),0 3px 9px rgba(60,38,55,.20);
+    }
+
+    .voting{
+      display:grid;
+      grid-template-columns:1fr 1fr;
       gap:8px;
       margin:12px 0;
     }
-    .pipeline-meta > div {
+
+    .person-vote{
       padding:10px;
-      border-radius:13px;
+      border:1px solid var(--line);
+      border-radius:14px;
+      background:#fcfdfd;
+    }
+
+    .person-vote.locked{opacity:.68}
+
+    .person-vote-label{
+      display:flex;
+      justify-content:space-between;
+      gap:8px;
+      margin-bottom:8px;
+      font-size:13px;
+      font-weight:850;
+    }
+
+    .vote-buttons{
+      display:grid;
+      grid-template-columns:1fr 1fr;
+      gap:6px;
+    }
+
+    .vote-btn{
+      height:40px;
+      border:1px solid var(--line);
+      border-radius:10px;
+      background:white;
+      font-size:19px;
+    }
+
+    .vote-btn.up.active{background:var(--good-soft);border-color:#abd8bf}
+    .vote-btn.down.active{background:var(--bad-soft);border-color:#efb8c0}
+
+    .locked-hint{
+      margin-top:6px;
+      color:var(--muted);
+      font-size:10px;
+      text-align:center;
+    }
+
+    .notes{
+      display:grid;
+      grid-template-columns:1fr 1fr;
+      gap:8px;
+      margin-top:10px;
+    }
+
+    .note-wrap label{
+      display:block;
+      margin:0 0 5px 2px;
+      color:var(--muted);
+      font-size:12px;
+      font-weight:850;
+    }
+
+    .note{
+      width:100%;
+      min-height:82px;
+      resize:vertical;
+      padding:10px;
+      border:1px solid var(--line);
+      border-radius:12px;
+      background:white;
+      color:var(--text);
+      outline:none;
+    }
+
+    .note:focus{border-color:var(--accent-2);box-shadow:0 0 0 4px rgba(183,132,167,.11)}
+
+    .card-actions{
+      display:grid;
+      grid-template-columns:minmax(0,1fr) auto auto;
+      gap:7px;
+      margin-top:11px;
+    }
+
+    .link-btn{
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+      min-height:44px;
+      padding:9px 12px;
+      border:1px solid var(--line);
+      border-radius:12px;
+      background:white;
+      text-decoration:none;
+      font-weight:850;
+    }
+
+    .source-line{
+      margin-top:10px;
+      color:var(--muted);
+      font-size:11px;
+    }
+
+    .pipeline-status{
+      flex:0 0 auto;
+      max-width:46%;
+      padding:7px 10px;
+      border-radius:999px;
+      background:var(--accent-soft);
+      color:var(--accent);
+      font-size:11px;
+      font-weight:900;
+      text-align:center;
+    }
+
+    .pipeline-description{
+      color:#46535c;
+      line-height:1.55;
+      font-size:13px;
+    }
+
+    .pipeline-meta{
+      display:grid;
+      grid-template-columns:repeat(3,minmax(0,1fr));
+      gap:8px;
+      margin:12px 0;
+    }
+
+    .pipeline-meta>div{
+      padding:11px;
       background:var(--surface-2);
+      border:1px solid var(--line);
+      border-radius:12px;
       min-width:0;
     }
-    .pipeline-meta small { display:block; color:var(--muted); margin-bottom:3px; }
-    .pipeline-meta strong { display:block; overflow-wrap:anywhere; }
-    .pipeline-description { color:var(--text); line-height:1.48; font-size:14px; }
-    .project-links { display:flex; flex-wrap:wrap; gap:8px; margin-top:12px; }
-    .source-line { margin-top:10px; color:var(--muted); font-size:12px; }
-    .pipeline-badge { background:var(--blue); color:#56738d; }
 
-    .person-vote.locked, .note-wrap.locked { opacity: .56; }
-    .person-vote.locked .vote-btn, .note-wrap.locked textarea { cursor: not-allowed; pointer-events:none; }
-    .person-vote.locked .vote-buttons, .note-wrap.locked textarea { user-select:none; }
-    .locked-hint { margin-top: 7px; color: var(--muted); font-size: 12px; font-weight: 700; }
+    .pipeline-meta small{display:block;color:var(--muted);font-size:10px}
+    .pipeline-meta strong{display:block;margin-top:3px;font-size:12px;overflow-wrap:anywhere}
+
+    .project-links{
+      display:flex;
+      flex-wrap:wrap;
+      gap:7px;
+      margin-top:11px;
+    }
+
+    .empty{
+      grid-column:1/-1;
+      padding:44px 20px;
+      text-align:center;
+      border:1px dashed #cfd8dc;
+      border-radius:var(--radius-lg);
+      background:rgba(255,255,255,.7);
+      color:var(--muted);
+    }
+
+    .bottom-nav{
+      position:fixed;
+      z-index:1200;
+      left:50%;
+      bottom:10px;
+      transform:translateX(-50%);
+      width:min(720px,calc(100% - 20px));
+      display:grid;
+      grid-template-columns:repeat(5,1fr);
+      gap:5px;
+      padding:7px;
+      padding-bottom:calc(7px + var(--safe-bottom));
+      border:1px solid rgba(227,232,236,.88);
+      border-radius:20px;
+      background:rgba(255,255,255,.92);
+      box-shadow:0 18px 45px rgba(26,39,51,.18);
+      backdrop-filter:blur(20px);
+    }
+
+    .nav-btn{
+      min-height:56px;
+      border:0;
+      border-radius:14px;
+      background:transparent;
+      color:var(--muted);
+      font-size:11px;
+      font-weight:850;
+      display:flex;
+      flex-direction:column;
+      align-items:center;
+      justify-content:center;
+      gap:3px;
+    }
+
+    .nav-btn span:first-child{font-size:20px}
+    .nav-btn.active{background:linear-gradient(135deg,#4b3447,#7a4f6d);color:white;box-shadow:0 7px 16px rgba(79,49,72,.18)}
+
+    .wiggle{
+      animation:buttonWiggle .42s cubic-bezier(.36,.07,.19,.97);
+      transform-origin:center;
+    }
+
+    @keyframes buttonWiggle{
+      0%{transform:rotate(0deg) scale(1)}
+      18%{transform:rotate(-4deg) scale(.97)}
+      36%{transform:rotate(4deg) scale(1.03)}
+      54%{transform:rotate(-3deg) scale(1.01)}
+      72%{transform:rotate(2deg) scale(1.01)}
+      100%{transform:rotate(0deg) scale(1)}
+    }
+
+    .modal,.profile-gate{
+      position:fixed;
+      z-index:3000;
+      inset:0;
+      display:none;
+      align-items:center;
+      justify-content:center;
+      padding:16px;
+      background:rgba(8,14,20,.68);
+      backdrop-filter:blur(8px);
+    }
+
+    .modal.open,.profile-gate.open{display:flex}
+
+    .modal-panel,.profile-gate-card{
+      width:min(760px,100%);
+      max-height:90vh;
+      overflow:auto;
+      background:white;
+      border-radius:24px;
+      padding:20px;
+      box-shadow:0 28px 80px rgba(0,0,0,.28);
+    }
+
+    .profile-gate-card{width:min(460px,100%);text-align:center}
+    .home-icon{font-size:46px}
+    .profile-gate-card h2{margin:8px 0 6px;font-size:28px}
+    .profile-gate-card p{margin:0;color:var(--muted);line-height:1.5}
+    .profile-choices{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:18px}
+    .profile-choice{min-height:54px;border:0;border-radius:14px;background:var(--surface-dark);color:white;font-weight:900}
+
+    .modal-head{
+      display:flex;
+      align-items:flex-start;
+      justify-content:space-between;
+      gap:12px;
+      margin-bottom:12px;
+    }
+
+    .modal-head h2{margin:0;font-size:24px}
+    .modal-head p{margin:5px 0 0;color:var(--muted);font-size:13px;line-height:1.45}
+    .icon-btn{width:40px;height:40px;border:1px solid var(--line);border-radius:11px;background:white}
+    .import-text{width:100%;min-height:360px;padding:14px;border:1px solid var(--line);border-radius:14px;background:#0f1720;color:#dbe7ec;font:13px/1.5 ui-monospace,SFMono-Regular,Menlo,monospace;resize:vertical;outline:none}
+    .modal-actions{display:flex;justify-content:flex-end;gap:8px;margin-top:12px}
+
+    .toast{
+      position:fixed;
+      z-index:5000;
+      left:50%;
+      bottom:98px;
+      transform:translate(-50%,18px);
+      max-width:min(520px,calc(100% - 28px));
+      padding:11px 14px;
+      border-radius:12px;
+      background:#101820;
+      color:white;
+      box-shadow:var(--shadow);
+      opacity:0;
+      pointer-events:none;
+      transition:.22s ease;
+      font-size:13px;
+      font-weight:750;
+      text-align:center;
+    }
+
+    .toast.show{opacity:1;transform:translate(-50%,0)}
+    .toast.error{background:#8e2d38}
+
+    .loading{
+      position:fixed;
+      z-index:4500;
+      inset:0;
+      display:none;
+      place-items:center;
+      background:rgba(244,246,248,.72);
+      backdrop-filter:blur(5px);
+    }
+
+    .loading.show{display:grid}
+    .spinner{width:38px;height:38px;border:4px solid #d8e2e4;border-top-color:var(--accent);border-radius:50%;animation:spin .8s linear infinite}
+    @keyframes spin{to{transform:rotate(360deg)}}
+
+    .leaflet-popup-content-wrapper,.leaflet-popup-tip{box-shadow:var(--shadow-soft)}
+    .popup-title{font-weight:900;margin-bottom:5px}
+    .popup-meta{color:var(--muted);font-size:12px;line-height:1.4}
+    .popup-btn{margin-top:8px;border:0;border-radius:9px;padding:7px 9px;background:var(--accent);color:white;font-weight:850}
+
+    @media(max-width:900px){
+      .search-row{grid-template-columns:1fr 1fr}
+      .search-row .wide{grid-column:1/-1}
+      .properties{grid-template-columns:1fr}
+    }
+
+    @media(max-width:640px){
+      .app{padding:10px 10px calc(98px + var(--safe-bottom))}
+      .hero{padding:18px;border-radius:22px}
+      .hero-row{flex-direction:column}
+      .profile-picker{align-self:flex-start}
+      .mobile-break{display:block}
+      .summary-grid{grid-template-columns:repeat(2,1fr)}
+      .toolbar{top:4px}
+      .search-row{grid-template-columns:1fr 1fr}
+      .search-row .wide,.search-row button{grid-column:1/-1}
+      .property-card,.pipeline-card{padding:15px;border-radius:18px}
+      .notes,.voting{grid-template-columns:1fr}
+      .pipeline-meta{grid-template-columns:1fr 1fr}
+      .card-actions{grid-template-columns:1fr 1fr}
+      .card-actions .status-select{grid-column:1/-1}
+      .map-caption{align-items:flex-start}
+      .bottom-nav{bottom:4px}
+    }
   </style>
 </head>
+
 <body>
   <main class="app">
-    <header class="topbar">
-      <div class="brand">
-        <h1>Euses Dihei 🥰🏡</h1>
-        <p>Wohnungssuche von Gessi &amp;<br>Luca ❤️🔐</p>
+    <section class="hero">
+      <div class="hero-row">
+        <div class="brand">
+          <h1>Euses Dihei <span class="title-emojis">🥰 🏡</span></h1>
+          <p>Wohnungssuche von Gessi &amp;<br class="mobile-break"> Luca <span class="subtitle-emojis">💗 🔐</span></p>
+        </div>
+        <div class="profile-picker" aria-label="Aktives Profil">
+          <button class="profile-btn" data-profile="luca" type="button">Luca</button>
+          <button class="profile-btn" data-profile="gessi" type="button">Gessi</button>
+        </div>
       </div>
 
-      <div class="profile-picker" aria-label="Aktives Profil">
-        <button class="profile-btn" data-profile="luca" type="button">Luca</button>
-        <button class="profile-btn" data-profile="gessi" type="button">Gessi</button>
-      </div>
-    </header>
-
-    <section class="summary-grid" aria-label="Zusammenfassung">
-      <div class="metric"><strong id="metricVisible">0</strong><span>angezeigt</span></div>
-      <div class="metric"><strong id="metricBothLike">0</strong><span>beide 👍</span></div>
-      <div class="metric"><strong id="metricFavorites">0</strong><span>Favoriten</span></div>
-      <div class="metric"><strong id="metricAvgPrice">–</strong><span>Ø Preis</span></div>
+      <section class="summary-grid" aria-label="Zusammenfassung">
+        <div class="metric"><strong id="metricVisible">0</strong><span>angezeigt</span></div>
+        <div class="metric"><strong id="metricBothLike">0</strong><span>beide mögen</span></div>
+        <div class="metric"><strong id="metricFavorites">0</strong><span>Favoriten</span></div>
+        <div class="metric"><strong id="metricAvgPrice">–</strong><span>Ø Preis</span></div>
+      </section>
     </section>
 
     <section class="map-shell">
       <div id="map" role="region" aria-label="Karte der Wohnungen"></div>
-      <div id="mapEmpty" class="map-empty">Für diese Wohnungen fehlen noch Koordinaten. Bekannte Orte werden automatisch auf der Karte platziert.</div>
+      <div id="mapEmpty" class="map-empty">Für diese Einträge fehlen Koordinaten.</div>
       <div class="map-caption">
-        <span id="mapCaption">Wohnungen mit Kartenposition</span>
+        <span id="mapCaption">Einträge mit Kartenposition</span>
         <button id="fitMapBtn" type="button">Alle anzeigen</button>
       </div>
     </section>
@@ -739,7 +894,7 @@
           <option value="priceDesc">Preis absteigend</option>
           <option value="ratingDesc">KI-Bewertung</option>
         </select>
-        <button id="resetFiltersBtn" class="secondary-btn" type="button">Reset</button>
+        <button id="resetFiltersBtn" class="secondary-btn" type="button">Filter löschen</button>
       </div>
     </section>
 
@@ -759,12 +914,11 @@
     <button class="nav-btn" data-view="import" type="button"><span>📥</span><span>Import</span></button>
   </nav>
 
-
-  <div id="profileGate" class="profile-gate" role="dialog" aria-modal="true" aria-labelledby="profileGateTitle">
+  <div id="profileGate" class="profile-gate open" role="dialog" aria-modal="true">
     <section class="profile-gate-card">
       <div class="home-icon">🏡</div>
-      <h2 id="profileGateTitle">Wer schaut gerade?</h2>
-      <p>So landen Bewertung, Notiz und Favorit garantiert beim richtigen Profil.</p>
+      <h2>Wer schaut gerade?</h2>
+      <p>Bewertungen, Notizen und Favoriten werden dem richtigen Profil zugeordnet.</p>
       <div class="profile-choices">
         <button class="profile-choice" data-profile="luca" type="button">Luca</button>
         <button class="profile-choice" data-profile="gessi" type="button">Gessi</button>
@@ -772,44 +926,18 @@
     </section>
   </div>
 
-  <div id="importModal" class="modal" role="dialog" aria-modal="true" aria-labelledby="importTitle">
+  <div id="importModal" class="modal" role="dialog" aria-modal="true">
     <section class="modal-panel">
       <div class="modal-head">
         <div>
-          <h2 id="importTitle">ChatGPT-Update importieren</h2>
-          <p>JSON-Block einfügen. Fahrzeiten bitte möglichst im JSON mitgeben; Bewertungen, Favoriten und Notizen bleiben erhalten.</p>
+          <h2>ChatGPT-Update importieren</h2>
+          <p>JSON einfügen. Bereits vorhandene Bewertungen, Notizen und Favoriten bleiben erhalten.</p>
         </div>
         <button id="closeImportBtn" class="icon-btn" type="button" aria-label="Schliessen">✕</button>
       </div>
-
-      <textarea id="importText" class="import-text" spellcheck="false" placeholder='{
-  "properties": [
-  {
-    "external_id": "homegate-123",
-    "source": "Homegate",
-    "title": "4.5-Zimmer-Wohnung",
-    "location": "Othmarsingen",
-    "address": "Wilhalde 42, 5504 Othmarsingen",
-    "latitude": 47.401,
-    "longitude": 8.214,
-    "price_chf": 1040000,
-    "rooms": 4.5,
-    "living_area_m2": 119,
-    "move_in": "April 2027",
-    "listing_url": "https://...",
-    "minergie": true,
-    "building_right": false,
-    "drive_minutes_othmarsingen": 18,
-    "drive_minutes_duebendorf": 22,
-    "ai_rating": 9.1,
-    "ai_recommendation_reason": "Sehr gutes Preis-Flächen-Verhältnis."
-  }
-  ],
-  "pipeline_projects": []
-}'></textarea>
-
+      <textarea id="importText" class="import-text" spellcheck="false" placeholder='{"properties":[],"pipeline_projects":[]}'></textarea>
       <div class="modal-actions">
-        <button id="sampleBtn" class="secondary-btn" type="button">Beispiel einsetzen</button>
+        <button id="sampleBtn" class="secondary-btn" type="button">Beispiel</button>
         <button id="runImportBtn" class="primary-btn" type="button">Jetzt importieren</button>
       </div>
     </section>
@@ -828,756 +956,576 @@
     const SUPABASE_KEY = "sb_publishable_2UwF0H-4eW_A0KHUMQydlA_XDvWoXxY";
 
     const db = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY, {
-      auth: {
-        persistSession: false,
-        autoRefreshToken: false,
-        detectSessionInUrl: false
-      }
+      auth:{persistSession:false,autoRefreshToken:false,detectSessionInUrl:false}
     });
 
     const storedProfile = localStorage.getItem("wohnung_profile");
     const state = {
-      profile: ["luca", "gessi"].includes(storedProfile) ? storedProfile : null,
-      view: "main",
-      properties: [],
-      pipelineProjects: [],
-      votes: [],
-      notes: [],
-      favorites: [],
-      filtered: [],
-      markers: new Map(),
-      map: null,
-      markerLayer: null
+      profile:["luca","gessi"].includes(storedProfile) ? storedProfile : null,
+      view:"main",
+      properties:[],
+      pipelineProjects:[],
+      votes:[],
+      notes:[],
+      favorites:[],
+      filtered:[],
+      markers:new Map(),
+      map:null,
+      markerLayer:null
     };
 
-    const el = {
-      propertyList: document.getElementById("propertyList"),
-      viewTitle: document.getElementById("viewTitle"),
-      resultCount: document.getElementById("resultCount"),
-      metricVisible: document.getElementById("metricVisible"),
-      metricBothLike: document.getElementById("metricBothLike"),
-      metricFavorites: document.getElementById("metricFavorites"),
-      metricAvgPrice: document.getElementById("metricAvgPrice"),
-      mapCaption: document.getElementById("mapCaption"),
-      mapEmpty: document.getElementById("mapEmpty"),
-      profileGate: document.getElementById("profileGate"),
-      searchInput: document.getElementById("searchInput"),
-      priceFilter: document.getElementById("priceFilter"),
-      roomsFilter: document.getElementById("roomsFilter"),
-      sortFilter: document.getElementById("sortFilter"),
-      resetFiltersBtn: document.getElementById("resetFiltersBtn"),
-      fitMapBtn: document.getElementById("fitMapBtn"),
-      importModal: document.getElementById("importModal"),
-      importText: document.getElementById("importText"),
-      closeImportBtn: document.getElementById("closeImportBtn"),
-      runImportBtn: document.getElementById("runImportBtn"),
-      sampleBtn: document.getElementById("sampleBtn"),
-      toast: document.getElementById("toast"),
-      loading: document.getElementById("loading")
-    };
+    const el = Object.fromEntries([
+      "propertyList","viewTitle","resultCount","metricVisible","metricBothLike",
+      "metricFavorites","metricAvgPrice","mapCaption","mapEmpty","profileGate",
+      "searchInput","priceFilter","roomsFilter","sortFilter","resetFiltersBtn",
+      "fitMapBtn","importModal","importText","closeImportBtn","runImportBtn",
+      "sampleBtn","toast","loading"
+    ].map(id=>[id,document.getElementById(id)]));
 
     const STATUS_LABELS = {
-      interesting: "Interessant",
-      contacted: "Kontakt aufgenommen",
-      viewing_planned: "Besichtigung geplant",
-      viewed: "Besichtigt",
-      rejected: "Abgelehnt",
-      purchased: "Gekauft",
-      archived: "Archiviert"
+      interesting:"Interessant",
+      contacted:"Kontakt aufgenommen",
+      viewing_planned:"Besichtigung geplant",
+      viewed:"Besichtigt",
+      rejected:"Abgelehnt",
+      purchased:"Gekauft",
+      archived:"Archiviert"
     };
-
-    function escapeHtml(value) {
-      return String(value ?? "")
-        .replaceAll("&", "&amp;")
-        .replaceAll("<", "&lt;")
-        .replaceAll(">", "&gt;")
-        .replaceAll('"', "&quot;")
-        .replaceAll("'", "&#039;");
-    }
-
-    function formatPrice(value) {
-      if (value === null || value === undefined || value === "") return "Preis offen";
-      return new Intl.NumberFormat("de-CH", {
-        style: "currency",
-        currency: "CHF",
-        maximumFractionDigits: 0
-      }).format(Number(value));
-    }
-
-    function formatDate(value) {
-      if (!value) return "";
-      const date = new Date(value);
-      if (Number.isNaN(date.getTime())) return value;
-      return new Intl.DateTimeFormat("de-CH", {
-        day: "2-digit",
-        month: "2-digit",
-        year: "numeric"
-      }).format(date);
-    }
-
-    function showToast(message, isError = false) {
-      el.toast.textContent = message;
-      el.toast.classList.toggle("error", isError);
-      el.toast.classList.add("show");
-      clearTimeout(showToast.timer);
-      showToast.timer = setTimeout(() => el.toast.classList.remove("show"), 3000);
-    }
-
-    function setLoading(active) {
-      el.loading.classList.toggle("show", active);
-      el.loading.setAttribute("aria-hidden", String(!active));
-    }
-
-    function getVote(propertyId, person) {
-      return state.votes.find(v => v.property_id === propertyId && v.person === person)?.vote ?? null;
-    }
-
-    function getNote(propertyId, person) {
-      return state.notes.find(n => n.property_id === propertyId && n.person === person)?.note ?? "";
-    }
-
-    function isFavorite(propertyId, person) {
-      return Boolean(state.favorites.find(f =>
-        f.property_id === propertyId &&
-        f.person === person &&
-        f.is_favorite === true
-      ));
-    }
-
-    function isFavoriteByAnyone(propertyId) {
-      return isFavorite(propertyId, "luca") || isFavorite(propertyId, "gessi");
-    }
-
-    function isLikedByBoth(propertyId) {
-      return getVote(propertyId, "luca") === 1 && getVote(propertyId, "gessi") === 1;
-    }
 
     const PLACE_COORDINATES = {
-      "neuenhof": [47.4494, 8.3266],
-      "killwangen": [47.4328, 8.3475],
-      "wurenlos": [47.4420, 8.3620],
-      "würenlos": [47.4420, 8.3620],
-      "spreitenbach": [47.4227, 8.3659],
-      "wettingen": [47.4668, 8.3267],
-      "baden": [47.4729, 8.3081],
-      "bergdietikon": [47.3899, 8.3898],
-      "dietikon": [47.4054, 8.4034],
-      "urdorf": [47.3851, 8.4258],
-      "schlieren": [47.3967, 8.4476],
-      "geroldswil": [47.4216, 8.4090],
-      "oetwil an der limmat": [47.4280, 8.3945],
-      "oberengstringen": [47.4099, 8.4659],
-      "regensdorf": [47.4347, 8.4683],
-      "buchs zh": [47.4570, 8.4378],
-      "dallikon": [47.4392, 8.4388],
-      "dällikon": [47.4392, 8.4388],
-      "otelfingen": [47.4604, 8.3911],
-      "fislisbach": [47.4384, 8.2903],
-      "niederrohrdorf": [47.4242, 8.3042],
-      "oberrohrdorf": [47.4188, 8.3184],
-      "mellingen": [47.4195, 8.2734],
-      "bremgarten": [47.3513, 8.3421],
-      "bremgarten ag": [47.3513, 8.3421],
-      "hermetschwil staffeln": [47.3318, 8.3488],
-      "hermetschwil-staffeln": [47.3318, 8.3488],
-      "staffeln": [47.3318, 8.3488],
-      "magenwil": [47.4112, 8.2347],
-      "mägenwil": [47.4112, 8.2347],
-      "wohlenschwil": [47.4130, 8.2568],
-      "birrhard": [47.4343, 8.2475],
-      "birr": [47.4353, 8.2084],
-      "lupfig": [47.4407, 8.2026],
-      "hendschiken": [47.3863, 8.2166],
-      "dintikon": [47.3626, 8.2278],
-      "kunten": [47.3897, 8.3310],
-      "künten": [47.3897, 8.3310],
-      "kuenten": [47.3897, 8.3310],
-      "othmarsingen": [47.4014, 8.2136],
-      "dubendorf": [47.3971, 8.6187],
-      "dübendorf": [47.3971, 8.6187],
-      "duebendorf": [47.3971, 8.6187]
+      "neuenhof":[47.4494,8.3266],"killwangen":[47.4328,8.3475],"wurenlos":[47.442,8.362],
+      "würenlos":[47.442,8.362],"spreitenbach":[47.4227,8.3659],"wettingen":[47.4668,8.3267],
+      "baden":[47.4729,8.3081],"bergdietikon":[47.3899,8.3898],"dietikon":[47.4054,8.4034],
+      "urdorf":[47.3851,8.4258],"schlieren":[47.3967,8.4476],"geroldswil":[47.4216,8.409],
+      "oetwil an der limmat":[47.428,8.3945],"oberengstringen":[47.4099,8.4659],
+      "regensdorf":[47.4347,8.4683],"buchs zh":[47.457,8.4378],"dallikon":[47.4392,8.4388],
+      "dällikon":[47.4392,8.4388],"otelfingen":[47.4604,8.3911],"fislisbach":[47.4384,8.2903],
+      "niederrohrdorf":[47.4242,8.3042],"oberrohrdorf":[47.4188,8.3184],
+      "mellingen":[47.4195,8.2734],"bremgarten":[47.3513,8.3429],"wohlen":[47.3507,8.2779],
+      "lenzburg":[47.3885,8.1763],"othmarsingen":[47.4014,8.2136],"duebendorf":[47.3971,8.6187],
+      "dübendorf":[47.3971,8.6187],"wallisellen":[47.414,8.5967],"zürich":[47.3769,8.5417]
     };
 
-    function normalizePlace(value) {
-      return String(value || "")
-        .trim()
-        .toLowerCase()
-        .normalize("NFD")
-        .replace(/[\u0300-\u036f]/g, "")
-        .replace(/\b(ch|schweiz)\b/g, "")
-        .replace(/[^a-z0-9 ]+/g, " ")
-        .replace(/\s+/g, " ")
-        .trim();
+    const ROUTE_DESTINATIONS = {
+      othmarsingen:[47.4014,8.2136],
+      duebendorf:[47.3971,8.6187]
+    };
+
+    function escapeHtml(value){
+      return String(value ?? "")
+        .replaceAll("&","&amp;").replaceAll("<","&lt;").replaceAll(">","&gt;")
+        .replaceAll('"',"&quot;").replaceAll("'","&#039;");
     }
 
-    function coordinatesFor(property) {
-      const lat = Number(property.latitude);
-      const lng = Number(property.longitude);
-      if (Number.isFinite(lat) && Number.isFinite(lng) && lat !== 0 && lng !== 0) return [lat, lng];
+    function formatPrice(value){
+      if(value===null||value===undefined||value==="") return "Preis offen";
+      return new Intl.NumberFormat("de-CH",{style:"currency",currency:"CHF",maximumFractionDigits:0}).format(Number(value));
+    }
 
-      const candidates = [property.municipality, property.location, property.address]
-        .map(normalizePlace)
-        .filter(Boolean);
+    function formatDate(value){
+      if(!value) return "";
+      const date=new Date(value);
+      if(Number.isNaN(date.getTime())) return String(value);
+      return new Intl.DateTimeFormat("de-CH",{day:"2-digit",month:"2-digit",year:"numeric"}).format(date);
+    }
 
-      for (const candidate of candidates) {
-        if (PLACE_COORDINATES[candidate]) return PLACE_COORDINATES[candidate];
-        const matchedKey = Object.keys(PLACE_COORDINATES)
-          .find(key => candidate === normalizePlace(key) || candidate.includes(normalizePlace(key)));
-        if (matchedKey) return PLACE_COORDINATES[matchedKey];
+    function showToast(message,isError=false){
+      el.toast.textContent=message;
+      el.toast.classList.toggle("error",isError);
+      el.toast.classList.add("show");
+      clearTimeout(showToast.timer);
+      showToast.timer=setTimeout(()=>el.toast.classList.remove("show"),3200);
+    }
+
+    function setLoading(active){
+      el.loading.classList.toggle("show",active);
+      el.loading.setAttribute("aria-hidden",String(!active));
+    }
+
+    function getVote(propertyId,person){
+      return state.votes.find(v=>v.property_id===propertyId&&v.person===person)?.vote ?? null;
+    }
+
+    function getNote(propertyId,person){
+      return state.notes.find(n=>n.property_id===propertyId&&n.person===person)?.note ?? "";
+    }
+
+    function isFavorite(propertyId,person){
+      return Boolean(state.favorites.find(f=>f.property_id===propertyId&&f.person===person&&f.is_favorite===true));
+    }
+
+    function isFavoriteByAnyone(propertyId){
+      return isFavorite(propertyId,"luca")||isFavorite(propertyId,"gessi");
+    }
+
+    function isLikedByBoth(propertyId){
+      return getVote(propertyId,"luca")===1&&getVote(propertyId,"gessi")===1;
+    }
+
+    function normalizePlace(value){
+      return String(value||"").trim().toLowerCase().normalize("NFD")
+        .replace(/[\u0300-\u036f]/g,"").replace(/\b(ch|schweiz)\b/g,"")
+        .replace(/[^a-z0-9 ]+/g," ").replace(/\s+/g," ").trim();
+    }
+
+    function coordinatesFor(item){
+      const lat=Number(item.latitude),lng=Number(item.longitude);
+      if(Number.isFinite(lat)&&Number.isFinite(lng)&&lat!==0&&lng!==0) return [lat,lng];
+      const candidates=[item.municipality,item.location,item.address].map(normalizePlace).filter(Boolean);
+      for(const candidate of candidates){
+        if(PLACE_COORDINATES[candidate]) return PLACE_COORDINATES[candidate];
+        const key=Object.keys(PLACE_COORDINATES).find(k=>candidate===normalizePlace(k)||candidate.includes(normalizePlace(k)));
+        if(key) return PLACE_COORDINATES[key];
       }
       return null;
     }
 
-    function initMap() {
-      if (!window.L) {
-        document.querySelector(".map-shell")?.classList.add("no-points");
-        el.mapCaption.textContent = "Karte konnte nicht geladen werden";
-        return;
+    function firstPositiveNumber(item,keys){
+      for(const key of keys){
+        const value=Number(item?.[key]);
+        if(Number.isFinite(value)&&value>0) return Math.round(value);
       }
-      state.map = L.map("map", { zoomControl: true, preferCanvas: true }).setView([47.39, 8.43], 10);
-
-      L.tileLayer("https://tile.openstreetmap.org/{z}/{x}/{y}.png", {
-        maxZoom: 19,
-        attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
-      }).addTo(state.map);
-
-      state.markerLayer = L.layerGroup().addTo(state.map);
+      return null;
     }
 
-    function renderMap() {
-      if (!state.map || !state.markerLayer) return;
+    function commuteValues(item){
+      return {
+        othmarsingen:firstPositiveNumber(item,[
+          "_drive_minutes_othmarsingen",
+          "drive_minutes_othmarsingen",
+          "othmarsingen_minutes",
+          "travel_time_othmarsingen_minutes",
+          "travel_time_luca_minutes"
+        ]),
+        duebendorf:firstPositiveNumber(item,[
+          "_drive_minutes_duebendorf",
+          "drive_minutes_duebendorf",
+          "duebendorf_minutes",
+          "travel_time_duebendorf_minutes",
+          "travel_time_gessi_minutes"
+        ])
+      };
+    }
+
+    function commuteHtml(item){
+      const times=commuteValues(item);
+      const a=times.othmarsingen;
+      const b=times.duebendorf;
+      const validA=Number.isFinite(a)&&a>0;
+      const validB=Number.isFinite(b)&&b>0;
+      const pending=item._route_failed ? "nicht verfügbar" : "wird berechnet …";
+      const ratio=validA&&validB ? Math.max(10,Math.min(90,(a/(a+b))*100)) : 50;
+
+      return `
+        <div class="commute-box">
+          <div class="commute-head">
+            <span>🚗 Fahrzeit mit dem Auto</span>
+            <span>Richtwert</span>
+          </div>
+          <div class="commute-labels">
+            <span>Othmarsingen</span>
+            <span>Dübendorf</span>
+          </div>
+          <div class="commute-track">
+            <div class="commute-line"></div>
+            <span class="commute-middle" style="left:${ratio}%">WOHNUNG</span>
+            <span class="commute-dot" style="left:${ratio}%"></span>
+          </div>
+          <div class="commute-times">
+            <span>${validA ? `${a} Min.` : pending}</span>
+            <span>${validB ? `${b} Min.` : pending}</span>
+          </div>
+        </div>`;
+    }
+
+    function initMap(){
+      if(!window.L){
+        document.querySelector(".map-shell")?.classList.add("no-points");
+        el.mapCaption.textContent="Karte konnte nicht geladen werden";
+        return;
+      }
+      state.map=L.map("map",{zoomControl:true,preferCanvas:true}).setView([47.39,8.43],10);
+      L.tileLayer("https://tile.openstreetmap.org/{z}/{x}/{y}.png",{
+        maxZoom:19,
+        attribution:'&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
+      }).addTo(state.map);
+      state.markerLayer=L.layerGroup().addTo(state.map);
+    }
+
+    function renderMap(){
+      if(!state.map||!state.markerLayer) return;
       state.markerLayer.clearLayers();
       state.markers.clear();
 
-      const itemsWithCoordinates = state.filtered
-        .map(item => ({ item, coordinates: coordinatesFor(item) }))
-        .filter(entry => entry.coordinates);
+      const entries=state.filtered.map(item=>({item,coordinates:coordinatesFor(item)})).filter(x=>x.coordinates);
+      const used=new Map();
 
-      const coordinateUsage = new Map();
+      for(const entry of entries){
+        const item=entry.item;
+        const isProject=item._item_type==="pipeline";
+        const base=entry.coordinates;
+        const key=`${base[0].toFixed(5)},${base[1].toFixed(5)}`;
+        const index=used.get(key)||0;
+        used.set(key,index+1);
+        const angle=index*2.3999632297;
+        const radius=index===0?0:.00044*Math.ceil(index/6+1);
+        const point=[base[0]+Math.sin(angle)*radius,base[1]+Math.cos(angle)*radius];
 
-      for (const entry of itemsWithCoordinates) {
-        const item = entry.item;
-        const isProject = state.view === "pipeline" || item._item_type === "pipeline";
-
-        // Inserate derselben Überbauung/Gemeinde dürfen sich nicht exakt überdecken.
-        const base = entry.coordinates;
-        const coordinateKey = `${base[0].toFixed(5)},${base[1].toFixed(5)}`;
-        const duplicateIndex = coordinateUsage.get(coordinateKey) || 0;
-        coordinateUsage.set(coordinateKey, duplicateIndex + 1);
-        const angle = duplicateIndex * 2.3999632297;
-        const radius = duplicateIndex === 0 ? 0 : 0.00042 * Math.ceil(duplicateIndex / 6 + 1);
-        const displayedCoordinates = [
-          base[0] + Math.sin(angle) * radius,
-          base[1] + Math.cos(angle) * radius
-        ];
-        const marker = L.marker(displayedCoordinates);
-
-        const popupMeta = isProject
-          ? `${escapeHtml(item.municipality || item.location || item.address || "Ort offen")}<br>${escapeHtml(item.project_status || "Status offen")} · ${escapeHtml(item.expected_move_in || "Bezug offen")}`
-          : `${escapeHtml(item.location || item.address || "")}<br>${escapeHtml(formatPrice(item.price_chf))} · ${item.rooms ?? "–"} Zi. · ${item.living_area_m2 ?? "–"} m²<br>Luca ${getVote(item.id, "luca") === 1 ? "👍" : getVote(item.id, "luca") === -1 ? "👎" : "–"} · Gessi ${getVote(item.id, "gessi") === 1 ? "👍" : getVote(item.id, "gessi") === -1 ? "👎" : "–"}`;
-
+        const marker=L.marker(point);
         marker.bindPopup(`
-          <div class="popup-title">${escapeHtml(isProject ? item.project_name : item.title)}</div>
-          <div class="popup-meta">${popupMeta}</div>
-          <button class="popup-btn" type="button" data-scroll-item="${item.id}">
-            ${isProject ? "Projekt anzeigen" : "Wohnung anzeigen"}
-          </button>
+          <div class="popup-title">${escapeHtml(isProject?item.project_name:item.title)}</div>
+          <div class="popup-meta">${escapeHtml(item.municipality||item.location||item.address||"Ort offen")}</div>
+          <button class="popup-btn" type="button" data-scroll-item="${item.id}">Anzeigen</button>
         `);
-
-        marker.on("popupopen", () => {
-          setTimeout(() => {
-            document.querySelector(`[data-scroll-item="${item.id}"]`)
-              ?.addEventListener("click", () => focusItem(item.id));
-          }, 0);
-        });
-
+        marker.on("popupopen",()=>setTimeout(()=>{
+          document.querySelector(`[data-scroll-item="${item.id}"]`)?.addEventListener("click",()=>focusItem(item.id));
+        },0));
         marker.addTo(state.markerLayer);
-        state.markers.set(item.id, marker);
+        state.markers.set(item.id,marker);
       }
 
-      const noun = state.view === "pipeline" ? "Projekte" : "Wohnungen";
-      el.mapCaption.textContent = `${itemsWithCoordinates.length} von ${state.filtered.length} ${noun} auf der Karte`;
-      document.querySelector(".map-shell")?.classList.toggle("no-points", itemsWithCoordinates.length === 0);
-
-      if (itemsWithCoordinates.length > 0) fitMapToVisible();
-      else state.map.setView([47.39, 8.43], 10);
-
-      setTimeout(() => state.map.invalidateSize(), 50);
+      el.mapCaption.textContent=`${entries.length} von ${state.filtered.length} Einträgen auf der Karte`;
+      document.querySelector(".map-shell")?.classList.toggle("no-points",entries.length===0);
+      if(entries.length) fitMapToVisible();
+      else state.map.setView([47.39,8.43],10);
+      setTimeout(()=>state.map.invalidateSize(),50);
     }
 
-    function fitMapToVisible() {
-      if (!state.map) return;
-      const markers = [...state.markers.values()];
-      if (!markers.length) return;
-
-      if (markers.length === 1) {
-        state.map.setView(markers[0].getLatLng(), 14);
+    function fitMapToVisible(){
+      if(!state.map) return;
+      const markers=[...state.markers.values()];
+      if(!markers.length) return;
+      if(markers.length===1){
+        state.map.setView(markers[0].getLatLng(),14);
         return;
       }
-
-      const group = L.featureGroup(markers);
-      state.map.fitBounds(group.getBounds().pad(0.17));
+      state.map.fitBounds(L.featureGroup(markers).getBounds().pad(.17));
     }
 
-    function focusItem(propertyId) {
-      const card = document.getElementById(`property-${propertyId}`);
-      if (card) {
-        card.scrollIntoView({ behavior: "smooth", block: "center" });
+    function focusItem(id){
+      const card=document.getElementById(`property-${id}`);
+      if(card){
+        card.scrollIntoView({behavior:"smooth",block:"center"});
         card.classList.add("highlight");
-        setTimeout(() => card.classList.remove("highlight"), 1800);
+        setTimeout(()=>card.classList.remove("highlight"),1800);
       }
-
-      const marker = state.markers.get(propertyId);
-      if (marker) {
-        state.map.setView(marker.getLatLng(), Math.max(state.map.getZoom(), 14));
+      const marker=state.markers.get(id);
+      if(marker){
+        state.map.setView(marker.getLatLng(),Math.max(state.map.getZoom(),14));
         marker.openPopup();
       }
     }
 
-    function applyFilters() {
-      const query = el.searchInput.value.trim().toLowerCase();
-      const maxPrice = Number(el.priceFilter.value || 0);
-      const minRooms = Number(el.roomsFilter.value || 0);
-      const isPipeline = state.view === "pipeline";
+    function applyFilters(){
+      const query=el.searchInput.value.trim().toLowerCase();
+      const maxPrice=Number(el.priceFilter.value||0);
+      const minRooms=Number(el.roomsFilter.value||0);
+      const isPipeline=state.view==="pipeline";
 
-      const sourceItems = isPipeline
-        ? state.pipelineProjects.map(project => ({ ...project, _item_type: "pipeline" }))
+      const source=isPipeline
+        ? state.pipelineProjects.map(x=>({...x,_item_type:"pipeline"}))
         : state.properties;
 
-      let items = sourceItems.filter(item => {
-        if (!isPipeline) {
-          if (state.view === "main" && item.is_archived) return false;
-          if (state.view === "archive" && !item.is_archived) return false;
-          if (state.view === "favorites" && (item.is_archived || !isFavoriteByAnyone(item.id))) return false;
-        } else if (item.is_archived) {
-          return false;
+      let items=source.filter(item=>{
+        if(!isPipeline){
+          if(state.view==="main"&&item.is_archived) return false;
+          if(state.view==="archive"&&!item.is_archived) return false;
+          if(state.view==="favorites"&&(item.is_archived||!isFavoriteByAnyone(item.id))) return false;
+        }else if(item.is_archived) return false;
+
+        const haystack=isPipeline
+          ? [item.project_name,item.description,item.municipality,item.address,item.developer,item.marketer,item.project_status]
+          : [item.title,item.location,item.address,item.municipality,item.canton];
+
+        if(query&&!haystack.filter(Boolean).join(" ").toLowerCase().includes(query)) return false;
+
+        if(isPipeline){
+          const price=Number(item.estimated_price_from_chf||item.estimated_price_to_chf||0);
+          const rooms=(String(item.expected_rooms||"").match(/\d+(?:[.,]\d+)?/g)||[]).map(v=>Number(v.replace(",",".")));
+          const maxRooms=rooms.length?Math.max(...rooms):0;
+          if(maxPrice&&price&&price>maxPrice) return false;
+          if(minRooms&&maxRooms&&maxRooms<minRooms) return false;
+        }else{
+          if(maxPrice&&Number(item.price_chf||Infinity)>maxPrice) return false;
+          if(minRooms&&Number(item.rooms||0)<minRooms) return false;
         }
-
-        const haystack = isPipeline
-          ? [item.project_name, item.description, item.municipality, item.address, item.developer, item.marketer, item.project_status]
-          : [item.title, item.location, item.address, item.municipality, item.canton];
-
-        if (query && !haystack.filter(Boolean).join(" ").toLowerCase().includes(query)) return false;
-
-        if (isPipeline) {
-          const projectPrice = Number(item.estimated_price_from_chf || item.estimated_price_to_chf || 0);
-          const roomsText = String(item.expected_rooms || "");
-          const roomValues = (roomsText.match(/\d+(?:[.,]\d+)?/g) || []).map(v => Number(v.replace(",", ".")));
-          const maxExpectedRooms = roomValues.length ? Math.max(...roomValues) : 0;
-          if (maxPrice && projectPrice && projectPrice > maxPrice) return false;
-          if (minRooms && maxExpectedRooms && maxExpectedRooms < minRooms) return false;
-        } else {
-          if (maxPrice && Number(item.price_chf || Infinity) > maxPrice) return false;
-          if (minRooms && Number(item.rooms || 0) < minRooms) return false;
-        }
-
         return true;
       });
 
-      switch (el.sortFilter.value) {
+      switch(el.sortFilter.value){
         case "priceAsc":
-          items.sort((a, b) => Number((isPipeline ? a.estimated_price_from_chf : a.price_chf) || Infinity) - Number((isPipeline ? b.estimated_price_from_chf : b.price_chf) || Infinity));
+          items.sort((a,b)=>Number((isPipeline?a.estimated_price_from_chf:a.price_chf)||Infinity)-Number((isPipeline?b.estimated_price_from_chf:b.price_chf)||Infinity));
           break;
         case "priceDesc":
-          items.sort((a, b) => Number((isPipeline ? b.estimated_price_to_chf : b.price_chf) || 0) - Number((isPipeline ? a.estimated_price_to_chf : a.price_chf) || 0));
+          items.sort((a,b)=>Number((isPipeline?b.estimated_price_to_chf:b.price_chf)||0)-Number((isPipeline?a.estimated_price_to_chf:a.price_chf)||0));
           break;
         case "ratingDesc":
-          items.sort((a, b) => Number(b.ai_rating || 0) - Number(a.ai_rating || 0));
+          items.sort((a,b)=>Number(b.ai_rating||0)-Number(a.ai_rating||0));
           break;
         default:
-          items.sort((a, b) => new Date(b.imported_at || b.updated_at || b.created_at || 0) - new Date(a.imported_at || a.updated_at || a.created_at || 0));
+          items.sort((a,b)=>new Date(b.imported_at||b.updated_at||b.created_at||0)-new Date(a.imported_at||a.updated_at||a.created_at||0));
       }
 
-      state.filtered = items;
+      state.filtered=items;
       renderAll();
     }
 
-    function renderAll() {
+    function renderAll(){
       renderSummary();
       renderProperties();
       renderMap();
-
-      const titles = {
-        main: "Alle Wohnungen",
-        favorites: "Favoriten von Luca & Gessi",
-        pipeline: "Projekt-Pipeline",
-        archive: "Archiv"
-      };
-
-      el.viewTitle.textContent = titles[state.view] || "Wohnungen";
-      el.resultCount.textContent = `${state.filtered.length} ${state.filtered.length === 1 ? "Treffer" : "Treffer"}`;
+      const titles={main:"Alle Wohnungen",favorites:"Unsere Favoriten",pipeline:"Projekt-Pipeline",archive:"Archiv"};
+      el.viewTitle.textContent=titles[state.view]||"Wohnungen";
+      el.resultCount.textContent=`${state.filtered.length} Treffer`;
     }
 
-    function renderSummary() {
-      if (state.view === "pipeline") {
-        const priced = state.filtered.map(p => Number(p.estimated_price_from_chf)).filter(Number.isFinite).filter(v => v > 0);
-        const avg = priced.length ? priced.reduce((a,b) => a+b,0) / priced.length : null;
-        el.metricVisible.textContent = state.filtered.length;
-        el.metricBothLike.textContent = state.filtered.filter(p => /bewilligt|approved/i.test(String(p.project_status || ""))).length;
-        el.metricFavorites.textContent = state.filtered.filter(p => /vermarkt|marketing|reservation|verkauf/i.test(String(p.project_status || ""))).length;
-        el.metricAvgPrice.textContent = avg ? `${Math.round(avg / 1000).toLocaleString("de-CH")}k` : "–";
-        el.metricBothLike.nextElementSibling.textContent = "bewilligt";
-        el.metricFavorites.nextElementSibling.textContent = "nahe Vermarktung";
-        el.metricAvgPrice.nextElementSibling.textContent = "Ø ab Preis";
+    function renderSummary(){
+      if(state.view==="pipeline"){
+        const priced=state.filtered.map(p=>Number(p.estimated_price_from_chf)).filter(v=>Number.isFinite(v)&&v>0);
+        const avg=priced.length?priced.reduce((a,b)=>a+b,0)/priced.length:null;
+        el.metricVisible.textContent=state.filtered.length;
+        el.metricBothLike.textContent=state.filtered.filter(p=>/bewilligt|approved/i.test(String(p.project_status||""))).length;
+        el.metricFavorites.textContent=state.filtered.filter(p=>/vermarkt|marketing|reservation|verkauf/i.test(String(p.project_status||""))).length;
+        el.metricAvgPrice.textContent=avg?`${Math.round(avg/1000).toLocaleString("de-CH")}k`:"–";
+        el.metricBothLike.nextElementSibling.textContent="bewilligt";
+        el.metricFavorites.nextElementSibling.textContent="nahe Vermarktung";
+        el.metricAvgPrice.nextElementSibling.textContent="Ø ab Preis";
         return;
       }
 
-      el.metricBothLike.nextElementSibling.textContent = "beide 👍";
-      el.metricFavorites.nextElementSibling.textContent = "Favoriten";
-      el.metricAvgPrice.nextElementSibling.textContent = "Ø Preis";
-      const prices = state.filtered.map(p => Number(p.price_chf)).filter(Number.isFinite);
-      const avg = prices.length ? prices.reduce((a, b) => a + b, 0) / prices.length : null;
-      el.metricVisible.textContent = state.filtered.length;
-      el.metricBothLike.textContent = state.filtered.filter(p => isLikedByBoth(p.id)).length;
-      el.metricFavorites.textContent = state.filtered.filter(p => isFavoriteByAnyone(p.id)).length;
-      el.metricAvgPrice.textContent = avg ? `${Math.round(avg / 1000).toLocaleString("de-CH")}k` : "–";
+      el.metricBothLike.nextElementSibling.textContent="beide mögen";
+      el.metricFavorites.nextElementSibling.textContent="Favoriten";
+      el.metricAvgPrice.nextElementSibling.textContent="Ø Preis";
+      const prices=state.filtered.map(p=>Number(p.price_chf)).filter(Number.isFinite);
+      const avg=prices.length?prices.reduce((a,b)=>a+b,0)/prices.length:null;
+      el.metricVisible.textContent=state.filtered.length;
+      el.metricBothLike.textContent=state.filtered.filter(p=>isLikedByBoth(p.id)).length;
+      el.metricFavorites.textContent=state.filtered.filter(p=>isFavoriteByAnyone(p.id)).length;
+      el.metricAvgPrice.textContent=avg?`${Math.round(avg/1000).toLocaleString("de-CH")}k`:"–";
     }
 
-    function propertyCardHtml(property) {
-      const lucaVote = getVote(property.id, "luca");
-      const gessiVote = getVote(property.id, "gessi");
-      const lucaNote = getNote(property.id, "luca");
-      const gessiNote = getNote(property.id, "gessi");
-      const ownFavorite = isFavorite(property.id, state.profile);
-      const bothFavorite = isFavorite(property.id, "luca") && isFavorite(property.id, "gessi");
+    function voteBlockHtml(person,label,id,vote){
+      const locked=state.profile!==person;
+      return `
+        <div class="person-vote ${locked?"locked":""}">
+          <div class="person-vote-label"><span>${label}</span><span>${vote===1?"👍":vote===-1?"👎":"–"}</span></div>
+          <div class="vote-buttons">
+            <button class="vote-btn up ${vote===1?"active":""}" type="button" data-action="vote" data-id="${id}" data-person="${person}" data-vote="1" ${locked?"disabled":""}>👍</button>
+            <button class="vote-btn down ${vote===-1?"active":""}" type="button" data-action="vote" data-id="${id}" data-person="${person}" data-vote="-1" ${locked?"disabled":""}>👎</button>
+          </div>
+          ${locked?`<div class="locked-hint">Nur ${label} kann hier bewerten 🔒</div>`:""}
+        </div>`;
+    }
 
-      const minergieChip = property.minergie === true
-        ? '<span class="chip good">Minergie</span>'
-        : property.minergie === false
-          ? '<span class="chip">Kein Minergie</span>'
-          : "";
-
-      const buildingRightChip = property.building_right
-        ? '<span class="chip warn">Baurecht</span>'
-        : '<span class="chip good">Kein Baurecht</span>';
-
-      const archivedChip = property.is_archived
-        ? '<span class="chip bad">Archiviert</span>'
-        : "";
-
-      const listingLink = property.listing_url
+    function propertyCardHtml(property){
+      const ownFavorite=isFavorite(property.id,state.profile);
+      const bothFavorite=isFavorite(property.id,"luca")&&isFavorite(property.id,"gessi");
+      const aiRating=property.ai_rating!=null?`${Number(property.ai_rating).toFixed(1)}/10`:"offen";
+      const aiText=property.ai_recommendation_reason||property.ai_summary||"Noch keine KI-Einschätzung.";
+      const listing=property.listing_url
         ? `<a class="link-btn" href="${escapeHtml(property.listing_url)}" target="_blank" rel="noopener noreferrer">Inserat ↗</a>`
         : `<span class="link-btn" aria-disabled="true">Kein Link</span>`;
-
-      const aiText = property.ai_recommendation_reason || property.ai_summary || "Noch keine KI-Einschätzung.";
-      const aiRating = property.ai_rating !== null && property.ai_rating !== undefined
-        ? `${Number(property.ai_rating).toFixed(1)}/10`
-        : "offen";
 
       return `
         <article class="property-card" id="property-${property.id}">
           <div class="card-top">
             <div>
-              <h3 class="card-title">${escapeHtml(property.title)}</h3>
-              <div class="location">${escapeHtml(property.location || property.address || "Ort offen")}</div>
+              <h3 class="card-title">${escapeHtml(property.title||"Wohnung ohne Titel")}</h3>
+              <div class="location">${escapeHtml(property.location||property.address||"Ort offen")}</div>
             </div>
-            <button class="favorite-btn ${ownFavorite ? "active" : ""}"
-                    type="button"
-                    data-action="favorite"
-                    data-id="${property.id}"
-                    aria-label="${ownFavorite ? "Aus Favoriten entfernen" : "Als Favorit speichern"}">
-              ${bothFavorite ? "💛" : ownFavorite ? "⭐" : "☆"}
-            </button>
+            <div class="top-actions">
+              <button class="favorite-btn ${ownFavorite?"active":""}" type="button" data-action="favorite" data-id="${property.id}" aria-label="Favorit">${bothFavorite?"💛":ownFavorite?"⭐":"☆"}</button>
+              <button class="icon-danger" type="button" data-action="delete-property" data-id="${property.id}" data-title="${escapeHtml(property.title||"diese Wohnung")}" aria-label="Dauerhaft löschen">🗑</button>
+            </div>
           </div>
 
           <div class="price">${escapeHtml(formatPrice(property.price_chf))}</div>
 
           <div class="facts">
-            ${property.rooms != null ? `<span class="chip">${property.rooms} Zimmer</span>` : ""}
-            ${property.living_area_m2 != null ? `<span class="chip">${property.living_area_m2} m²</span>` : ""}
-            ${property.move_in ? `<span class="chip">Einzug: ${escapeHtml(property.move_in)}</span>` : ""}
-            ${minergieChip}
-            ${buildingRightChip}
-            ${archivedChip}
+            ${property.rooms!=null?`<span class="chip">${property.rooms} Zimmer</span>`:""}
+            ${property.living_area_m2!=null?`<span class="chip">${property.living_area_m2} m²</span>`:""}
+            ${property.move_in?`<span class="chip">Bezug: ${escapeHtml(property.move_in)}</span>`:""}
+            ${property.minergie===true?'<span class="chip good">Minergie</span>':property.minergie===false?'<span class="chip">Kein Minergie</span>':""}
+            ${property.building_right?'<span class="chip warn">Baurecht</span>':'<span class="chip good">Kein Baurecht</span>'}
+            ${property.is_archived?'<span class="chip bad">Archiviert</span>':""}
           </div>
 
-          <div class="ai-box">
-            <strong>KI-Bewertung: ${escapeHtml(aiRating)}</strong>
-            ${escapeHtml(aiText)}
-          </div>
-
+          <div class="ai-box"><strong>KI-Bewertung: ${escapeHtml(aiRating)}</strong>${escapeHtml(aiText)}</div>
           ${commuteHtml(property)}
 
           <div class="voting">
-            ${voteBlockHtml("luca", "Luca", property.id, lucaVote)}
-            ${voteBlockHtml("gessi", "Gessi", property.id, gessiVote)}
+            ${voteBlockHtml("luca","Luca",property.id,getVote(property.id,"luca"))}
+            ${voteBlockHtml("gessi","Gessi",property.id,getVote(property.id,"gessi"))}
           </div>
 
           <div class="notes">
-            <div class="note-wrap ${state.profile !== "luca" ? "locked" : ""}">
-              <label for="note-luca-${property.id}">Lucas Notiz</label>
-              <textarea class="note"
-                        id="note-luca-${property.id}"
-                        data-action="note"
-                        data-person="luca"
-                        data-id="${property.id}"
-                        ${state.profile !== "luca" ? "disabled" : ""}
-                        placeholder="Lucas Gedanken …">${escapeHtml(lucaNote)}</textarea>
-              ${state.profile !== "luca" ? '<div class="locked-hint">Nur Luca kann diese Notiz bearbeiten 🔒</div>' : ""}
-            </div>
-            <div class="note-wrap ${state.profile !== "gessi" ? "locked" : ""}">
-              <label for="note-gessi-${property.id}">Gessis Notiz</label>
-              <textarea class="note"
-                        id="note-gessi-${property.id}"
-                        data-action="note"
-                        data-person="gessi"
-                        data-id="${property.id}"
-                        ${state.profile !== "gessi" ? "disabled" : ""}
-                        placeholder="Gessis Gedanken …">${escapeHtml(gessiNote)}</textarea>
-              ${state.profile !== "gessi" ? '<div class="locked-hint">Nur Gessi kann diese Notiz bearbeiten 🔒</div>' : ""}
-            </div>
+            ${["luca","gessi"].map(person=>{
+              const label=person==="luca"?"Lucas":"Gessis";
+              const locked=state.profile!==person;
+              return `<div class="note-wrap">
+                <label>${label} Notiz</label>
+                <textarea class="note" data-action="note" data-person="${person}" data-id="${property.id}" ${locked?"disabled":""} placeholder="${label} Gedanken …">${escapeHtml(getNote(property.id,person))}</textarea>
+                ${locked?`<div class="locked-hint">Nur ${person==="luca"?"Luca":"Gessi"} kann diese Notiz bearbeiten 🔒</div>`:""}
+              </div>`;
+            }).join("")}
           </div>
 
           <div class="card-actions">
-            <select class="control status-select" data-action="status" data-id="${property.id}" aria-label="Status">
-              ${Object.entries(STATUS_LABELS).map(([value, label]) =>
-                `<option value="${value}" ${property.status === value ? "selected" : ""}>${label}</option>`
-              ).join("")}
+            <select class="control status-select" data-action="status" data-id="${property.id}">
+              ${Object.entries(STATUS_LABELS).map(([value,label])=>`<option value="${value}" ${property.status===value?"selected":""}>${label}</option>`).join("")}
             </select>
-
-            <button class="secondary-btn" type="button" data-action="locate" data-id="${property.id}">
-              Karte
-            </button>
-
-            ${listingLink}
+            <button class="secondary-btn" type="button" data-action="locate" data-id="${property.id}">Karte</button>
+            ${listing}
           </div>
 
-          <div style="margin-top:9px;color:var(--muted);font-size:12px;">
-            Importiert: ${escapeHtml(formatDate(property.imported_at || property.created_at))}
-          </div>
-        </article>
-      `;
+          <div class="source-line">Quelle: ${escapeHtml(property.source||"nicht angegeben")} · Importiert: ${escapeHtml(formatDate(property.imported_at||property.created_at))}</div>
+        </article>`;
     }
 
-    function formatRange(from, to, formatter = value => value) {
-      const a = from !== null && from !== undefined && from !== "" ? formatter(from) : null;
-      const b = to !== null && to !== undefined && to !== "" ? formatter(to) : null;
-      if (a && b && a !== b) return `${a} – ${b}`;
-      return a || b || "offen";
+    function formatRange(from,to,formatter=v=>v){
+      const a=from!==null&&from!==undefined&&from!==""?formatter(from):null;
+      const b=to!==null&&to!==undefined&&to!==""?formatter(to):null;
+      if(a&&b&&a!==b) return `${a} – ${b}`;
+      return a||b||"offen";
     }
 
-    function pipelineCardHtml(project) {
-      const sourceUrl = project.source_url || null;
-      const projectUrl = project.project_url || null;
-      const aiText = project.ai_recommendation_reason || project.ai_summary || "Noch keine KI-Einschätzung.";
-      const aiRating = project.ai_rating !== null && project.ai_rating !== undefined ? `${Number(project.ai_rating).toFixed(1)}/10` : "offen";
-      const priceRange = formatRange(project.estimated_price_from_chf, project.estimated_price_to_chf, formatPrice);
-      const areaRange = formatRange(project.expected_living_area_from_m2, project.expected_living_area_to_m2, v => `${v} m²`);
-      const projectLink = projectUrl ? `<a class="link-btn" href="${escapeHtml(projectUrl)}" target="_blank" rel="noopener noreferrer">Projektseite ↗</a>` : "";
-      const sourceLink = sourceUrl && sourceUrl !== projectUrl ? `<a class="link-btn" href="${escapeHtml(sourceUrl)}" target="_blank" rel="noopener noreferrer">Quelle ↗</a>` : "";
+    function pipelineCardHtml(project){
+      const aiRating=project.ai_rating!=null?`${Number(project.ai_rating).toFixed(1)}/10`:"offen";
+      const aiText=project.ai_recommendation_reason||project.ai_summary||"Noch keine KI-Einschätzung.";
+      const projectLink=project.project_url?`<a class="link-btn" href="${escapeHtml(project.project_url)}" target="_blank" rel="noopener noreferrer">Projektseite ↗</a>`:"";
+      const sourceLink=project.source_url&&project.source_url!==project.project_url?`<a class="link-btn" href="${escapeHtml(project.source_url)}" target="_blank" rel="noopener noreferrer">Quelle ↗</a>`:"";
 
       return `
         <article class="pipeline-card" id="property-${project.id}">
           <div class="card-top">
             <div>
-              <h3 class="card-title">${escapeHtml(project.project_name || "Projekt ohne Namen")}</h3>
-              <div class="location">${escapeHtml(project.municipality || project.address || "Ort offen")}</div>
+              <h3 class="card-title">${escapeHtml(project.project_name||"Projekt ohne Namen")}</h3>
+              <div class="location">${escapeHtml(project.municipality||project.address||"Ort offen")}</div>
             </div>
-            <span class="pipeline-status">🏗️ ${escapeHtml(project.project_status || "Status offen")}</span>
+            <div class="top-actions">
+              <span class="pipeline-status">${escapeHtml(project.project_status||"Status offen")}</span>
+              <button class="icon-danger" type="button" data-action="delete-project" data-id="${project.id}" data-title="${escapeHtml(project.project_name||"dieses Projekt")}" aria-label="Dauerhaft löschen">🗑</button>
+            </div>
           </div>
 
-          ${project.status_details ? `<div class="ai-box"><strong>Statusdetails</strong>${escapeHtml(project.status_details)}</div>` : ""}
-          ${project.description ? `<p class="pipeline-description">${escapeHtml(project.description)}</p>` : ""}
+          ${project.status_details?`<div class="ai-box"><strong>Statusdetails</strong>${escapeHtml(project.status_details)}</div>`:""}
+          ${project.description?`<p class="pipeline-description">${escapeHtml(project.description)}</p>`:""}
 
           <div class="facts">
-            ${project.property_type ? `<span class="chip pipeline-badge">${escapeHtml(project.property_type)}</span>` : ""}
-            ${project.expected_units ? `<span class="chip">ca. ${escapeHtml(project.expected_units)} Einheiten</span>` : ""}
-            ${project.expected_rooms ? `<span class="chip">${escapeHtml(project.expected_rooms)} Zimmer</span>` : ""}
-            ${project.minergie === true ? '<span class="chip good">Minergie</span>' : ""}
-            ${project.energy_standard ? `<span class="chip good">${escapeHtml(project.energy_standard)}</span>` : ""}
-            ${project.building_right ? '<span class="chip warn">Baurecht</span>' : ""}
+            ${project.property_type?`<span class="chip pipeline-badge">${escapeHtml(project.property_type)}</span>`:""}
+            ${project.expected_units?`<span class="chip">ca. ${escapeHtml(project.expected_units)} Einheiten</span>`:""}
+            ${project.expected_rooms?`<span class="chip">${escapeHtml(project.expected_rooms)} Zimmer</span>`:""}
+            ${project.minergie===true?'<span class="chip good">Minergie</span>':""}
+            ${project.energy_standard?`<span class="chip good">${escapeHtml(project.energy_standard)}</span>`:""}
+            ${project.building_right?'<span class="chip warn">Baurecht</span>':""}
           </div>
 
           <div class="pipeline-meta">
-            <div><small>Preisrahmen</small><strong>${escapeHtml(priceRange)}</strong></div>
-            <div><small>Wohnfläche</small><strong>${escapeHtml(areaRange)}</strong></div>
-            <div><small>Vermarktungsstart</small><strong>${escapeHtml(project.expected_marketing_start || "offen")}</strong></div>
-            <div><small>Bezug</small><strong>${escapeHtml(project.expected_move_in || "offen")}</strong></div>
-            <div><small>Entwickler</small><strong>${escapeHtml(project.developer || "offen")}</strong></div>
-            <div><small>Vermarktung</small><strong>${escapeHtml(project.marketer || "offen")}</strong></div>
+            <div><small>Preisrahmen</small><strong>${escapeHtml(formatRange(project.estimated_price_from_chf,project.estimated_price_to_chf,formatPrice))}</strong></div>
+            <div><small>Wohnfläche</small><strong>${escapeHtml(formatRange(project.expected_living_area_from_m2,project.expected_living_area_to_m2,v=>`${v} m²`))}</strong></div>
+            <div><small>Vermarktungsstart</small><strong>${escapeHtml(project.expected_marketing_start||"offen")}</strong></div>
+            <div><small>Bezug</small><strong>${escapeHtml(project.expected_move_in||"offen")}</strong></div>
+            <div><small>Entwickler</small><strong>${escapeHtml(project.developer||"offen")}</strong></div>
+            <div><small>Vermarktung</small><strong>${escapeHtml(project.marketer||"offen")}</strong></div>
           </div>
 
           <div class="ai-box"><strong>KI-Bewertung: ${escapeHtml(aiRating)}</strong>${escapeHtml(aiText)}</div>
-
           ${commuteHtml(project)}
 
           <div class="project-links">
             <button class="secondary-btn" type="button" data-action="locate" data-id="${project.id}">Karte</button>
             ${projectLink}${sourceLink}
           </div>
-          <div class="source-line">Quelle: ${escapeHtml(project.source || "nicht angegeben")} · Importiert: ${escapeHtml(formatDate(project.imported_at || project.created_at))}</div>
+
+          <div class="source-line">Quelle: ${escapeHtml(project.source||"nicht angegeben")} · Importiert: ${escapeHtml(formatDate(project.imported_at||project.created_at))}</div>
         </article>`;
     }
 
-    function commuteHtml(property) {
-      const a = Number(property._drive_minutes_othmarsingen ?? property.drive_minutes_othmarsingen ?? property.othmarsingen_minutes);
-      const b = Number(property._drive_minutes_duebendorf ?? property.drive_minutes_duebendorf ?? property.duebendorf_minutes);
-      const validA = Number.isFinite(a) && a > 0;
-      const validB = Number.isFinite(b) && b > 0;
-      const pendingText = property._route_failed ? "im JSON nicht erfasst" : "wird berechnet …";
-      const ratio = validA && validB ? Math.max(8, Math.min(92, (a / (a + b)) * 100)) : 50;
-      return `
-        <div class="commute-box">
-          <div class="commute-labels"><span>Othmarsingen</span><span>Dübendorf</span></div>
-          <div class="commute-track">
-            <div class="commute-line"></div>
-            <span class="commute-middle" style="left:${ratio}%">WOHNUNG</span>
-            <span class="commute-dot" style="left:${ratio}%"></span>
-          </div>
-          <div class="commute-times"><span>${validA ? `${a} Min.` : pendingText}</span><span>${validB ? `${b} Min.` : pendingText}</span></div>
-        </div>`;
+    function renderProperties(){
+      if(!state.filtered.length){
+        el.propertyList.innerHTML=`<div class="empty"><strong>Keine Treffer gefunden.</strong><br>Filter anpassen oder neue Daten importieren.</div>`;
+        return;
+      }
+      el.propertyList.innerHTML=state.filtered.map(item=>item._item_type==="pipeline"?pipelineCardHtml(item):propertyCardHtml(item)).join("");
     }
 
-    function voteBlockHtml(person, label, propertyId, vote) {
-      const locked = state.profile !== person;
-      return `
-        <div class="person-vote ${locked ? "locked" : ""}">
-          <div class="person-vote-label">
-            <span>${label}</span>
-            <span>${vote === 1 ? "👍" : vote === -1 ? "👎" : "–"}</span>
-          </div>
-          <div class="vote-buttons">
-            <button class="vote-btn up ${vote === 1 ? "active" : ""}"
-                    type="button"
-                    data-action="vote"
-                    data-id="${propertyId}"
-                    data-person="${person}"
-                    data-vote="1"
-                    ${locked ? "disabled" : ""}
-                    aria-label="${label}: Daumen hoch">👍</button>
-            <button class="vote-btn down ${vote === -1 ? "active" : ""}"
-                    type="button"
-                    data-action="vote"
-                    data-id="${propertyId}"
-                    data-person="${person}"
-                    data-vote="-1"
-                    ${locked ? "disabled" : ""}
-                    aria-label="${label}: Daumen runter">👎</button>
-          </div>
-          ${locked ? `<div class="locked-hint">Nur ${label} kann hier bewerten 🔒</div>` : ""}
-        </div>
-      `;
-    }
-
-    const ROUTE_DESTINATIONS = {
-      othmarsingen: [47.4014, 8.2136],
-      duebendorf: [47.3971, 8.6187]
-    };
-
-    async function fetchJsonWithTimeout(url, timeoutMs = 7000) {
-      const controller = new AbortController();
-      const timer = setTimeout(() => controller.abort(), timeoutMs);
-      try {
-        const response = await fetch(url, {
-          signal: controller.signal,
-          headers: { "Accept": "application/json" }
-        });
-        if (!response.ok) throw new Error(`Routing ${response.status}`);
+    async function fetchJsonWithTimeout(url,timeoutMs=7000){
+      const controller=new AbortController();
+      const timer=setTimeout(()=>controller.abort(),timeoutMs);
+      try{
+        const response=await fetch(url,{signal:controller.signal,headers:{Accept:"application/json"}});
+        if(!response.ok) throw new Error(`Routing ${response.status}`);
         return await response.json();
-      } finally {
-        clearTimeout(timer);
-      }
+      }finally{clearTimeout(timer)}
     }
 
-    async function routeTimes(from) {
-      const destinations = [ROUTE_DESTINATIONS.othmarsingen, ROUTE_DESTINATIONS.duebendorf];
-      const hosts = [
-        "https://router.project-osrm.org",
-        "https://routing.openstreetmap.de/routed-car"
-      ];
-
-      let lastError = null;
-      for (const host of hosts) {
-        try {
-          const minutes = [];
-          for (const destination of destinations) {
-            const points = `${from[1]},${from[0]};${destination[1]},${destination[0]}`;
-            const data = await fetchJsonWithTimeout(
-              `${host}/route/v1/driving/${points}?overview=false&alternatives=false&steps=false`
-            );
-            const seconds = data?.routes?.[0]?.duration;
-            if (!Number.isFinite(seconds)) throw new Error("Keine Routendaten");
-            minutes.push(Math.max(1, Math.round(seconds / 60)));
+    async function routeTimes(from){
+      const destinations=[ROUTE_DESTINATIONS.othmarsingen,ROUTE_DESTINATIONS.duebendorf];
+      const hosts=["https://router.project-osrm.org","https://routing.openstreetmap.de/routed-car"];
+      let lastError=null;
+      for(const host of hosts){
+        try{
+          const minutes=[];
+          for(const destination of destinations){
+            const points=`${from[1]},${from[0]};${destination[1]},${destination[0]}`;
+            const data=await fetchJsonWithTimeout(`${host}/route/v1/driving/${points}?overview=false&alternatives=false&steps=false`);
+            const seconds=data?.routes?.[0]?.duration;
+            if(!Number.isFinite(seconds)) throw new Error("Keine Routendaten");
+            minutes.push(Math.max(1,Math.round(seconds/60)));
           }
-          return { othmarsingen: minutes[0], duebendorf: minutes[1] };
-        } catch (error) {
-          lastError = error;
-        }
+          return {othmarsingen:minutes[0],duebendorf:minutes[1]};
+        }catch(error){lastError=error}
       }
-      throw lastError || new Error("Routing nicht verfügbar");
+      throw lastError||new Error("Routing nicht verfügbar");
     }
 
-    async function calculateCommutes() {
-      const allItems = [...state.properties, ...state.pipelineProjects];
-
-      // Bewusst nacheinander statt 12 gleichzeitiger Requests: Der öffentliche
-      // Routing-Dienst blockiert bzw. drosselt sonst mobile Browser schnell.
-      for (const property of allItems) {
-        const importedA = Number(property.drive_minutes_othmarsingen ?? property.othmarsingen_minutes);
-        const importedB = Number(property.drive_minutes_duebendorf ?? property.duebendorf_minutes);
-        if (Number.isFinite(importedA) && importedA > 0 && Number.isFinite(importedB) && importedB > 0) {
-          property._drive_minutes_othmarsingen = importedA;
-          property._drive_minutes_duebendorf = importedB;
-          property._route_failed = false;
+    async function calculateCommutes(){
+      const items=[...state.properties,...state.pipelineProjects];
+      for(const item of items){
+        const existing=commuteValues(item);
+        if(existing.othmarsingen&&existing.duebendorf){
+          item._drive_minutes_othmarsingen=existing.othmarsingen;
+          item._drive_minutes_duebendorf=existing.duebendorf;
+          item._route_failed=false;
           continue;
         }
 
-        const coordinates = coordinatesFor(property);
-        if (!coordinates) {
-          property._route_failed = true;
+        const coordinates=coordinatesFor(item);
+        if(!coordinates){
+          item._route_failed=true;
           continue;
         }
 
-        const cacheKey = `wohnung_route_v2_${coordinates[0].toFixed(4)}_${coordinates[1].toFixed(4)}`;
-        try {
-          const cached = JSON.parse(localStorage.getItem(cacheKey) || "null");
-          if (cached && Date.now() - cached.savedAt < 14 * 24 * 60 * 60 * 1000) {
-            property._drive_minutes_othmarsingen = cached.othmarsingen;
-            property._drive_minutes_duebendorf = cached.duebendorf;
-            property._route_failed = false;
+        const cacheKey=`wohnung_route_v3_${coordinates[0].toFixed(4)}_${coordinates[1].toFixed(4)}`;
+        try{
+          const cached=JSON.parse(localStorage.getItem(cacheKey)||"null");
+          if(cached&&Date.now()-cached.savedAt<14*24*60*60*1000){
+            item._drive_minutes_othmarsingen=existing.othmarsingen||cached.othmarsingen;
+            item._drive_minutes_duebendorf=existing.duebendorf||cached.duebendorf;
+            item._route_failed=false;
             continue;
           }
-        } catch {}
+        }catch{}
 
-        try {
-          const times = await routeTimes(coordinates);
-          if (!times.othmarsingen || !times.duebendorf) throw new Error("Unvollständige Routendaten");
-          property._drive_minutes_othmarsingen = times.othmarsingen;
-          property._drive_minutes_duebendorf = times.duebendorf;
-          property._route_failed = false;
-          localStorage.setItem(cacheKey, JSON.stringify({ ...times, savedAt: Date.now() }));
-        } catch (error) {
-          console.warn("Fahrzeit konnte nicht berechnet werden", property.title || property.project_name, error);
-          property._route_failed = true;
+        try{
+          const times=await routeTimes(coordinates);
+          item._drive_minutes_othmarsingen=existing.othmarsingen||times.othmarsingen;
+          item._drive_minutes_duebendorf=existing.duebendorf||times.duebendorf;
+          item._route_failed=false;
+          localStorage.setItem(cacheKey,JSON.stringify({...times,savedAt:Date.now()}));
+        }catch(error){
+          console.warn("Fahrzeit konnte nicht berechnet werden",item.title||item.project_name,error);
+          item._route_failed=true;
         }
-
-        // Jede Karte sofort aktualisieren; dadurch bleibt nie endlos
-        // „wird berechnet …“ stehen.
         renderProperties();
       }
-
       renderProperties();
     }
 
-    function renderProperties() {
-      if (!state.filtered.length) {
-        el.propertyList.innerHTML = `
-          <div class="empty">
-            <strong>Keine Wohnungen gefunden.</strong><br>
-            Passe die Filter an oder importiere neue Inserate.
-          </div>`;
-        return;
-      }
-
-      el.propertyList.innerHTML = state.filtered
-        .map(item => state.view === "pipeline" ? pipelineCardHtml(item) : propertyCardHtml(item))
-        .join("");
-    }
-
-    async function loadData() {
+    async function loadData(){
       setLoading(true);
-      try {
-        const [propertiesResult, pipelineResult, votesResult, notesResult, favoritesResult] = await Promise.all([
+      try{
+        const [propertiesResult,pipelineResult,votesResult,notesResult,favoritesResult]=await Promise.all([
           db.from("properties").select("*"),
           db.from("pipeline_projects").select("*"),
           db.from("property_votes").select("*"),
@@ -1585,481 +1533,445 @@
           db.from("property_favorites").select("*")
         ]);
 
-        for (const result of [propertiesResult, votesResult, notesResult, favoritesResult]) {
-          if (result.error) throw result.error;
+        for(const result of [propertiesResult,votesResult,notesResult,favoritesResult]){
+          if(result.error) throw result.error;
         }
 
-        state.properties = propertiesResult.data || [];
-        state.pipelineProjects = pipelineResult.error ? [] : (pipelineResult.data || []);
-        if (pipelineResult.error) console.warn("Pipeline-Tabelle noch nicht verfügbar:", pipelineResult.error.message);
-        state.votes = votesResult.data || [];
-        state.notes = notesResult.data || [];
-        state.favorites = favoritesResult.data || [];
+        state.properties=propertiesResult.data||[];
+        state.pipelineProjects=pipelineResult.error?[]:(pipelineResult.data||[]);
+        state.votes=votesResult.data||[];
+        state.notes=notesResult.data||[];
+        state.favorites=favoritesResult.data||[];
 
         applyFilters();
         calculateCommutes();
-      } catch (error) {
+      }catch(error){
         console.error(error);
-        showToast(`Daten konnten nicht geladen werden: ${error.message}`, true);
-      } finally {
-        setLoading(false);
-      }
+        showToast(`Daten konnten nicht geladen werden: ${error.message}`,true);
+      }finally{setLoading(false)}
     }
 
-    async function saveVote(propertyId, person, desiredVote) {
-      if (!state.profile || person !== state.profile) {
-        showToast(`Du bist als ${state.profile === "luca" ? "Luca" : "Gessi"} angemeldet.`, true);
+    async function saveVote(propertyId,person,desiredVote){
+      if(!state.profile||person!==state.profile){
+        showToast("Du kannst nur in deinem eigenen Profil bewerten.",true);
         return;
       }
-      const current = getVote(propertyId, person);
-      const nextVote = current === desiredVote ? null : desiredVote;
 
-      const existing = state.votes.find(v => v.property_id === propertyId && v.person === person);
+      const current=getVote(propertyId,person);
+      const nextVote=current===desiredVote?null:desiredVote;
+      const existing=state.votes.find(v=>v.property_id===propertyId&&v.person===person);
 
-      if (existing && nextVote === null) {
-        const { error } = await db.from("property_votes").delete().eq("id", existing.id);
-        if (error) throw error;
-        state.votes = state.votes.filter(v => v.id !== existing.id);
-      } else {
-        const { data, error } = await db
-          .from("property_votes")
-          .upsert(
-            { property_id: propertyId, person, vote: nextVote },
-            { onConflict: "property_id,person" }
-          )
-          .select()
-          .single();
-
-        if (error) throw error;
-        state.votes = state.votes.filter(v => !(v.property_id === propertyId && v.person === person));
+      if(existing&&nextVote===null){
+        const {error}=await db.from("property_votes").delete().eq("id",existing.id);
+        if(error) throw error;
+        state.votes=state.votes.filter(v=>v.id!==existing.id);
+      }else{
+        const {data,error}=await db.from("property_votes")
+          .upsert({property_id:propertyId,person,vote:nextVote},{onConflict:"property_id,person"})
+          .select().single();
+        if(error) throw error;
+        state.votes=state.votes.filter(v=>!(v.property_id===propertyId&&v.person===person));
         state.votes.push(data);
       }
-
       applyFilters();
     }
 
-    async function saveFavorite(propertyId) {
-      const person = state.profile;
-      if (!person) {
-        el.profileGate.classList.add("open");
-        return;
-      }
-      const existing = state.favorites.find(f => f.property_id === propertyId && f.person === person);
+    async function saveFavorite(propertyId){
+      const person=state.profile;
+      if(!person){el.profileGate.classList.add("open");return}
+      const existing=state.favorites.find(f=>f.property_id===propertyId&&f.person===person);
 
-      if (existing) {
-        const { error } = await db.from("property_favorites").delete().eq("id", existing.id);
-        if (error) throw error;
-        state.favorites = state.favorites.filter(f => f.id !== existing.id);
-      } else {
-        const { data, error } = await db
-          .from("property_favorites")
-          .insert({ property_id: propertyId, person, is_favorite: true })
-          .select()
-          .single();
-
-        if (error) throw error;
+      if(existing){
+        const {error}=await db.from("property_favorites").delete().eq("id",existing.id);
+        if(error) throw error;
+        state.favorites=state.favorites.filter(f=>f.id!==existing.id);
+      }else{
+        const {data,error}=await db.from("property_favorites")
+          .insert({property_id:propertyId,person,is_favorite:true})
+          .select().single();
+        if(error) throw error;
         state.favorites.push(data);
       }
-
       applyFilters();
     }
 
-    async function saveNote(propertyId, person, note) {
-      if (!state.profile || person !== state.profile) {
-        showToast(`Du bist als ${state.profile === "luca" ? "Luca" : "Gessi"} angemeldet.`, true);
+    async function saveNote(propertyId,person,note){
+      if(!state.profile||person!==state.profile){
+        showToast("Du kannst nur deine eigene Notiz bearbeiten.",true);
         return;
       }
-      const { data, error } = await db
-        .from("property_notes")
-        .upsert(
-          { property_id: propertyId, person, note },
-          { onConflict: "property_id,person" }
-        )
-        .select()
-        .single();
-
-      if (error) throw error;
-
-      state.notes = state.notes.filter(n => !(n.property_id === propertyId && n.person === person));
+      const {data,error}=await db.from("property_notes")
+        .upsert({property_id:propertyId,person,note},{onConflict:"property_id,person"})
+        .select().single();
+      if(error) throw error;
+      state.notes=state.notes.filter(n=>!(n.property_id===propertyId&&n.person===person));
       state.notes.push(data);
-      showToast(`${person === "luca" ? "Lucas" : "Gessis"} Notiz gespeichert`);
+      showToast("Notiz gespeichert");
     }
 
-    async function saveStatus(propertyId, status) {
-      const patch = status === "archived"
-        ? { status, is_archived: true }
-        : { status, is_archived: false };
-
-      const { data, error } = await db
-        .from("properties")
-        .update(patch)
-        .eq("id", propertyId)
-        .select()
-        .single();
-
-      if (error) throw error;
-
-      state.properties = state.properties.map(p => p.id === propertyId ? data : p);
+    async function saveStatus(propertyId,status){
+      const patch=status==="archived"?{status,is_archived:true}:{status,is_archived:false};
+      const {data,error}=await db.from("properties").update(patch).eq("id",propertyId).select().single();
+      if(error) throw error;
+      state.properties=state.properties.map(p=>p.id===propertyId?data:p);
       applyFilters();
       showToast("Status gespeichert");
     }
 
-    function slugify(value) {
-      return String(value || "")
-        .toLowerCase()
-        .normalize("NFD")
-        .replace(/[\u0300-\u036f]/g, "")
-        .replace(/[^a-z0-9]+/g, "-")
-        .replace(/^-|-$/g, "")
-        .slice(0, 90);
+    async function deleteProperty(propertyId,title){
+      const confirmed=confirm(`"${title}" wirklich dauerhaft löschen?\n\nBewertungen, Notizen und Favoriten zu diesem Eintrag werden ebenfalls gelöscht.`);
+      if(!confirmed) return;
+
+      setLoading(true);
+      try{
+        await Promise.all([
+          db.from("property_votes").delete().eq("property_id",propertyId),
+          db.from("property_notes").delete().eq("property_id",propertyId),
+          db.from("property_favorites").delete().eq("property_id",propertyId)
+        ]);
+
+        const {error}=await db.from("properties").delete().eq("id",propertyId);
+        if(error) throw error;
+
+        state.properties=state.properties.filter(p=>p.id!==propertyId);
+        state.votes=state.votes.filter(v=>v.property_id!==propertyId);
+        state.notes=state.notes.filter(n=>n.property_id!==propertyId);
+        state.favorites=state.favorites.filter(f=>f.property_id!==propertyId);
+        applyFilters();
+        showToast("Wohnung dauerhaft gelöscht");
+      }finally{setLoading(false)}
     }
 
-    function normalizeImportItem(item) {
-      const listingUrl = item.listing_url || item.url || item.link || null;
-      const externalId = item.external_id ||
-        item.source_listing_id ||
-        (listingUrl ? `url-${slugify(listingUrl)}` : `manual-${slugify(`${item.title}-${item.location}-${item.address}`)}`);
+    async function deleteProject(projectId,title){
+      const confirmed=confirm(`"${title}" wirklich dauerhaft aus der Pipeline löschen?`);
+      if(!confirmed) return;
+
+      setLoading(true);
+      try{
+        const {error}=await db.from("pipeline_projects").delete().eq("id",projectId);
+        if(error) throw error;
+        state.pipelineProjects=state.pipelineProjects.filter(p=>p.id!==projectId);
+        applyFilters();
+        showToast("Projekt dauerhaft gelöscht");
+      }finally{setLoading(false)}
+    }
+
+    function slugify(value){
+      return String(value||"").toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g,"")
+        .replace(/[^a-z0-9]+/g,"-").replace(/^-|-$/g,"").slice(0,90);
+    }
+
+    function normalizeImportItem(item){
+      const listingUrl=item.listing_url||item.url||item.link||null;
+      const externalId=item.external_id||item.source_listing_id||
+        (listingUrl?`url-${slugify(listingUrl)}`:`manual-${slugify(`${item.title}-${item.location}-${item.address}`)}`);
 
       return {
-        external_id: externalId,
-        source: item.source || null,
-        source_listing_id: item.source_listing_id || null,
-        title: item.title || "Wohnung ohne Titel",
-        location: item.location || item.ort || null,
-        municipality: item.municipality || null,
-        canton: item.canton || null,
-        postal_code: item.postal_code ? String(item.postal_code) : null,
-        address: item.address || item.adresse || null,
-        latitude: item.latitude ?? item.lat ?? null,
-        longitude: item.longitude ?? item.lng ?? item.lon ?? null,
-        price_chf: item.price_chf ?? item.price ?? null,
-        rooms: item.rooms ?? item.zimmer ?? null,
-        living_area_m2: item.living_area_m2 ?? item.area_m2 ?? item.flaeche ?? null,
-        move_in: item.move_in || item.einzug || null,
-        listing_url: listingUrl,
-        minergie: item.minergie ?? null,
-        minergie_details: item.minergie_details || null,
-        building_right: Boolean(item.building_right ?? item.baurecht ?? false),
-        building_right_details: item.building_right_details || null,
-        building_right_cost_chf_monthly: item.building_right_cost_chf_monthly ?? null,
-        drive_minutes_othmarsingen: item.drive_minutes_othmarsingen ?? item.othmarsingen_minutes ?? null,
-        drive_minutes_duebendorf: item.drive_minutes_duebendorf ?? item.duebendorf_minutes ?? null,
-        travel_time_gessi_minutes: item.travel_time_gessi_minutes ?? null,
-        ai_rating: item.ai_rating ?? null,
-        ai_summary: item.ai_summary || null,
-        ai_recommendation_reason: item.ai_recommendation_reason || item.recommendation_reason || null,
-        advantages: Array.isArray(item.advantages) ? item.advantages : null,
-        disadvantages: Array.isArray(item.disadvantages) ? item.disadvantages : null,
-        status: item.status || "interesting",
-        is_archived: Boolean(item.is_archived ?? false),
-        archive_reason: item.archive_reason || null,
-        last_seen_at: new Date().toISOString(),
-        imported_at: new Date().toISOString()
+        external_id:externalId,
+        source:item.source||null,
+        source_listing_id:item.source_listing_id||null,
+        title:item.title||"Wohnung ohne Titel",
+        location:item.location||item.ort||null,
+        municipality:item.municipality||null,
+        canton:item.canton||null,
+        postal_code:item.postal_code?String(item.postal_code):null,
+        address:item.address||item.adresse||null,
+        latitude:item.latitude??item.lat??null,
+        longitude:item.longitude??item.lng??item.lon??null,
+        price_chf:item.price_chf??item.price??null,
+        rooms:item.rooms??item.zimmer??null,
+        living_area_m2:item.living_area_m2??item.area_m2??item.flaeche??null,
+        move_in:item.move_in||item.einzug||null,
+        listing_url:listingUrl,
+        minergie:item.minergie??null,
+        minergie_details:item.minergie_details||null,
+        building_right:Boolean(item.building_right??item.baurecht??false),
+        building_right_details:item.building_right_details||null,
+        building_right_cost_chf_monthly:item.building_right_cost_chf_monthly??null,
+        drive_minutes_othmarsingen:
+          item.drive_minutes_othmarsingen??
+          item.othmarsingen_minutes??
+          item.travel_time_othmarsingen_minutes??
+          item.travel_time_luca_minutes??
+          null,
+        drive_minutes_duebendorf:
+          item.drive_minutes_duebendorf??
+          item.duebendorf_minutes??
+          item.travel_time_duebendorf_minutes??
+          item.travel_time_gessi_minutes??
+          null,
+        travel_time_gessi_minutes:item.travel_time_gessi_minutes??null,
+        ai_rating:item.ai_rating??null,
+        ai_summary:item.ai_summary||null,
+        ai_recommendation_reason:item.ai_recommendation_reason||item.recommendation_reason||null,
+        advantages:Array.isArray(item.advantages)?item.advantages:null,
+        disadvantages:Array.isArray(item.disadvantages)?item.disadvantages:null,
+        status:item.status||"interesting",
+        is_archived:Boolean(item.is_archived??false),
+        archive_reason:item.archive_reason||null,
+        last_seen_at:new Date().toISOString(),
+        imported_at:new Date().toISOString()
       };
     }
 
-    function normalizePipelineItem(item) {
-      const sourceUrl = item.source_url || item.url || item.link || null;
-      const projectUrl = item.project_url || null;
-      const externalId = item.external_id || item.source_project_id || (projectUrl ? `url-${slugify(projectUrl)}` : `project-${slugify(`${item.project_name}-${item.municipality}-${item.address}`)}`);
+    function normalizePipelineItem(item){
+      const sourceUrl=item.source_url||item.url||item.link||null;
+      const projectUrl=item.project_url||null;
+      const externalId=item.external_id||item.source_project_id||
+        (projectUrl?`url-${slugify(projectUrl)}`:`project-${slugify(`${item.project_name}-${item.municipality}-${item.address}`)}`);
+
       return {
-        external_id: externalId,
-        source: item.source || null,
-        source_project_id: item.source_project_id || null,
-        source_url: sourceUrl,
-        project_url: projectUrl,
-        project_name: item.project_name || item.title || "Projekt ohne Namen",
-        description: item.description || null,
-        municipality: item.municipality || item.location || null,
-        canton: item.canton || null,
-        postal_code: item.postal_code ? String(item.postal_code) : null,
-        address: item.address || null,
-        latitude: item.latitude ?? item.lat ?? null,
-        longitude: item.longitude ?? item.lng ?? item.lon ?? null,
-        developer: item.developer || null,
-        marketer: item.marketer || null,
-        architect: item.architect || null,
-        project_status: item.project_status || "unknown",
-        status_details: item.status_details || null,
-        property_type: item.property_type || null,
-        expected_units: item.expected_units ?? null,
-        expected_rooms: item.expected_rooms || null,
-        expected_living_area_from_m2: item.expected_living_area_from_m2 ?? null,
-        expected_living_area_to_m2: item.expected_living_area_to_m2 ?? null,
-        estimated_price_from_chf: item.estimated_price_from_chf ?? null,
-        estimated_price_to_chf: item.estimated_price_to_chf ?? null,
-        expected_marketing_start: item.expected_marketing_start || null,
-        expected_construction_start: item.expected_construction_start || null,
-        expected_move_in: item.expected_move_in || null,
-        minergie: item.minergie ?? null,
-        minergie_details: item.minergie_details || null,
-        energy_standard: item.energy_standard || null,
-        building_right: Boolean(item.building_right ?? false),
-        building_right_details: item.building_right_details || null,
-        drive_minutes_othmarsingen: item.drive_minutes_othmarsingen ?? item.othmarsingen_minutes ?? null,
-        drive_minutes_duebendorf: item.drive_minutes_duebendorf ?? item.duebendorf_minutes ?? null,
-        ai_rating: item.ai_rating ?? null,
-        ai_summary: item.ai_summary || null,
-        ai_recommendation_reason: item.ai_recommendation_reason || null,
-        advantages: Array.isArray(item.advantages) ? item.advantages : null,
-        disadvantages: Array.isArray(item.disadvantages) ? item.disadvantages : null,
-        is_archived: false,
-        last_seen_at: new Date().toISOString(),
-        imported_at: new Date().toISOString()
+        external_id:externalId,
+        source:item.source||null,
+        source_project_id:item.source_project_id||null,
+        source_url:sourceUrl,
+        project_url:projectUrl,
+        project_name:item.project_name||item.title||"Projekt ohne Namen",
+        description:item.description||null,
+        municipality:item.municipality||item.location||null,
+        canton:item.canton||null,
+        postal_code:item.postal_code?String(item.postal_code):null,
+        address:item.address||null,
+        latitude:item.latitude??item.lat??null,
+        longitude:item.longitude??item.lng??item.lon??null,
+        developer:item.developer||null,
+        marketer:item.marketer||null,
+        architect:item.architect||null,
+        project_status:item.project_status||"unknown",
+        status_details:item.status_details||null,
+        property_type:item.property_type||null,
+        expected_units:item.expected_units??null,
+        expected_rooms:item.expected_rooms||null,
+        expected_living_area_from_m2:item.expected_living_area_from_m2??null,
+        expected_living_area_to_m2:item.expected_living_area_to_m2??null,
+        estimated_price_from_chf:item.estimated_price_from_chf??null,
+        estimated_price_to_chf:item.estimated_price_to_chf??null,
+        expected_marketing_start:item.expected_marketing_start||null,
+        expected_construction_start:item.expected_construction_start||null,
+        expected_move_in:item.expected_move_in||null,
+        minergie:item.minergie??null,
+        minergie_details:item.minergie_details||null,
+        energy_standard:item.energy_standard||null,
+        building_right:Boolean(item.building_right??false),
+        building_right_details:item.building_right_details||null,
+        drive_minutes_othmarsingen:
+          item.drive_minutes_othmarsingen??
+          item.othmarsingen_minutes??
+          item.travel_time_othmarsingen_minutes??
+          item.travel_time_luca_minutes??
+          null,
+        drive_minutes_duebendorf:
+          item.drive_minutes_duebendorf??
+          item.duebendorf_minutes??
+          item.travel_time_duebendorf_minutes??
+          item.travel_time_gessi_minutes??
+          null,
+        ai_rating:item.ai_rating??null,
+        ai_summary:item.ai_summary||null,
+        ai_recommendation_reason:item.ai_recommendation_reason||null,
+        advantages:Array.isArray(item.advantages)?item.advantages:null,
+        disadvantages:Array.isArray(item.disadvantages)?item.disadvantages:null,
+        is_archived:Boolean(item.is_archived??false),
+        last_seen_at:new Date().toISOString(),
+        imported_at:new Date().toISOString()
       };
     }
 
-    async function importProperties() {
+    async function importProperties(){
       let parsed;
-      try { parsed = JSON.parse(el.importText.value.trim()); }
-      catch { showToast("Der eingefügte Text ist kein gültiges JSON.", true); return; }
+      try{parsed=JSON.parse(el.importText.value.trim())}
+      catch{showToast("Der eingefügte Text ist kein gültiges JSON.",true);return}
 
-      const rawProperties = Array.isArray(parsed) ? parsed : (Array.isArray(parsed.properties) ? parsed.properties : []);
-      const rawProjects = !Array.isArray(parsed) && Array.isArray(parsed.pipeline_projects) ? parsed.pipeline_projects : [];
-      if (!rawProperties.length && !rawProjects.length) {
-        showToast("Keine Wohnungen oder Pipeline-Projekte im JSON gefunden.", true);
+      const rawProperties=Array.isArray(parsed)?parsed:(Array.isArray(parsed.properties)?parsed.properties:[]);
+      const rawProjects=!Array.isArray(parsed)&&Array.isArray(parsed.pipeline_projects)?parsed.pipeline_projects:[];
+
+      if(!rawProperties.length&&!rawProjects.length){
+        showToast("Keine Wohnungen oder Projekte im JSON gefunden.",true);
         return;
       }
 
-      const properties = rawProperties.map(normalizeImportItem);
-      const projects = rawProjects.map(normalizePipelineItem);
+      const properties=rawProperties.map(normalizeImportItem);
+      const projects=rawProjects.map(normalizePipelineItem);
       setLoading(true);
 
-      try {
-        if (properties.length) {
-          const ids = properties.map(x => x.external_id);
-          const { data: existingRows, error: existingError } = await db.from("properties").select("external_id,status,is_archived").in("external_id", ids);
-          if (existingError) throw existingError;
-          const existingMap = new Map((existingRows || []).map(row => [row.external_id, row]));
-          const safeProperties = properties.map(item => {
-            const old = existingMap.get(item.external_id);
-            return old ? { ...item, status: old.status, is_archived: old.is_archived } : { ...item, is_archived: false };
+      try{
+        if(properties.length){
+          const ids=properties.map(x=>x.external_id);
+          const {data:existingRows,error:existingError}=await db.from("properties")
+            .select("external_id,status,is_archived").in("external_id",ids);
+          if(existingError) throw existingError;
+          const existingMap=new Map((existingRows||[]).map(row=>[row.external_id,row]));
+          const safe=properties.map(item=>{
+            const old=existingMap.get(item.external_id);
+            return old?{...item,status:old.status,is_archived:old.is_archived}:{...item,is_archived:false};
           });
-          const { error } = await db.from("properties").upsert(safeProperties, { onConflict: "external_id" });
-          if (error) throw error;
+          const {error}=await db.from("properties").upsert(safe,{onConflict:"external_id"});
+          if(error) throw error;
         }
 
-        if (projects.length) {
-          const ids = projects.map(x => x.external_id);
-          const { data: existingRows, error: existingError } = await db.from("pipeline_projects").select("external_id,is_archived").in("external_id", ids);
-          if (existingError) throw existingError;
-          const existingMap = new Map((existingRows || []).map(row => [row.external_id, row]));
-          const safeProjects = projects.map(item => {
-            const old = existingMap.get(item.external_id);
-            return old ? { ...item, is_archived: old.is_archived } : { ...item, is_archived: false };
+        if(projects.length){
+          const ids=projects.map(x=>x.external_id);
+          const {data:existingRows,error:existingError}=await db.from("pipeline_projects")
+            .select("external_id,is_archived").in("external_id",ids);
+          if(existingError) throw existingError;
+          const existingMap=new Map((existingRows||[]).map(row=>[row.external_id,row]));
+          const safe=projects.map(item=>{
+            const old=existingMap.get(item.external_id);
+            return old?{...item,is_archived:old.is_archived}:{...item,is_archived:false};
           });
-          const { error } = await db.from("pipeline_projects").upsert(safeProjects, { onConflict: "external_id" });
-          if (error) throw error;
+          const {error}=await db.from("pipeline_projects").upsert(safe,{onConflict:"external_id"});
+          if(error) throw error;
         }
 
         await db.from("import_logs").insert({
-          imported_by: state.profile,
-          new_properties: properties.length,
-          import_note: `${properties.length} Wohnungen und ${projects.length} Pipeline-Projekte importiert`
+          imported_by:state.profile,
+          new_properties:properties.length,
+          import_note:`${properties.length} Wohnungen und ${projects.length} Pipeline-Projekte importiert`
         });
 
         el.importModal.classList.remove("open");
-        el.importText.value = "";
+        el.importText.value="";
         showToast(`${properties.length} Wohnung(en), ${projects.length} Projekt(e) importiert`);
         await loadData();
-      } catch (error) {
+      }catch(error){
         console.error(error);
-        showToast(`Import fehlgeschlagen: ${error.message}`, true);
-      } finally { setLoading(false); }
+        showToast(`Import fehlgeschlagen: ${error.message}`,true);
+      }finally{setLoading(false)}
     }
 
     let noteTimer;
 
-    // Harte Profilsperre: Aktionen im Namen der anderen Person werden bereits
-    // vor der normalen Ereignisverarbeitung abgefangen.
-    el.propertyList.addEventListener("click", event => {
-      const target = event.target.closest("[data-person]");
-      if (!target) return;
-      if (!state.profile || target.dataset.person !== state.profile) {
-        event.preventDefault();
-        event.stopImmediatePropagation();
-        showToast(`Du bist als ${state.profile === "gessi" ? "Gessi" : "Luca"} angemeldet.`, true);
-      }
-    }, true);
+    function wiggleButton(button){
+      if(!button) return;
+      button.classList.remove("wiggle");
+      void button.offsetWidth;
+      button.classList.add("wiggle");
+      setTimeout(()=>button.classList.remove("wiggle"),500);
+    }
 
-    el.propertyList.addEventListener("input", event => {
-      const target = event.target;
-      if (target.dataset.action !== "note") return;
-      if (!state.profile || target.dataset.person !== state.profile) {
-        event.preventDefault();
-        event.stopImmediatePropagation();
+    document.addEventListener("click",event=>{
+      const button=event.target.closest("button,.link-btn");
+      if(button) wiggleButton(button);
+    },true);
+
+    el.propertyList.addEventListener("click",async event=>{
+      const target=event.target.closest("[data-action]");
+      if(!target) return;
+      const action=target.dataset.action;
+      const id=target.dataset.id;
+
+      try{
+        if(action==="vote") await saveVote(id,target.dataset.person,Number(target.dataset.vote));
+        else if(action==="favorite") await saveFavorite(id);
+        else if(action==="locate"){
+          focusItem(id);
+          window.scrollTo({top:0,behavior:"smooth"});
+        }
+        else if(action==="delete-property") await deleteProperty(id,target.dataset.title||"diese Wohnung");
+        else if(action==="delete-project") await deleteProject(id,target.dataset.title||"dieses Projekt");
+      }catch(error){
+        console.error(error);
+        showToast(error.message,true);
+      }
+    });
+
+    el.propertyList.addEventListener("change",async event=>{
+      const target=event.target;
+      try{
+        if(target.dataset.action==="status") await saveStatus(target.dataset.id,target.value);
+      }catch(error){
+        console.error(error);
+        showToast(error.message,true);
+      }
+    });
+
+    el.propertyList.addEventListener("input",event=>{
+      const target=event.target;
+      if(target.dataset.action!=="note") return;
+      if(target.dataset.person!==state.profile){
         target.blur();
+        return;
       }
-    }, true);
-
-    el.propertyList.addEventListener("click", async event => {
-      const target = event.target.closest("[data-action]");
-      if (!target) return;
-
-      const action = target.dataset.action;
-      const propertyId = target.dataset.id;
-      if (["favorite", "vote", "locate"].includes(action)) animateEmoji(target);
-
-      try {
-        if (action === "vote") {
-          await saveVote(propertyId, target.dataset.person, Number(target.dataset.vote));
-        } else if (action === "favorite") {
-          await saveFavorite(propertyId);
-        } else if (action === "locate") {
-          focusItem(propertyId);
-          window.scrollTo({ top: 0, behavior: "smooth" });
-        }
-      } catch (error) {
-        console.error(error);
-        showToast(error.message, true);
-      }
-    });
-
-    el.propertyList.addEventListener("change", async event => {
-      const target = event.target;
-      const action = target.dataset.action;
-      if (!action) return;
-
-      try {
-        if (action === "status") {
-          await saveStatus(target.dataset.id, target.value);
-        }
-      } catch (error) {
-        console.error(error);
-        showToast(error.message, true);
-      }
-    });
-
-    el.propertyList.addEventListener("input", event => {
-      const target = event.target;
-      if (target.dataset.action !== "note") return;
 
       clearTimeout(noteTimer);
-      noteTimer = setTimeout(async () => {
-        try {
-          await saveNote(target.dataset.id, target.dataset.person, target.value.trim());
-        } catch (error) {
-          console.error(error);
-          showToast(error.message, true);
-        }
-      }, 700);
+      noteTimer=setTimeout(async()=>{
+        try{await saveNote(target.dataset.id,target.dataset.person,target.value.trim())}
+        catch(error){console.error(error);showToast(error.message,true)}
+      },700);
     });
 
-    function selectProfile(profile) {
-      if (!["luca", "gessi"].includes(profile)) return;
-      state.profile = profile;
-      localStorage.setItem("wohnung_profile", profile);
-      document.querySelectorAll(".profile-btn").forEach(btn =>
-        btn.classList.toggle("active", btn.dataset.profile === profile)
-      );
+    function selectProfile(profile){
+      if(!["luca","gessi"].includes(profile)) return;
+      state.profile=profile;
+      localStorage.setItem("wohnung_profile",profile);
+      document.querySelectorAll(".profile-btn").forEach(btn=>btn.classList.toggle("active",btn.dataset.profile===profile));
       el.profileGate.classList.remove("open");
       renderProperties();
-      showToast(`Profil: ${profile === "luca" ? "Luca" : "Gessi"}`);
+      showToast(`Profil: ${profile==="luca"?"Luca":"Gessi"}`);
     }
 
-    document.querySelectorAll(".profile-btn, .profile-choice").forEach(button => {
-      button.addEventListener("click", () => selectProfile(button.dataset.profile));
+    document.querySelectorAll(".profile-btn,.profile-choice").forEach(button=>{
+      button.addEventListener("click",()=>selectProfile(button.dataset.profile));
     });
 
-    function animateEmoji(button) {
-      const emoji = button?.querySelector("span:first-child") || button;
-      if (!emoji) return;
-      emoji.classList.remove("emoji-pop");
-      void emoji.offsetWidth;
-      emoji.classList.add("emoji-pop");
-      setTimeout(() => emoji.classList.remove("emoji-pop"), 950);
-    }
-
-    document.querySelectorAll(".nav-btn").forEach(button => {
-      button.addEventListener("click", () => {
-        animateEmoji(button);
-        if (button.dataset.view === "import") {
+    document.querySelectorAll(".nav-btn").forEach(button=>{
+      button.addEventListener("click",()=>{
+        if(button.dataset.view==="import"){
           el.importModal.classList.add("open");
           return;
         }
-
-        state.view = button.dataset.view;
-        document.querySelectorAll(".nav-btn").forEach(btn =>
-          btn.classList.toggle("active", btn.dataset.view === state.view)
-        );
+        state.view=button.dataset.view;
+        document.querySelectorAll(".nav-btn").forEach(btn=>btn.classList.toggle("active",btn.dataset.view===state.view));
         applyFilters();
-        window.scrollTo({ top: 0, behavior: "smooth" });
+        window.scrollTo({top:0,behavior:"smooth"});
       });
     });
 
-    [el.searchInput, el.priceFilter, el.roomsFilter, el.sortFilter]
-      .forEach(control => control.addEventListener("input", applyFilters));
+    [el.searchInput,el.priceFilter,el.roomsFilter,el.sortFilter].forEach(control=>control.addEventListener("input",applyFilters));
 
-    el.resetFiltersBtn.addEventListener("click", () => {
-      el.searchInput.value = "";
-      el.priceFilter.value = "";
-      el.roomsFilter.value = "";
-      el.sortFilter.value = "newest";
+    el.resetFiltersBtn.addEventListener("click",()=>{
+      el.searchInput.value="";
+      el.priceFilter.value="";
+      el.roomsFilter.value="";
+      el.sortFilter.value="newest";
       applyFilters();
     });
 
-    el.fitMapBtn.addEventListener("click", fitMapToVisible);
-    el.closeImportBtn.addEventListener("click", () => el.importModal.classList.remove("open"));
-    el.importModal.addEventListener("click", event => {
-      if (event.target === el.importModal) el.importModal.classList.remove("open");
-    });
-    el.runImportBtn.addEventListener("click", importProperties);
+    el.fitMapBtn.addEventListener("click",fitMapToVisible);
+    el.closeImportBtn.addEventListener("click",()=>el.importModal.classList.remove("open"));
+    el.importModal.addEventListener("click",event=>{if(event.target===el.importModal)el.importModal.classList.remove("open")});
+    el.runImportBtn.addEventListener("click",importProperties);
 
-    el.sampleBtn.addEventListener("click", () => {
-      el.importText.value = JSON.stringify({
-        properties: [{
-          external_id: "sample-wilhalde-42",
-          source: "Beispiel",
-          title: "4.5-Zimmer-Wohnung Wilhalde 42",
-          location: "Othmarsingen",
-          address: "Wilhalde 42, 5504 Othmarsingen",
-          latitude: 47.4013,
-          longitude: 8.2136,
-          price_chf: 1040000,
-          rooms: 4.5,
-          living_area_m2: 119,
-          move_in: "April 2027",
-          listing_url: "https://example.com",
-          minergie: true,
-          building_right: false,
-          drive_minutes_othmarsingen: 18,
-          drive_minutes_duebendorf: 22,
-          ai_rating: 9.1,
-          ai_recommendation_reason: "Sehr gutes Verhältnis aus Preis, Fläche und Energiestandard."
+    el.sampleBtn.addEventListener("click",()=>{
+      el.importText.value=JSON.stringify({
+        properties:[{
+          external_id:"sample-wilhalde-42",
+          source:"Beispiel",
+          title:"4.5-Zimmer-Wohnung Wilhalde 42",
+          location:"Othmarsingen",
+          address:"Wilhalde 42, 5504 Othmarsingen",
+          latitude:47.4013,
+          longitude:8.2136,
+          price_chf:1040000,
+          rooms:4.5,
+          living_area_m2:119,
+          move_in:"April 2027",
+          listing_url:"https://example.com",
+          minergie:true,
+          building_right:false,
+          drive_minutes_othmarsingen:18,
+          drive_minutes_duebendorf:22,
+          ai_rating:9.1,
+          ai_recommendation_reason:"Sehr gutes Verhältnis aus Preis, Fläche und Energiestandard."
         }],
-        pipeline_projects: [{
-          external_id: "sample-projekt-neuenhof",
-          source: "Beispiel",
-          source_url: "https://example.com/quelle",
-          project_url: "https://example.com/projekt",
-          project_name: "Wohnprojekt am Limmatbogen",
-          description: "Geplantes Eigentumsprojekt mit voraussichtlichem Bezug ab 2027.",
-          municipality: "Neuenhof",
-          canton: "AG",
-          latitude: 47.4494,
-          longitude: 8.3266,
-          developer: "Beispiel Entwicklerin AG",
-          project_status: "bewilligt",
-          expected_units: 24,
-          expected_rooms: "3.5 bis 5.5",
-          estimated_price_from_chf: 1050000,
-          expected_marketing_start: "Herbst 2026",
-          expected_move_in: "2028",
-          minergie: true,
-          ai_rating: 8.6,
-          ai_recommendation_reason: "Gute Mittellage und passender Zeithorizont."
-        }]
-      }, null, 2);
+        pipeline_projects:[]
+      },null,2);
     });
 
-    // Bereits gewähltes Profil auf diesem Gerät merken. Nur beim ersten
-    // Besuch oder nach dem Löschen der Browserdaten wird erneut gefragt.
-    if (state.profile) {
-      document.querySelectorAll(".profile-btn").forEach(btn =>
-        btn.classList.toggle("active", btn.dataset.profile === state.profile)
-      );
+    if(state.profile){
+      document.querySelectorAll(".profile-btn").forEach(btn=>btn.classList.toggle("active",btn.dataset.profile===state.profile));
       el.profileGate.classList.remove("open");
-    } else {
+    }else{
       el.profileGate.classList.add("open");
     }
 
