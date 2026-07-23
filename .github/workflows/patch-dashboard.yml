@@ -1,9 +1,11 @@
 name: Patch dashboard distance fields and delete actions
 
 on:
+  workflow_dispatch:
   push:
     paths:
       - '.github/workflows/patch-dashboard.yml'
+      - '.dashboard-patch-trigger'
 
 permissions:
   contents: write
