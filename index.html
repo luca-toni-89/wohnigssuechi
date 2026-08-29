@@ -1148,7 +1148,7 @@ svg.leaflet-image-layer.leaflet-interactive path {
 
     document.addEventListener("click",event=>{
       const profile=event.target.closest("[data-profile]")?.dataset.profile;if(profile){setProfile(profile);return}
-      const category=event.target.closest("[data-category]")?.dataset.category;if(category){setCategory(category);return}
+      const category=event.target.closest(".category-btn[data-category]")?.dataset.category;if(category){setCategory(category);return}
       const button=event.target.closest("[data-action]");if(!button)return;const {action,id}=button.dataset;if(!state.profile&&["favorite","vote","note"].includes(action)){els.profileGate.classList.add("open");return}
       if(action==="expand"){const card=document.getElementById(`card-${CSS.escape(id)}`);card?.classList.toggle("expanded");button.textContent=card?.classList.contains("expanded")?"−":"＋"}
       if(action==="favorite"){const pref=preference(id),key=`${state.profile}_favorite`;savePreference(id,{[key]:!pref[key]})}
