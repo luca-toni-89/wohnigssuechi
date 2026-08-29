@@ -446,6 +446,30 @@ insert into public.home_finder_state(external_id,status)
 select external_id,'new' from public.home_finder_properties
 on conflict (external_id) do nothing;
 
+-- Bekannte Lücken aus den Altbeständen lokal und idempotent ergänzen. Die Orte
+-- stammen aus eindeutigen Schwesterzeilen beziehungsweise dem amtlichen
+-- Gebäudeadressverzeichnis; vorhandene Werte werden niemals überschrieben.
+with location_fixes(external_id, city, zip, canton, latitude, longitude) as (
+  values
+    ('elitehomes-2025-03-2801', 'Schafisheim', '5503', 'AG', 47.375773::double precision, 8.142612::double precision),
+    ('homegate-4002884760', 'Niederrohrdorf', '5443', 'AG', 47.426442::double precision, 8.297048::double precision),
+    ('homegate-4003102423', 'Oberrohrdorf', '5452', 'AG', null::double precision, null::double precision),
+    ('homegate-4003363067', 'Oberlunkhofen', '8917', 'AG', null::double precision, null::double precision),
+    ('homegate-4003378103', 'Schwerzenbach', '8603', 'ZH', null::double precision, null::double precision),
+    ('homegate-4003380009', 'Hendschiken', '5604', 'AG', null::double precision, null::double precision),
+    ('homegate-4003385173', 'Opfikon', '8152', 'ZH', null::double precision, null::double precision),
+    ('immoscout24-4003071782', 'Killwangen', '8956', 'AG', null::double precision, null::double precision),
+    ('immoswipe-7804574', 'Oberrohrdorf', '5452', 'AG', null::double precision, null::double precision)
+)
+update public.home_finder_properties as property
+set city = coalesce(nullif(trim(property.city), ''), location_fixes.city),
+    zip = coalesce(nullif(trim(property.zip), ''), location_fixes.zip),
+    canton = coalesce(nullif(trim(property.canton), ''), location_fixes.canton),
+    latitude = coalesce(property.latitude, location_fixes.latitude),
+    longitude = coalesce(property.longitude, location_fixes.longitude)
+from location_fixes
+where property.external_id = location_fixes.external_id;
+
 -- Hilfsfunktionen bleiben absichtlich bestehen, damit die Migration gefahrlos
 -- erneut ausgeführt werden kann, falls später noch alte Daten ergänzt werden.
 
