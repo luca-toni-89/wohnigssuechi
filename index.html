@@ -765,8 +765,8 @@ svg.leaflet-image-layer.leaflet-interactive path {
     .section-head p{margin:2px 0 0;color:var(--muted);font-size:11px;font-weight:700}
     .result-count{color:var(--muted);font-size:11px;font-weight:850}
     .properties{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:15px}
-    .property-card{position:relative;border-radius:var(--radius);padding:19px;overflow:hidden;transition:transform .2s ease,box-shadow .2s ease,border-color .2s ease}
-    .property-card:hover{transform:translateY(-2px);box-shadow:0 16px 42px rgba(20,32,51,.1);border-color:rgba(var(--accent-rgb),.25)}
+    .property-card{position:relative;border-radius:var(--radius);padding:19px;overflow:hidden;transition:box-shadow .2s ease,border-color .2s ease}
+    .property-card:hover{box-shadow:0 16px 42px rgba(20,32,51,.1);border-color:rgba(var(--accent-rgb),.25)}
     .property-card:before{content:"";position:absolute;left:0;top:0;bottom:0;width:4px;background:var(--accent);opacity:.9}
     .property-card.pipeline:before{background:linear-gradient(var(--accent),var(--gold))}
     .card-top{display:flex;align-items:flex-start;justify-content:space-between;gap:13px}
