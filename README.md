@@ -11,14 +11,18 @@ Ein Datensatz kann nur eine Kategorie besitzen. Bei bekanntem Gesamtpreis wird d
 
 - `index.html`: komplette responsive Website
 - `data.json`: einziger Feed für neue und aktualisierte Treffer
+- `place-coordinates.json`: lokale Orts-/PLZ-Mittelpunkte für AG/ZH aus dem amtlichen Schweizer Ortschaftenverzeichnis
 - `supabase-migration.sql`: erstellt die gemeinsamen Tabellen und übernimmt die bisherigen Daten
+- `scripts/build-place-coordinates.mjs`: reproduzierbarer Generator für `place-coordinates.json`
 
 ## Datenfluss
 
 1. Die Suchtasks aktualisieren ausschließlich `data.json`.
 2. Die Website liest den Feed und synchronisiert neue Einträge nach Supabase.
 3. Supabase bewahrt Wohnungen, Status, Favoriten, Bewertungen und Notizen dauerhaft auf.
-4. Cloudflare Pages veröffentlicht jede Änderung am GitHub-Branch `main` automatisch.
+4. GitHub Pages veröffentlicht jede Änderung am GitHub-Branch `main` automatisch.
+
+Fehlen exakte Koordinaten, verwendet die Website lokal einen amtlichen Orts- oder PLZ-Mittelpunkt. Dabei wird keine Inseratadresse an einen externen Geocoder übertragen. Fehlen Fahrzeiten, zeigt die Website eine mit `≈` gekennzeichnete lokale Schätzung. Exakte Koordinaten und Fahrzeiten aus `data.json` haben immer Vorrang.
 
 ## JSON-Grundformat
 
@@ -37,6 +41,8 @@ Ein Datensatz kann nur eine Kategorie besitzen. Bei bekanntem Gesamtpreis wird d
       "zip": "8304",
       "city": "Wallisellen",
       "canton": "ZH",
+      "latitude": 47.4141,
+      "longitude": 8.5968,
       "rooms": 4.5,
       "living_area_m2": 118,
       "purchase_price_chf": 965000,
@@ -56,5 +62,17 @@ Ein Datensatz kann nur eine Kategorie besitzen. Bei bekanntem Gesamtpreis wird d
   "pipeline_projects": []
 }
 ```
+
+## Qualitätsanforderungen für den nächsten Feed
+
+Für eine exakte Karte und echte Fahrzeiten soll jeder neue Datensatz diese acht Felder liefern:
+
+- `address`, `zip`, `city`
+- `latitude`, `longitude` in WGS84
+- `drive_minutes_duebendorf`, `drive_minutes_wohlen`, `drive_minutes_othmarsingen`
+
+Die Website akzeptiert zusätzlich `lat`/`lng`, ein Objekt `coordinates`, ein Objekt `location` sowie `commute_minutes.{duebendorf,wohlen,othmarsingen}`. Fehlende Werte überschreiben bereits in Supabase vorhandene Koordinaten oder Fahrzeiten nicht mehr.
+
+`external_id` muss pro Quelle stabil und eindeutig bleiben. `source_url` beziehungsweise `project_url` muss direkt zum Inserat oder Projekt führen; nur `http`- und `https`-Links werden angezeigt.
 
 Pipeline-Projekte dürfen vorläufig noch unter `pipeline_projects` geliefert werden. Die Website wandelt sie automatisch in normale Wohnungskarten mit `entry_type: "pipeline"` um. Für künftige Updates ist die Ablage direkt in `properties` mit `entry_type: "pipeline"` bevorzugt.
