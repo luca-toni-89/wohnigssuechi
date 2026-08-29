@@ -2,1982 +2,479 @@
 <html lang="de">
 <head>
   <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-  <meta name="theme-color" content="#121923">
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+  <meta name="theme-color" content="#101827">
+  <meta name="description" content="Die gemeinsame Wohnungssuche von Gessi und Luca.">
   <title>Euses Dihei – Gessi & Luca</title>
-  
+  <link rel="icon" href="apple-touch-icon.png">
   <link rel="apple-touch-icon" href="apple-touch-icon.png">
   <link rel="preconnect" href="https://unpkg.com">
-  <link rel="preconnect" href="https://tile.openstreetmap.org">
-  <link rel="stylesheet"
-        href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
-        integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY="
-        crossorigin="">
-
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIINfQ3ynHTGPDKJQmZVztS7qYp2l94Z5aM=" crossorigin="">
   <style>
     :root{
-      --bg:#f4f6f8;
-      --surface:#ffffff;
-      --surface-2:#f8fafb;
-      --surface-dark:#121923;
-      --text:#17202a;
-      --muted:#697480;
-      --line:#e3e8ec;
-      --accent:#7a4f6d;
-      --accent-2:#b784a7;
-      --accent-soft:#f4eaf1;
-      --gold:#b8894f;
-      --gold-soft:#fbf3e8;
-      --good:#5f7d6c;
-      --good-soft:#edf4f0;
-      --bad:#b33a45;
-      --bad-soft:#fdecef;
-      --warn:#9a6519;
-      --warn-soft:#fff5df;
-      --shadow:0 18px 50px rgba(26,39,51,.10);
-      --shadow-soft:0 8px 24px rgba(26,39,51,.07);
-      --radius-xl:28px;
-      --radius-lg:20px;
-      --radius-md:14px;
-      --safe-bottom:env(safe-area-inset-bottom,0px);
+      --ink:#142033;--muted:#687386;--line:#e5e9ef;--paper:#f5f6f8;--card:#fff;
+      --accent:#1e6b59;--accent-2:#58b998;--accent-soft:#e7f5ef;--accent-rgb:30,107,89;
+      --hero:#101827;--hero-2:#173c38;--hero-text:#f9fbff;--hero-muted:#b9c7d5;
+      --gold:#d6b66b;--danger:#a53a4d;--warn:#a66418;--shadow:0 18px 54px rgba(20,32,51,.10);
+      --radius:26px;--nav-h:78px;
     }
-
+    body[data-category="homedeluxe"]{
+      --accent:#8e3550;--accent-2:#d1a34c;--accent-soft:#f8eaf0;--accent-rgb:142,53,80;
+      --hero:#19131a;--hero-2:#4b2433;--gold:#e7c57a;
+    }
     *{box-sizing:border-box}
     html{scroll-behavior:smooth}
-    body{
-      margin:0;
-      background:
-        radial-gradient(circle at 12% 0%, rgba(183,132,167,.11), transparent 28rem),
-        radial-gradient(circle at 90% 12%, rgba(184,137,79,.08), transparent 24rem),
-        var(--bg);
-      color:var(--text);
-      font-family:Inter,-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
-      -webkit-font-smoothing:antialiased;
-    }
-
+    body{margin:0;background:var(--paper);color:var(--ink);font-family:Inter,ui-sans-serif,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;line-height:1.45;padding-bottom:calc(var(--nav-h) + env(safe-area-inset-bottom) + 20px)}
     button,input,select,textarea{font:inherit}
+    button,a,select{touch-action:manipulation}
     button{cursor:pointer}
-    a{color:inherit}
-    .hidden{display:none!important}
-
-    .app{
-      width:min(1240px,100%);
-      margin:0 auto;
-      padding:18px 18px calc(104px + var(--safe-bottom));
-    }
-
-    .hero{
-      position:relative;
-      overflow:hidden;
-      background:linear-gradient(135deg,#fffaf7 0%,#fffdfb 58%,#fbf4f8 100%);
-      color:#3f3946;
-      border-radius:var(--radius-xl);
-      padding:24px;
-      margin-bottom:16px;
-      box-shadow:var(--shadow);
-    }
-
-    .hero::after{
-      content:"";
-      position:absolute;
-      width:260px;
-      height:260px;
-      border-radius:50%;
-      right:-90px;
-      top:-120px;
-      background:radial-gradient(circle,rgba(183,132,167,.18),rgba(183,132,167,0));
-      pointer-events:none;
-    }
-
-    .hero-row{
-      position:relative;
-      z-index:1;
-      display:flex;
-      align-items:flex-start;
-      justify-content:space-between;
-      gap:18px;
-    }
-
-
-    .brand h1{
-      margin:0;
-      font-size:clamp(34px,6vw,54px);
-      line-height:1.04;
-      letter-spacing:-.045em;
-      font-weight:900;
-    }
-
-    .title-emojis{
-      display:inline-block;
-      margin-left:8px;
-      font-size:.82em;
-      letter-spacing:0;
-      vertical-align:.06em;
-    }
-
-    .brand p{
-      margin:10px 0 0;
-      max-width:650px;
-      color:#d9cfd7;
-      font-size:clamp(18px,2.2vw,23px);
-      line-height:1.34;
-      font-weight:500;
-      letter-spacing:-.015em;
-    }
-
-    .subtitle-emojis{
-      white-space:nowrap;
-      letter-spacing:0;
-    }
-
-    .mobile-break{display:none}
-
-    .profile-picker{
-      flex:0 0 auto;
-      display:flex;
-      gap:5px;
-      padding:5px;
-      background:rgba(122,79,109,.08);
-      border:1px solid rgba(122,79,109,.12);
-      border-radius:999px;
-      backdrop-filter:blur(12px);
-    }
-
-    .profile-btn{
-      border:0;
-      background:transparent;
-      color:#6d6471;
-      border-radius:999px;
-      padding:9px 14px;
-      font-weight:800;
-    }
-
-    .profile-btn.active{
-      background:#4b3447;
-      color:white;
-      box-shadow:0 4px 14px rgba(0,0,0,.18);
-    }
-
-    .summary-grid{
-      display:grid;
-      grid-template-columns:repeat(4,minmax(0,1fr));
-      gap:10px;
-      margin-top:22px;
-    }
-
-    .metric{
-      position:relative;
-      z-index:1;
-      padding:14px 15px;
-      border-radius:16px;
-      background:rgba(255,255,255,.72);
-      border:1px solid rgba(122,79,109,.10);
-      backdrop-filter:blur(10px);
-    }
-
-    .metric strong{
-      display:block;
-      font-size:24px;
-      letter-spacing:-.035em;
-    }
-
-    .metric span{
-      display:block;
-      margin-top:3px;
-      color:#817684;
-      font-size:12px;
-    }
-
-    .map-shell{
-      overflow:hidden;
-      background:var(--surface);
-      border:1px solid var(--line);
-      border-radius:var(--radius-xl);
-      box-shadow:var(--shadow-soft);
-      margin-bottom:16px;
-    }
-
-    #map{
-      width:100%;
-      height:clamp(300px,45vh,460px);
-      background:#dfe8e8;
-    }
-
-    .map-empty{
-      display:none;
-      padding:26px;
-      text-align:center;
-      color:var(--muted);
-    }
-
-    .map-shell.no-points #map{display:none}
-    .map-shell.no-points .map-empty{display:block}
-
-    .map-caption{
-      display:flex;
-      align-items:center;
-      justify-content:space-between;
-      gap:12px;
-      padding:12px 15px;
-      color:var(--muted);
-      font-size:13px;
-    }
-
-    .map-caption button{
-      border:0;
-      background:var(--accent-soft);
-      color:var(--accent);
-      border-radius:10px;
-      padding:8px 11px;
-      font-weight:850;
-    }
-
-    .toolbar{
-      position:relative;
-      top:auto;
-      z-index:auto;
-      padding:12px;
-      margin-bottom:16px;
-      background:rgba(255,255,255,.88);
-      border:1px solid rgba(227,232,236,.85);
-      border-radius:var(--radius-lg);
-      box-shadow:var(--shadow-soft);
-      backdrop-filter:blur(18px);
-    }
-
-    .search-row{
-      display:grid;
-      grid-template-columns:minmax(200px,1.65fr) repeat(3,minmax(128px,.72fr)) auto;
-      gap:8px;
-    }
-
-    .control{
-      width:100%;
-      min-height:46px;
-      padding:10px 12px;
-      border:1px solid var(--line);
-      border-radius:12px;
-      background:var(--surface);
-      color:var(--text);
-      outline:none;
-      transition:.18s ease;
-    }
-
-    .control:focus{
-      border-color:var(--accent-2);
-      box-shadow:0 0 0 4px rgba(183,132,167,.14);
-    }
-
-    .primary-btn,.secondary-btn,.danger-btn,.ghost-btn{
-      min-height:44px;
-      padding:10px 14px;
-      border-radius:12px;
-      font-weight:850;
-      border:1px solid transparent;
-      transition:transform .16s ease,box-shadow .16s ease,background .16s ease;
-    }
-
-    .primary-btn:hover,.secondary-btn:hover,.danger-btn:hover,.ghost-btn:hover{transform:translateY(-1px)}
-    .primary-btn{background:var(--accent);color:white;box-shadow:0 8px 18px rgba(122,79,109,.20)}
-    .secondary-btn{background:var(--surface-2);color:var(--text);border-color:var(--line)}
-    .danger-btn{background:var(--bad-soft);color:var(--bad);border-color:#f7cbd1}
-    .ghost-btn{background:transparent;color:var(--muted);border-color:var(--line)}
-
-    .list-head{
-      display:flex;
-      align-items:end;
-      justify-content:space-between;
-      gap:12px;
-      margin:20px 3px 11px;
-    }
-
-    .list-head h2{
-      margin:0;
-      font-size:24px;
-      letter-spacing:-.035em;
-    }
-
-    .list-head span{color:var(--muted);font-size:13px}
-
-    .properties{
-      display:grid;
-      grid-template-columns:repeat(2,minmax(0,1fr));
-      gap:14px;
-    }
-
-    .property-card,.pipeline-card{
-      position:relative;
-      min-width:0;
-      overflow:hidden;
-      background:var(--surface);
-      border:1px solid var(--line);
-      border-radius:var(--radius-lg);
-      padding:18px;
-      box-shadow:var(--shadow-soft);
-      transition:transform .18s ease,border-color .18s ease,box-shadow .18s ease;
-    }
-
-    .property-card:hover,.pipeline-card:hover{
-      transform:translateY(-2px);
-      border-color:#cdd8dd;
-      box-shadow:var(--shadow);
-    }
-
-    .property-card.highlight,.pipeline-card.highlight{
-      border-color:var(--accent-2);
-      box-shadow:0 0 0 4px rgba(183,132,167,.15),var(--shadow);
-    }
-
-    .card-top{
-      display:flex;
-      align-items:flex-start;
-      justify-content:space-between;
-      gap:10px;
-    }
-
-    .card-title{
-      margin:0;
-      font-size:20px;
-      line-height:1.25;
-      letter-spacing:-.025em;
-      overflow-wrap:anywhere;
-    }
-
-    .location{
-      margin-top:5px;
-      color:var(--muted);
-      font-size:14px;
-    }
-
-    .top-actions{
-      display:flex;
-      gap:7px;
-      flex:0 0 auto;
-    }
-
-    .favorite-btn,.icon-danger{
-      width:42px;
-      height:42px;
-      display:inline-grid;
-      place-items:center;
-      border-radius:12px;
-      border:1px solid var(--line);
-      background:var(--surface);
-      font-size:20px;
-      transition:.17s ease;
-    }
-
-    .favorite-btn.active{
-      background:var(--gold-soft);
-      border-color:#edcf99;
-    }
-
-    .icon-danger{
-      color:var(--bad);
-      font-size:17px;
-    }
-
-    .icon-danger:hover{background:var(--bad-soft);border-color:#f4bec6}
-
-    .price{
-      margin:15px 0 9px;
-      font-size:28px;
-      font-weight:900;
-      letter-spacing:-.04em;
-    }
-
-    .facts{
-      display:flex;
-      flex-wrap:wrap;
-      gap:7px;
-      margin-bottom:11px;
-    }
-
-    .chip{
-      display:inline-flex;
-      align-items:center;
-      min-height:29px;
-      padding:5px 9px;
-      border-radius:999px;
-      background:#eef2f4;
-      color:#43505b;
-      font-size:12px;
-      font-weight:800;
-    }
-
-    .chip.good{background:var(--good-soft);color:var(--good)}
-    .chip.warn{background:var(--warn-soft);color:var(--warn)}
-    .chip.bad{background:var(--bad-soft);color:var(--bad)}
-    .pipeline-badge{background:var(--accent-soft);color:var(--accent)}
-
-    .ai-box{
-      margin:12px 0;
-      padding:12px 13px;
-      border-radius:14px;
-      border:1px solid #eadde6;
-      background:linear-gradient(135deg,#fffafd,#f7f1f6);
-      color:#34444b;
-      font-size:13px;
-      line-height:1.48;
-    }
-
-    .ai-box strong{display:block;margin-bottom:4px;color:var(--accent)}
-
-    .commute-box{
-      margin:12px 0;
-      padding:14px 14px 13px;
-      border:1px solid var(--line);
-      border-radius:15px;
-      background:linear-gradient(180deg,#fff,#fbf8fb);
-    }
-
-    .commute-head{
-      display:flex;
-      align-items:center;
-      justify-content:space-between;
-      gap:10px;
-      margin-bottom:11px;
-      color:var(--muted);
-      font-size:12px;
-      font-weight:850;
-    }
-
-    .commute-labels,
-    .commute-times{
-      display:flex;
-      align-items:center;
-      justify-content:space-between;
-      gap:10px;
-    }
-
-    .commute-labels{
-      color:#4a414a;
-      font-size:12px;
-      font-weight:850;
-    }
-
-    .commute-times{
-      margin-top:9px;
-      color:var(--text);
-      font-size:13px;
-      font-weight:900;
-    }
-
-    .commute-track{
-      position:relative;
-      height:36px;
-      margin:8px 4px 2px;
-    }
-
-    .commute-line{
-      position:absolute;
-      left:0;
-      right:0;
-      top:17px;
-      height:4px;
-      border-radius:999px;
-      background:linear-gradient(90deg,#eadbe5 0%,#b784a7 50%,#eadbe5 100%);
-    }
-
-    .commute-line::before,
-    .commute-line::after{
-      content:"";
-      position:absolute;
-      top:50%;
-      width:12px;
-      height:12px;
-      border-radius:50%;
-      background:white;
-      border:3px solid var(--accent);
-      transform:translateY(-50%);
-      box-shadow:0 2px 7px rgba(60,38,55,.14);
-    }
-
-    .commute-line::before{left:-1px}
-    .commute-line::after{right:-1px}
-
-    .commute-middle{
-      position:absolute;
-      top:-2px;
-      transform:translateX(-50%);
-      padding:0;
-      background:transparent;
-      color:#4d4050;
-      font-size:9px;
-      font-weight:950;
-      letter-spacing:.06em;
-      white-space:nowrap;
-      text-shadow:0 1px 0 rgba(255,255,255,.9);
-    }
-
-    .commute-dot{
-      position:absolute;
-      top:13px;
-      width:12px;
-      height:12px;
-      border-radius:50%;
-      transform:translateX(-50%);
-      background:var(--accent-2);
-      border:3px solid white;
-      box-shadow:0 0 0 2px var(--accent),0 3px 9px rgba(60,38,55,.20);
-    }
-
-    .voting{
-      display:grid;
-      grid-template-columns:1fr 1fr;
-      gap:8px;
-      margin:12px 0;
-    }
-
-    .person-vote{
-      padding:10px;
-      border:1px solid var(--line);
-      border-radius:14px;
-      background:#fcfdfd;
-    }
-
-    .person-vote.locked{opacity:.68}
-
-    .person-vote-label{
-      display:flex;
-      justify-content:space-between;
-      gap:8px;
-      margin-bottom:8px;
-      font-size:13px;
-      font-weight:850;
-    }
-
-    .vote-buttons{
-      display:grid;
-      grid-template-columns:1fr 1fr;
-      gap:6px;
-    }
-
-    .vote-btn{
-      height:40px;
-      border:1px solid var(--line);
-      border-radius:10px;
-      background:white;
-      font-size:19px;
-    }
-
-    .vote-btn.up.active{background:var(--good-soft);border-color:#abd8bf}
-    .vote-btn.down.active{background:var(--bad-soft);border-color:#efb8c0}
-
-    .locked-hint{
-      margin-top:6px;
-      color:var(--muted);
-      font-size:10px;
-      text-align:center;
-    }
-
-    .notes{
-      display:grid;
-      grid-template-columns:1fr 1fr;
-      gap:8px;
-      margin-top:10px;
-    }
-
-    .note-wrap label{
-      display:block;
-      margin:0 0 5px 2px;
-      color:var(--muted);
-      font-size:12px;
-      font-weight:850;
-    }
-
-    .note{
-      width:100%;
-      min-height:82px;
-      resize:vertical;
-      padding:10px;
-      border:1px solid var(--line);
-      border-radius:12px;
-      background:white;
-      color:var(--text);
-      outline:none;
-    }
-
-    .note:focus{border-color:var(--accent-2);box-shadow:0 0 0 4px rgba(183,132,167,.11)}
-
-    .card-actions{
-      display:grid;
-      grid-template-columns:minmax(0,1fr) auto auto;
-      gap:7px;
-      margin-top:11px;
-    }
-
-    .link-btn{
-      display:inline-flex;
-      align-items:center;
-      justify-content:center;
-      min-height:44px;
-      padding:9px 12px;
-      border:1px solid var(--line);
-      border-radius:12px;
-      background:white;
-      text-decoration:none;
-      font-weight:850;
-    }
-
-    .source-line{
-      margin-top:10px;
-      color:var(--muted);
-      font-size:11px;
-    }
-
-    .pipeline-status{
-      flex:0 0 auto;
-      max-width:46%;
-      padding:7px 10px;
-      border-radius:999px;
-      background:var(--accent-soft);
-      color:var(--accent);
-      font-size:11px;
-      font-weight:900;
-      text-align:center;
-    }
-
-    .pipeline-description{
-      color:#46535c;
-      line-height:1.55;
-      font-size:13px;
-    }
-
-    .pipeline-meta{
-      display:grid;
-      grid-template-columns:repeat(3,minmax(0,1fr));
-      gap:8px;
-      margin:12px 0;
-    }
-
-    .pipeline-meta>div{
-      padding:11px;
-      background:var(--surface-2);
-      border:1px solid var(--line);
-      border-radius:12px;
-      min-width:0;
-    }
-
-    .pipeline-meta small{display:block;color:var(--muted);font-size:10px}
-    .pipeline-meta strong{display:block;margin-top:3px;font-size:12px;overflow-wrap:anywhere}
-
-    .project-links{
-      display:flex;
-      flex-wrap:wrap;
-      gap:7px;
-      margin-top:11px;
-    }
-
-    .empty{
-      grid-column:1/-1;
-      padding:44px 20px;
-      text-align:center;
-      border:1px dashed #cfd8dc;
-      border-radius:var(--radius-lg);
-      background:rgba(255,255,255,.7);
-      color:var(--muted);
-    }
-
-    .bottom-nav{
-      position:fixed;
-      z-index:1200;
-      left:50%;
-      bottom:10px;
-      transform:translateX(-50%);
-      width:min(720px,calc(100% - 20px));
-      display:grid;
-      grid-template-columns:repeat(5,1fr);
-      gap:5px;
-      padding:7px;
-      padding-bottom:calc(7px + var(--safe-bottom));
-      border:1px solid rgba(227,232,236,.88);
-      border-radius:20px;
-      background:rgba(255,255,255,.92);
-      box-shadow:0 18px 45px rgba(26,39,51,.18);
-      backdrop-filter:blur(20px);
-    }
-
-    .nav-btn{
-      min-height:56px;
-      border:0;
-      border-radius:14px;
-      background:transparent;
-      color:var(--muted);
-      font-size:11px;
-      font-weight:850;
-      display:flex;
-      flex-direction:column;
-      align-items:center;
-      justify-content:center;
-      gap:3px;
-    }
-
-    .nav-btn span:first-child{font-size:20px}
-    .nav-btn.active{background:linear-gradient(135deg,#4b3447,#7a4f6d);color:white;box-shadow:0 7px 16px rgba(79,49,72,.18)}
-
-    .wiggle{
-      animation:buttonWiggle .42s cubic-bezier(.36,.07,.19,.97);
-      transform-origin:center;
-    }
-
-    @keyframes buttonWiggle{
-      0%{transform:rotate(0deg) scale(1)}
-      18%{transform:rotate(-4deg) scale(.97)}
-      36%{transform:rotate(4deg) scale(1.03)}
-      54%{transform:rotate(-3deg) scale(1.01)}
-      72%{transform:rotate(2deg) scale(1.01)}
-      100%{transform:rotate(0deg) scale(1)}
-    }
-
-    .modal,.profile-gate{
-      position:fixed;
-      z-index:3000;
-      inset:0;
-      display:none;
-      align-items:center;
-      justify-content:center;
-      padding:16px;
-      background:rgba(8,14,20,.68);
-      backdrop-filter:blur(8px);
-    }
-
-    .modal.open,.profile-gate.open{display:flex}
-
-    .modal-panel,.profile-gate-card{
-      width:min(760px,100%);
-      max-height:90vh;
-      overflow:auto;
-      background:white;
-      border-radius:24px;
-      padding:20px;
-      box-shadow:0 28px 80px rgba(0,0,0,.28);
-    }
-
-    .profile-gate-card{width:min(460px,100%);text-align:center}
-    .home-icon{font-size:46px}
-    .profile-gate-card h2{margin:8px 0 6px;font-size:28px}
-    .profile-gate-card p{margin:0;color:var(--muted);line-height:1.5}
-    .profile-choices{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:18px}
-    .profile-choice{min-height:54px;border:0;border-radius:14px;background:var(--surface-dark);color:white;font-weight:900}
-
-    .modal-head{
-      display:flex;
-      align-items:flex-start;
-      justify-content:space-between;
-      gap:12px;
-      margin-bottom:12px;
-    }
-
-    .modal-head h2{margin:0;font-size:24px}
-    .modal-head p{margin:5px 0 0;color:var(--muted);font-size:13px;line-height:1.45}
-    .icon-btn{width:40px;height:40px;border:1px solid var(--line);border-radius:11px;background:white}
-    .import-text{width:100%;min-height:360px;padding:14px;border:1px solid var(--line);border-radius:14px;background:#0f1720;color:#dbe7ec;font:13px/1.5 ui-monospace,SFMono-Regular,Menlo,monospace;resize:vertical;outline:none}
-    .modal-actions{display:flex;justify-content:flex-end;gap:8px;margin-top:12px}
-
-    .toast{
-      position:fixed;
-      z-index:5000;
-      left:50%;
-      bottom:98px;
-      transform:translate(-50%,18px);
-      max-width:min(520px,calc(100% - 28px));
-      padding:11px 14px;
-      border-radius:12px;
-      background:#101820;
-      color:white;
-      box-shadow:var(--shadow);
-      opacity:0;
-      pointer-events:none;
-      transition:.22s ease;
-      font-size:13px;
-      font-weight:750;
-      text-align:center;
-    }
-
+    .shell{width:min(1380px,calc(100% - 32px));margin:0 auto}
+    .hero{position:relative;overflow:hidden;background:linear-gradient(128deg,var(--hero),var(--hero-2));color:var(--hero-text);padding:24px 0 88px;isolation:isolate}
+    .hero:before{content:"";position:absolute;inset:-60% -10% auto 46%;height:470px;border-radius:50%;background:radial-gradient(circle,rgba(255,255,255,.17),transparent 68%);z-index:-1}
+    .hero:after{content:"";position:absolute;width:330px;height:330px;border:1px solid rgba(255,255,255,.13);border-radius:50%;right:8%;bottom:-245px;box-shadow:0 0 0 38px rgba(255,255,255,.035),0 0 0 78px rgba(255,255,255,.025);z-index:-1}
+    .hero-top{display:flex;align-items:center;justify-content:space-between;gap:20px}
+    .wordmark{display:flex;align-items:center;gap:13px;font-weight:900;letter-spacing:-.04em;font-size:19px}
+    .mark{display:grid;place-items:center;width:42px;height:42px;border-radius:15px;background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.18);box-shadow:inset 0 1px rgba(255,255,255,.2)}
+    .mark svg{width:24px;height:24px;fill:none;stroke:var(--gold);stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+    .profile-switch{display:flex;padding:4px;background:rgba(255,255,255,.09);border:1px solid rgba(255,255,255,.14);border-radius:999px;backdrop-filter:blur(14px)}
+    .profile-switch button{border:0;background:transparent;color:var(--hero-muted);padding:8px 14px;border-radius:999px;font-size:12px;font-weight:850}
+    .profile-switch button.active{background:#fff;color:var(--hero);box-shadow:0 5px 18px rgba(0,0,0,.16)}
+    .hero-main{display:grid;grid-template-columns:minmax(0,1.3fr) minmax(320px,.7fr);gap:44px;align-items:end;margin-top:46px}
+    .eyebrow{display:flex;align-items:center;gap:9px;color:var(--gold);font-size:11px;font-weight:900;letter-spacing:.17em;text-transform:uppercase}
+    .eyebrow:before{content:"";width:30px;height:1px;background:currentColor}
+    h1{margin:12px 0 10px;font-family:Georgia,"Times New Roman",serif;font-size:clamp(42px,6vw,76px);line-height:.98;letter-spacing:-.055em;font-weight:600}
+    .hero-copy{margin:0;color:var(--hero-muted);font-size:15px;max-width:620px}
+    .hero-stats{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+    .hero-stat{padding:16px 17px;border-radius:20px;background:rgba(255,255,255,.085);border:1px solid rgba(255,255,255,.12);backdrop-filter:blur(12px)}
+    .hero-stat strong{display:block;font-size:24px;letter-spacing:-.05em}
+    .hero-stat span{display:block;margin-top:2px;color:var(--hero-muted);font-size:10px;font-weight:800;text-transform:uppercase;letter-spacing:.08em}
+    .workspace{margin-top:-54px;position:relative;z-index:5}
+    .category-panel{background:rgba(255,255,255,.95);border:1px solid rgba(255,255,255,.75);box-shadow:var(--shadow);border-radius:30px;padding:10px;display:grid;grid-template-columns:1fr 1fr;gap:9px;backdrop-filter:blur(16px)}
+    .category-btn{position:relative;text-align:left;border:0;border-radius:22px;background:transparent;padding:16px 18px;display:flex;align-items:center;justify-content:space-between;gap:18px;color:var(--muted);transition:.2s ease}
+    .category-btn:hover{background:#f5f6f8}
+    .category-btn.active{background:var(--accent-soft);color:var(--accent);box-shadow:inset 0 0 0 1px rgba(var(--accent-rgb),.12)}
+    .category-btn .cat-copy{display:flex;align-items:center;gap:13px}
+    .cat-symbol{display:grid;place-items:center;width:42px;height:42px;border-radius:15px;background:#fff;box-shadow:0 8px 22px rgba(20,32,51,.08);font-size:19px}
+    .category-btn strong{display:block;color:var(--ink);font-size:15px}
+    .category-btn small{display:block;margin-top:1px;color:inherit;font-size:11px;font-weight:700}
+    .cat-count{min-width:33px;padding:5px 8px;border-radius:99px;background:#fff;text-align:center;color:var(--ink);font-size:12px;font-weight:900}
+    .notice{display:none;margin-top:14px;padding:12px 16px;border:1px solid #efd6a8;background:#fff8e9;color:#7b5317;border-radius:15px;font-size:12px;font-weight:700}
+    .notice.show{display:block}
+    .dashboard{display:grid;grid-template-columns:minmax(0,1fr) 380px;gap:20px;margin-top:20px;align-items:start}
+    .main-column{min-width:0}
+    .map-card,.toolbar,.empty,.property-card{background:var(--card);border:1px solid var(--line);box-shadow:0 9px 32px rgba(20,32,51,.055)}
+    .map-card{border-radius:var(--radius);overflow:hidden}
+    #map{height:325px;background:#e8ecef}
+    .map-foot{display:flex;justify-content:space-between;align-items:center;gap:12px;padding:11px 15px;color:var(--muted);font-size:11px;font-weight:750}
+    .ghost-btn{border:0;background:var(--accent-soft);color:var(--accent);border-radius:10px;padding:7px 10px;font-size:11px;font-weight:900}
+    .side-panel{position:sticky;top:16px;display:grid;gap:14px}
+    .insight-card{position:relative;overflow:hidden;border-radius:var(--radius);padding:22px;background:linear-gradient(145deg,var(--hero),var(--hero-2));color:#fff;box-shadow:var(--shadow)}
+    .insight-card:after{content:"";position:absolute;width:150px;height:150px;border-radius:50%;right:-70px;top:-70px;background:rgba(255,255,255,.09)}
+    .insight-label{color:var(--gold);font-size:10px;font-weight:900;letter-spacing:.13em;text-transform:uppercase}
+    .insight-card h2{font-family:Georgia,"Times New Roman",serif;margin:7px 0 18px;font-size:27px;font-weight:500;letter-spacing:-.04em}
+    .insight-grid{display:grid;grid-template-columns:1fr 1fr;gap:9px}
+    .mini-stat{border-radius:16px;background:rgba(255,255,255,.095);padding:13px;border:1px solid rgba(255,255,255,.1)}
+    .mini-stat strong{display:block;font-size:20px;letter-spacing:-.04em}
+    .mini-stat span{display:block;color:var(--hero-muted);font-size:9px;font-weight:800;text-transform:uppercase;letter-spacing:.06em}
+    .toolbar{margin-top:16px;padding:13px;border-radius:21px;display:grid;grid-template-columns:minmax(190px,1fr) repeat(3,minmax(130px,auto));gap:9px}
+    .field{position:relative}
+    .field svg{position:absolute;left:13px;top:50%;transform:translateY(-50%);width:17px;height:17px;fill:none;stroke:#8a94a3;stroke-width:2;pointer-events:none}
+    .control{width:100%;height:43px;border:1px solid var(--line);border-radius:13px;background:#f8f9fb;color:var(--ink);padding:0 12px;outline:none;font-size:12px;font-weight:700}
+    .field .control{padding-left:40px}
+    .control:focus{border-color:rgba(var(--accent-rgb),.45);box-shadow:0 0 0 3px rgba(var(--accent-rgb),.09)}
+    .section-head{display:flex;align-items:end;justify-content:space-between;gap:15px;margin:27px 2px 13px}
+    .section-head h2{margin:0;font-size:22px;letter-spacing:-.045em}
+    .section-head p{margin:2px 0 0;color:var(--muted);font-size:11px;font-weight:700}
+    .result-count{color:var(--muted);font-size:11px;font-weight:850}
+    .properties{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:15px}
+    .property-card{position:relative;border-radius:var(--radius);padding:19px;overflow:hidden;transition:transform .2s ease,box-shadow .2s ease,border-color .2s ease}
+    .property-card:hover{transform:translateY(-2px);box-shadow:0 16px 42px rgba(20,32,51,.1);border-color:rgba(var(--accent-rgb),.25)}
+    .property-card:before{content:"";position:absolute;left:0;top:0;bottom:0;width:4px;background:var(--accent);opacity:.9}
+    .property-card.pipeline:before{background:linear-gradient(var(--accent),var(--gold))}
+    .card-top{display:flex;align-items:flex-start;justify-content:space-between;gap:13px}
+    .card-kickers{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:8px}
+    .badge{display:inline-flex;align-items:center;gap:5px;border-radius:99px;padding:4px 8px;background:var(--accent-soft);color:var(--accent);font-size:9px;font-weight:900;text-transform:uppercase;letter-spacing:.055em}
+    .badge.project{background:#fff5de;color:#8b6119}
+    .badge.year{background:#edf1f6;color:#536071}
+    .card-title{margin:0;font-size:18px;line-height:1.18;letter-spacing:-.035em}
+    .location{margin-top:5px;color:var(--muted);font-size:11px;font-weight:700}
+    .top-actions{display:flex;gap:6px;flex:none}
+    .round-btn{display:grid;place-items:center;width:35px;height:35px;border:1px solid var(--line);border-radius:12px;background:#fff;color:#7d8795;font-size:16px;transition:.18s ease}
+    .round-btn:hover{border-color:var(--accent);color:var(--accent)}
+    .round-btn.favorite{background:#fff4d8;border-color:#f4d896;color:#d09016}
+    .price-row{display:flex;justify-content:space-between;align-items:end;gap:12px;margin-top:17px;padding-top:14px;border-top:1px solid var(--line)}
+    .price strong{display:block;font-size:21px;letter-spacing:-.045em}
+    .price small{color:var(--muted);font-size:9px;font-weight:800;text-transform:uppercase;letter-spacing:.07em}
+    .ai-score{display:flex;align-items:center;gap:7px}
+    .score-ring{display:grid;place-items:center;width:42px;height:42px;border-radius:50%;background:conic-gradient(var(--accent) calc(var(--score)*10%),#e7ebef 0);position:relative}
+    .score-ring:after{content:"";position:absolute;inset:4px;border-radius:50%;background:#fff}
+    .score-ring strong{position:relative;z-index:1;font-size:11px}
+    .ai-score span{color:var(--muted);font-size:9px;font-weight:850;line-height:1.2}
+    .facts{display:grid;grid-template-columns:repeat(4,1fr);gap:7px;margin-top:14px}
+    .fact{min-width:0;padding:9px 7px;border-radius:13px;background:#f7f8fa;text-align:center}
+    .fact strong{display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-size:12px}
+    .fact span{display:block;margin-top:1px;color:var(--muted);font-size:8px;font-weight:850;text-transform:uppercase;letter-spacing:.04em}
+    .commutes{margin-top:13px;border:1px solid var(--line);border-radius:16px;overflow:hidden}
+    .commute-head{display:flex;align-items:center;justify-content:space-between;padding:8px 10px;background:#f8f9fb;color:var(--muted);font-size:9px;font-weight:900;text-transform:uppercase;letter-spacing:.06em}
+    .commute-grid{display:grid;grid-template-columns:repeat(3,1fr)}
+    .commute{padding:9px 8px;text-align:center;border-right:1px solid var(--line)}
+    .commute:last-child{border-right:0}
+    .commute strong{display:block;font-size:12px}
+    .commute span{display:block;color:var(--muted);font-size:8px;font-weight:800}
+    .ai-note{margin:13px 0 0;padding:11px 12px;border-radius:14px;background:linear-gradient(120deg,var(--accent-soft),#fff);font-size:11px;color:#3d4959}
+    .ai-note strong{display:block;margin-bottom:3px;color:var(--accent);font-size:9px;text-transform:uppercase;letter-spacing:.07em}
+    .details{display:none;margin-top:13px;padding-top:13px;border-top:1px solid var(--line)}
+    .property-card.expanded .details{display:block}
+    .pros-cons{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+    .pros-cons>div{padding:10px;border-radius:13px;background:#f8f9fb;font-size:10px}
+    .pros-cons strong{display:block;margin-bottom:5px;font-size:9px;text-transform:uppercase;letter-spacing:.05em}
+    .pros-cons ul{margin:0;padding-left:15px}
+    .pros-cons li+li{margin-top:3px}
+    .votes{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:10px}
+    .person-box{border:1px solid var(--line);border-radius:14px;padding:9px}
+    .person-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:7px;font-size:10px;font-weight:900}
+    .vote-actions{display:flex;gap:5px}
+    .vote-actions button{flex:1;border:1px solid var(--line);border-radius:9px;background:#fff;padding:6px}
+    .vote-actions button.active.like{background:#e3f4ec;border-color:#a9dbc8}
+    .vote-actions button.active.dislike{background:#fde9ec;border-color:#efb8c1}
+    .note-label{display:block;margin:10px 0 5px;color:var(--muted);font-size:9px;font-weight:900;text-transform:uppercase;letter-spacing:.05em}
+    .note{width:100%;min-height:64px;resize:vertical;border:1px solid var(--line);border-radius:12px;padding:9px;background:#fafbfc;color:var(--ink);font-size:11px;outline:none}
+    .note:focus{border-color:var(--accent)}
+    .card-actions{display:grid;grid-template-columns:1fr auto auto;gap:7px;margin-top:13px}
+    .action-btn,.link-btn{display:inline-flex;align-items:center;justify-content:center;gap:6px;min-height:38px;border-radius:12px;padding:0 12px;font-size:10px;font-weight:900;text-decoration:none}
+    .action-btn{border:1px solid var(--line);background:#fff;color:var(--ink)}
+    .action-btn.primary{border-color:var(--accent);background:var(--accent);color:#fff}
+    .action-btn.archive{color:var(--danger)}
+    .link-btn{background:var(--hero);color:#fff}
+    .source-line{margin-top:10px;color:#8b94a1;font-size:8px;font-weight:700}
+    .empty{grid-column:1/-1;border-radius:var(--radius);padding:55px 25px;text-align:center}
+    .empty-icon{font-size:30px}
+    .empty h3{margin:10px 0 4px;font-size:18px}
+    .empty p{margin:0;color:var(--muted);font-size:11px}
+    .bottom-nav{position:fixed;z-index:50;left:50%;bottom:max(12px,env(safe-area-inset-bottom));transform:translateX(-50%);width:min(620px,calc(100% - 24px));height:66px;padding:6px;background:rgba(16,24,39,.94);border:1px solid rgba(255,255,255,.1);border-radius:23px;display:grid;grid-template-columns:repeat(4,1fr);gap:4px;box-shadow:0 18px 48px rgba(10,17,28,.28);backdrop-filter:blur(17px)}
+    .nav-btn{border:0;border-radius:17px;background:transparent;color:#9faabb;display:grid;place-items:center;align-content:center;gap:2px;font-size:9px;font-weight:850}
+    .nav-btn span:first-child{font-size:17px;line-height:1}
+    .nav-btn.active{background:#fff;color:var(--hero);box-shadow:0 5px 16px rgba(0,0,0,.18)}
+    .profile-gate{display:none;position:fixed;z-index:100;inset:0;background:rgba(10,17,28,.72);backdrop-filter:blur(12px);padding:20px;place-items:center}
+    .profile-gate.open{display:grid}
+    .gate-card{width:min(430px,100%);background:#fff;border-radius:30px;padding:30px;box-shadow:0 25px 90px rgba(0,0,0,.35);text-align:center}
+    .gate-icon{display:grid;place-items:center;width:62px;height:62px;border-radius:21px;margin:0 auto 14px;background:var(--accent-soft);font-size:28px}
+    .gate-card h2{margin:0;font-family:Georgia,"Times New Roman",serif;font-size:31px;font-weight:500;letter-spacing:-.04em}
+    .gate-card p{margin:8px auto 19px;color:var(--muted);font-size:12px;max-width:310px}
+    .gate-options{display:grid;grid-template-columns:1fr 1fr;gap:9px}
+    .gate-options button{border:1px solid var(--line);border-radius:16px;background:#f8f9fb;padding:15px;font-weight:900;color:var(--ink)}
+    .gate-options button:hover{border-color:var(--accent);background:var(--accent-soft);color:var(--accent)}
+    .toast{position:fixed;z-index:120;left:50%;bottom:96px;transform:translate(-50%,18px);background:var(--hero);color:#fff;padding:11px 16px;border-radius:13px;box-shadow:var(--shadow);font-size:11px;font-weight:800;opacity:0;pointer-events:none;transition:.2s ease}
     .toast.show{opacity:1;transform:translate(-50%,0)}
-    .toast.error{background:#8e2d38}
-
-    .loading{
-      position:fixed;
-      z-index:4500;
-      inset:0;
-      display:none;
-      place-items:center;
-      background:rgba(244,246,248,.72);
-      backdrop-filter:blur(5px);
-    }
-
-    .loading.show{display:grid}
-    .spinner{width:38px;height:38px;border:4px solid #d8e2e4;border-top-color:var(--accent);border-radius:50%;animation:spin .8s linear infinite}
-    @keyframes spin{to{transform:rotate(360deg)}}
-
-    .leaflet-popup-content-wrapper,.leaflet-popup-tip{box-shadow:var(--shadow-soft)}
-    .popup-title{font-weight:900;margin-bottom:5px}
-    .popup-meta{color:var(--muted);font-size:12px;line-height:1.4}
-    .popup-btn{margin-top:8px;border:0;border-radius:9px;padding:7px 9px;background:var(--accent);color:white;font-weight:850}
-
-    @media(max-width:900px){
-      .search-row{grid-template-columns:1fr 1fr}
-      .search-row .wide{grid-column:1/-1}
-      .properties{grid-template-columns:1fr}
-    }
-
-    @media(max-width:640px){
-      .app{padding:10px 10px calc(98px + var(--safe-bottom))}
-      .hero{padding:18px;border-radius:22px}
-      .hero-row{flex-direction:column}
-      .profile-picker{align-self:flex-start}
-      .mobile-break{display:block}
-      .summary-grid{grid-template-columns:repeat(2,1fr)}
-      .toolbar{top:auto}
-      .search-row{grid-template-columns:1fr 1fr}
-      .search-row .wide,.search-row button{grid-column:1/-1}
-      .property-card,.pipeline-card{padding:15px;border-radius:18px}
-      .notes,.voting{grid-template-columns:1fr}
-      .pipeline-meta{grid-template-columns:1fr 1fr}
-      .card-actions{grid-template-columns:1fr 1fr}
-      .card-actions .status-select{grid-column:1/-1}
-      .map-caption{align-items:flex-start}
-      .bottom-nav{bottom:4px}
-    }
+    .toast.error{background:#8e3040}
+    .loading-bar{position:fixed;z-index:200;left:0;right:0;top:0;height:3px;background:transparent;overflow:hidden;pointer-events:none}
+    .loading-bar:after{content:"";display:block;height:100%;width:35%;background:var(--gold);transform:translateX(-110%)}
+    .loading-bar.active:after{animation:load 1.1s ease-in-out infinite}
+    @keyframes load{to{transform:translateX(400%)}}
+    @media(max-width:1040px){.dashboard{grid-template-columns:1fr}.side-panel{position:static;grid-template-columns:1fr}.properties{grid-template-columns:repeat(2,1fr)}.hero-main{grid-template-columns:1fr}.hero-stats{max-width:620px}.toolbar{grid-template-columns:1fr 1fr}.field{grid-column:1/-1}}
+    @media(max-width:720px){.shell{width:min(100% - 20px,1380px)}.hero{padding-top:15px;padding-bottom:78px}.wordmark{font-size:15px}.mark{width:37px;height:37px}.profile-switch button{padding:7px 10px}.hero-main{margin-top:36px;gap:28px}h1{font-size:44px}.hero-copy{font-size:13px}.hero-stats{gap:7px}.hero-stat{padding:12px}.hero-stat strong{font-size:19px}.workspace{margin-top:-47px}.category-panel{border-radius:24px;padding:7px}.category-btn{padding:11px;border-radius:18px}.cat-symbol{width:37px;height:37px}.category-btn small{display:none}.cat-count{display:none}.dashboard{margin-top:13px}.insight-card{padding:18px}.map-card{border-radius:22px}#map{height:260px}.toolbar{padding:10px;border-radius:18px}.properties{grid-template-columns:1fr}.property-card{border-radius:22px;padding:17px}.section-head{margin-top:22px}.bottom-nav{bottom:max(8px,env(safe-area-inset-bottom));height:62px}.pros-cons{grid-template-columns:1fr}.facts{gap:5px}.fact{padding:8px 4px}.commute{padding:8px 3px}.card-actions{grid-template-columns:1fr auto}.card-actions .link-btn{grid-column:1/-1}.hero:after{display:none}}
+    @media(max-width:420px){.category-btn{padding:9px}.cat-symbol{display:none}.hero-stats{grid-template-columns:repeat(3,1fr)}.hero-stat span{font-size:8px}.toolbar{grid-template-columns:1fr}.field{grid-column:auto}.facts{grid-template-columns:repeat(2,1fr)}.fact:nth-child(3),.fact:nth-child(4){margin-top:0}.votes{grid-template-columns:1fr}.profile-switch{margin-left:auto}}
   </style>
 </head>
-
-<body>
-  <main class="app">
-    <section class="hero">
-      <div class="hero-row">
-        <div class="brand">
-          <h1>Euses Dihei <span class="title-emojis">🥰 🏡</span></h1>
-          <p>Wohnungssuche von Gessi &amp;<br class="mobile-break"> Luca <span class="subtitle-emojis">💗 🔐</span></p>
+<body data-category="maxmio">
+  <div id="loadingBar" class="loading-bar active"></div>
+  <header class="hero">
+    <div class="shell">
+      <div class="hero-top">
+        <div class="wordmark">
+          <span class="mark" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M3 11.5 12 4l9 7.5"></path><path d="M5.5 10.5V20h13v-9.5M9.5 20v-6h5v6"></path></svg></span>
+          <span>Euses Dihei</span>
         </div>
-        <div class="profile-picker" aria-label="Aktives Profil">
-          <button class="profile-btn" data-profile="luca" type="button">Luca</button>
-          <button class="profile-btn" data-profile="gessi" type="button">Gessi</button>
+        <div class="profile-switch" aria-label="Aktives Profil">
+          <button type="button" data-profile="luca">Luca</button>
+          <button type="button" data-profile="gessi">Gessi</button>
         </div>
       </div>
-
-      <section class="summary-grid" aria-label="Zusammenfassung">
-        <div class="metric"><strong id="metricVisible">0</strong><span>angezeigt</span></div>
-        <div class="metric"><strong id="metricBothLike">0</strong><span>beide mögen</span></div>
-        <div class="metric"><strong id="metricFavorites">0</strong><span>Favoriten</span></div>
-        <div class="metric"><strong id="metricAvgPrice">–</strong><span>Ø Preis</span></div>
-      </section>
-    </section>
-
-    <section class="map-shell">
-      <div id="map" role="region" aria-label="Karte der Wohnungen"></div>
-      <div id="mapEmpty" class="map-empty">Für diese Einträge fehlen Koordinaten.</div>
-      <div class="map-caption">
-        <span id="mapCaption">Einträge mit Kartenposition</span>
-        <button id="fitMapBtn" type="button">Alle anzeigen</button>
+      <div class="hero-main">
+        <div>
+          <div class="eyebrow">Unsere Wohnungssuche</div>
+          <h1 id="heroTitle">MaxMio</h1>
+          <p id="heroCopy" class="hero-copy">Smarte Wohnungen bis CHF 1 Mio. – ab 3.5 Zimmern, sorgfältig geprüft und gemeinsam bewertet.</p>
+        </div>
+        <div class="hero-stats" aria-label="Übersicht">
+          <div class="hero-stat"><strong id="statNew">0</strong><span>Neu</span></div>
+          <div class="hero-stat"><strong id="statInteresting">0</strong><span>Interessant</span></div>
+          <div class="hero-stat"><strong id="statFavorite">0</strong><span>Favoriten</span></div>
+        </div>
       </div>
-    </section>
-
-    <section class="toolbar">
-      <div class="search-row">
-        <input id="searchInput" class="control wide" type="search" placeholder="Ort, Titel oder Adresse suchen …">
-        <select id="priceFilter" class="control" aria-label="Maximalpreis">
-          <option value="">Preis: alle</option>
-          <option value="1000000">bis CHF 1 Mio.</option>
-          <option value="1200000">bis CHF 1.2 Mio.</option>
-          <option value="1400000">bis CHF 1.4 Mio.</option>
-        </select>
-        <select id="roomsFilter" class="control" aria-label="Mindestzimmer">
-          <option value="">Zimmer: alle</option>
-          <option value="4.5">ab 4.5</option>
-          <option value="5.5">ab 5.5</option>
-        </select>
-        <select id="sortFilter" class="control" aria-label="Sortierung">
-          <option value="newest">Neueste zuerst</option>
-          <option value="priceAsc">Preis aufsteigend</option>
-          <option value="priceDesc">Preis absteigend</option>
-          <option value="ratingDesc">KI-Bewertung</option>
-        </select>
-        <button id="resetFiltersBtn" class="secondary-btn" type="button">Filter löschen</button>
-      </div>
-    </section>
-
-    <div class="list-head">
-      <h2 id="viewTitle">Alle Wohnungen</h2>
-      <span id="resultCount">0 Treffer</span>
     </div>
+  </header>
 
-    <section id="propertyList" class="properties" aria-live="polite"></section>
+  <main class="shell workspace">
+    <section class="category-panel" aria-label="Suchkategorie">
+      <button class="category-btn active" type="button" data-category="maxmio">
+        <span class="cat-copy"><span class="cat-symbol">◆</span><span><strong>MaxMio</strong><small>Bis CHF 1 Mio. · ab 3.5 Zimmer</small></span></span>
+        <span id="countMaxmio" class="cat-count">0</span>
+      </button>
+      <button class="category-btn" type="button" data-category="homedeluxe">
+        <span class="cat-copy"><span class="cat-symbol">✦</span><span><strong>HomeDeluxe</strong><small>Über CHF 1 Mio. · ab 4.5 Zimmer</small></span></span>
+        <span id="countDeluxe" class="cat-count">0</span>
+      </button>
+    </section>
+
+    <div id="dbNotice" class="notice"></div>
+
+    <section class="dashboard">
+      <div class="main-column">
+        <section class="map-card">
+          <div id="map" role="region" aria-label="Karte der sichtbaren Wohnungen"></div>
+          <div class="map-foot"><span id="mapCaption">Wohnungen mit Kartenposition</span><button id="fitMap" class="ghost-btn" type="button">Alle anzeigen</button></div>
+        </section>
+
+        <section class="toolbar" aria-label="Filter">
+          <label class="field"><svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"></circle><path d="m20 20-4-4"></path></svg><input id="search" class="control" type="search" placeholder="Ort, Adresse oder Titel suchen …"></label>
+          <select id="price" class="control" aria-label="Maximalpreis"><option value="">Preis: alle</option></select>
+          <select id="rooms" class="control" aria-label="Mindestzimmer"><option value="">Zimmer: alle</option><option value="3.5">ab 3.5</option><option value="4.5">ab 4.5</option><option value="5.5">ab 5.5</option></select>
+          <select id="sort" class="control" aria-label="Sortierung"><option value="newest">Neueste zuerst</option><option value="priceAsc">Preis aufsteigend</option><option value="priceDesc">Preis absteigend</option><option value="rating">Beste KI-Bewertung</option><option value="year">Neuestes Baujahr</option></select>
+        </section>
+
+        <div class="section-head"><div><h2 id="viewTitle">Neu entdeckt</h2><p id="viewSubtitle">Frische Treffer, die ihr noch nicht eingeordnet habt.</p></div><span id="resultCount" class="result-count">0 Treffer</span></div>
+        <section id="propertyList" class="properties" aria-live="polite"></section>
+      </div>
+
+      <aside class="side-panel">
+        <section class="insight-card">
+          <div class="insight-label">Aktuelle Auswahl</div>
+          <h2 id="insightTitle">MaxMio im Blick</h2>
+          <div class="insight-grid">
+            <div class="mini-stat"><strong id="visibleCount">0</strong><span>Angezeigt</span></div>
+            <div class="mini-stat"><strong id="avgPrice">–</strong><span>Ø Gesamtpreis</span></div>
+            <div class="mini-stat"><strong id="bothLike">0</strong><span>Beide mögen</span></div>
+            <div class="mini-stat"><strong id="projectsCount">0</strong><span>Projekte</span></div>
+          </div>
+        </section>
+      </aside>
+    </section>
   </main>
 
-  <nav class="bottom-nav" aria-label="Hauptnavigation">
-    <button class="nav-btn active" data-view="main" type="button"><span>🏠</span><span>Alle</span></button>
-    <button class="nav-btn" data-view="favorites" type="button"><span>⭐</span><span>Favoriten</span></button>
-    <button class="nav-btn" data-view="pipeline" type="button"><span>🏗️</span><span>Pipeline</span></button>
-    <button class="nav-btn" data-view="archive" type="button"><span>🗂️</span><span>Archiv</span></button>
-    <button class="nav-btn" data-view="import" type="button"><span>📥</span><span>Import</span></button>
+  <nav class="bottom-nav" aria-label="Statusfilter">
+    <button class="nav-btn active" type="button" data-view="new"><span>✦</span><span>Neu</span></button>
+    <button class="nav-btn" type="button" data-view="interesting"><span>◆</span><span>Interessant</span></button>
+    <button class="nav-btn" type="button" data-view="favorites"><span>★</span><span>Favoriten</span></button>
+    <button class="nav-btn" type="button" data-view="archive"><span>⌁</span><span>Archiv</span></button>
   </nav>
 
-  <div id="profileGate" class="profile-gate open" role="dialog" aria-modal="true">
-    <section class="profile-gate-card">
-      <div class="home-icon">🏡</div>
-      <h2>Wer schaut gerade?</h2>
-      <p>Bewertungen, Notizen und Favoriten werden dem richtigen Profil zugeordnet.</p>
-      <div class="profile-choices">
-        <button class="profile-choice" data-profile="luca" type="button">Luca</button>
-        <button class="profile-choice" data-profile="gessi" type="button">Gessi</button>
-      </div>
+  <div id="profileGate" class="profile-gate" role="dialog" aria-modal="true" aria-labelledby="gateTitle">
+    <section class="gate-card">
+      <div class="gate-icon">🏡</div>
+      <h2 id="gateTitle">Wer schaut gerade?</h2>
+      <p>Favoriten, Bewertungen und Notizen werden dem richtigen Profil zugeordnet.</p>
+      <div class="gate-options"><button type="button" data-profile="luca">Luca</button><button type="button" data-profile="gessi">Gessi</button></div>
     </section>
   </div>
-
-  <div id="importModal" class="modal" role="dialog" aria-modal="true">
-    <section class="modal-panel">
-      <div class="modal-head">
-        <div>
-          <h2>ChatGPT-Update importieren</h2>
-          <p>JSON einfügen. Bereits vorhandene Bewertungen, Notizen und Favoriten bleiben erhalten.</p>
-        </div>
-        <button id="closeImportBtn" class="icon-btn" type="button" aria-label="Schliessen">✕</button>
-      </div>
-      <textarea id="importText" class="import-text" spellcheck="false" placeholder='{"properties":[],"pipeline_projects":[]}'></textarea>
-      <div class="modal-actions">
-        <button id="sampleBtn" class="secondary-btn" type="button">Beispiel</button>
-        <button id="runImportBtn" class="primary-btn" type="button">Jetzt importieren</button>
-      </div>
-    </section>
-  </div>
-
   <div id="toast" class="toast" role="status" aria-live="polite"></div>
-  <div id="loading" class="loading" aria-hidden="true"><div class="spinner"></div></div>
 
-  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
-          integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo="
-          crossorigin=""></script>
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-
   <script>
-    const SUPABASE_URL = "https://ogxozfrnokjeoikngcvp.supabase.co";
-    const SUPABASE_KEY = "sb_publishable_2UwF0H-4eW_A0KHUMQydlA_XDvWoXxY";
-
-    const db = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY, {
-      auth:{persistSession:false,autoRefreshToken:false,detectSessionInUrl:false}
-    });
-
-    const storedProfile = localStorage.getItem("wohnung_profile");
-    const state = {
-      profile:["luca","gessi"].includes(storedProfile) ? storedProfile : null,
-      view:"main",
-      properties:[],
-      pipelineProjects:[],
-      votes:[],
-      notes:[],
-      favorites:[],
-      filtered:[],
-      markers:new Map(),
-      map:null,
-      markerLayer:null
-    };
-
-    const el = Object.fromEntries([
-      "propertyList","viewTitle","resultCount","metricVisible","metricBothLike",
-      "metricFavorites","metricAvgPrice","mapCaption","mapEmpty","profileGate",
-      "searchInput","priceFilter","roomsFilter","sortFilter","resetFiltersBtn",
-      "fitMapBtn","importModal","importText","closeImportBtn","runImportBtn",
-      "sampleBtn","toast","loading"
-    ].map(id=>[id,document.getElementById(id)]));
-
-    const STATUS_LABELS = {
-      interesting:"Interessant",
-      contacted:"Kontakt aufgenommen",
-      viewing_planned:"Besichtigung geplant",
-      viewed:"Besichtigt",
-      rejected:"Abgelehnt",
-      purchased:"Gekauft",
-      archived:"Archiviert"
-    };
-
-    const PLACE_COORDINATES = {
-      "neuenhof":[47.4494,8.3266],"killwangen":[47.4328,8.3475],"wurenlos":[47.442,8.362],
-      "würenlos":[47.442,8.362],"spreitenbach":[47.4227,8.3659],"wettingen":[47.4668,8.3267],
-      "baden":[47.4729,8.3081],"bergdietikon":[47.3899,8.3898],"dietikon":[47.4054,8.4034],
-      "urdorf":[47.3851,8.4258],"schlieren":[47.3967,8.4476],"geroldswil":[47.4216,8.409],
-      "oetwil an der limmat":[47.428,8.3945],"oberengstringen":[47.4099,8.4659],
-      "regensdorf":[47.4347,8.4683],"buchs zh":[47.457,8.4378],"dallikon":[47.4392,8.4388],
-      "dällikon":[47.4392,8.4388],"otelfingen":[47.4604,8.3911],"fislisbach":[47.4384,8.2903],
-      "niederrohrdorf":[47.4242,8.3042],"oberrohrdorf":[47.4188,8.3184],
-      "mellingen":[47.4195,8.2734],"bremgarten":[47.3513,8.3429],"wohlen":[47.3507,8.2779],
-      "lenzburg":[47.3885,8.1763],"othmarsingen":[47.4014,8.2136],"duebendorf":[47.3971,8.6187],
-      "dübendorf":[47.3971,8.6187],"wallisellen":[47.414,8.5967],"zürich":[47.3769,8.5417]
-    };
-
-    const ROUTE_DESTINATIONS = {
-      othmarsingen:[47.4014,8.2136],
-      duebendorf:[47.3971,8.6187]
-    };
-
-    function escapeHtml(value){
-      return String(value ?? "")
-        .replaceAll("&","&amp;").replaceAll("<","&lt;").replaceAll(">","&gt;")
-        .replaceAll('"',"&quot;").replaceAll("'","&#039;");
-    }
-
-    function formatPrice(value){
-      if(value===null||value===undefined||value==="") return "Preis offen";
-      return new Intl.NumberFormat("de-CH",{style:"currency",currency:"CHF",maximumFractionDigits:0}).format(Number(value));
-    }
-
-    function formatDate(value){
-      if(!value) return "";
-      const date=new Date(value);
-      if(Number.isNaN(date.getTime())) return String(value);
-      return new Intl.DateTimeFormat("de-CH",{day:"2-digit",month:"2-digit",year:"numeric"}).format(date);
-    }
-
-    function showToast(message,isError=false){
-      el.toast.textContent=message;
-      el.toast.classList.toggle("error",isError);
-      el.toast.classList.add("show");
-      clearTimeout(showToast.timer);
-      showToast.timer=setTimeout(()=>el.toast.classList.remove("show"),3200);
-    }
-
-    function setLoading(active){
-      el.loading.classList.toggle("show",active);
-      el.loading.setAttribute("aria-hidden",String(!active));
-    }
-
-    function getVote(propertyId,person){
-      return state.votes.find(v=>v.property_id===propertyId&&v.person===person)?.vote ?? null;
-    }
-
-    function getNote(propertyId,person){
-      return state.notes.find(n=>n.property_id===propertyId&&n.person===person)?.note ?? "";
-    }
-
-    function isFavorite(propertyId,person){
-      return Boolean(state.favorites.find(f=>f.property_id===propertyId&&f.person===person&&f.is_favorite===true));
-    }
-
-    function isFavoriteByAnyone(propertyId){
-      return isFavorite(propertyId,"luca")||isFavorite(propertyId,"gessi");
-    }
-
-    function isLikedByBoth(propertyId){
-      return getVote(propertyId,"luca")===1&&getVote(propertyId,"gessi")===1;
-    }
-
-    function normalizePlace(value){
-      return String(value||"").trim().toLowerCase().normalize("NFD")
-        .replace(/[\u0300-\u036f]/g,"").replace(/\b(ch|schweiz)\b/g,"")
-        .replace(/[^a-z0-9 ]+/g," ").replace(/\s+/g," ").trim();
-    }
-
-    function coordinatesFor(item){
-      const lat=Number(item.latitude),lng=Number(item.longitude);
-      if(Number.isFinite(lat)&&Number.isFinite(lng)&&lat!==0&&lng!==0) return [lat,lng];
-      const candidates=[item.municipality,item.location,item.address].map(normalizePlace).filter(Boolean);
-      for(const candidate of candidates){
-        if(PLACE_COORDINATES[candidate]) return PLACE_COORDINATES[candidate];
-        const key=Object.keys(PLACE_COORDINATES).find(k=>candidate===normalizePlace(k)||candidate.includes(normalizePlace(k)));
-        if(key) return PLACE_COORDINATES[key];
+    "use strict";
+    const CONFIG={
+      supabaseUrl:"https://ogxozfrnokjeoikngcvp.supabase.co",
+      supabaseKey:"sb_publishable_2UwF0H-4eW_A0KHUMQydlA_XDvWoXxY",
+      propertyTable:"home_finder_properties",
+      stateTable:"home_finder_state",
+      dataUrl:"data.json",
+      destinations:{
+        duebendorf:{label:"Dübendorf",lat:47.3971,lng:8.6187},
+        wohlen:{label:"Wohlen",lat:47.3507,lng:8.2779},
+        othmarsingen:{label:"Othmarsingen",lat:47.4014,lng:8.2136}
       }
-      return null;
-    }
+    };
+    const db=window.supabase?.createClient(CONFIG.supabaseUrl,CONFIG.supabaseKey,{auth:{persistSession:false,autoRefreshToken:false,detectSessionInUrl:false}});
+    const savedProfile=localStorage.getItem("euses_dihei_profile");
+    const state={profile:["luca","gessi"].includes(savedProfile)?savedProfile:null,category:"maxmio",view:"new",items:[],preferences:new Map(),filtered:[],map:null,markerLayer:null,markers:new Map(),dbReady:false,routing:new Set()};
+    const $=id=>document.getElementById(id);
+    const els=Object.fromEntries(["loadingBar","heroTitle","heroCopy","statNew","statInteresting","statFavorite","countMaxmio","countDeluxe","dbNotice","mapCaption","fitMap","search","price","rooms","sort","viewTitle","viewSubtitle","resultCount","propertyList","insightTitle","visibleCount","avgPrice","bothLike","projectsCount","profileGate","toast"].map(id=>[id,$(id)]));
+    const VIEW_COPY={
+      new:["Neu entdeckt","Frische Treffer, die ihr noch nicht eingeordnet habt."],
+      interesting:["Interessant","Die Wohnungen, die ihr genauer verfolgen möchtet."],
+      favorites:["Eure Favoriten","Alles, was Luca oder Gessi mit einem Stern markiert hat."],
+      archive:["Archiv","Ausgeschlossene oder nicht mehr aktuelle Wohnungen."]
+    };
+    const PLACE_COORDINATES={
+      "dübendorf":[47.3971,8.6187],"duebendorf":[47.3971,8.6187],"wallisellen":[47.414,8.5967],"dietlikon":[47.4256,8.6198],"brüttisellen":[47.4217,8.6329],"bassersdorf":[47.4434,8.6282],"kloten":[47.4515,8.5849],"bülach":[47.5187,8.5403],"embrach":[47.5065,8.5942],"volketswil":[47.3908,8.6902],"zürich":[47.3769,8.5417],"regensdorf":[47.4347,8.4683],"schlieren":[47.3967,8.4476],"urdorf":[47.3851,8.4258],"dietikon":[47.4054,8.4034],"bergdietikon":[47.3899,8.3899],"spreitenbach":[47.4227,8.3659],"killwangen":[47.4328,8.3475],"würenlos":[47.442,8.362],"wettingen":[47.4668,8.3266],"baden":[47.4729,8.3081],"fislisbach":[47.4384,8.2903],"niederrohrdorf":[47.4242,8.3042],"oberrohrdorf":[47.4188,8.3184],"mellingen":[47.4195,8.2734],"wohlen":[47.3507,8.2779],"othmarsingen":[47.4014,8.2136],"lenzburg":[47.3885,8.1763],"bremgarten":[47.3513,8.3429],"neuenhof":[47.4494,8.3266]
+    };
 
-    function firstPositiveNumber(item,keys){
-      for(const key of keys){
-        const value=Number(item?.[key]);
-        if(Number.isFinite(value)&&value>0) return Math.round(value);
-      }
-      return null;
-    }
-
-    function commuteValues(item){
+    function esc(value){return String(value??"").replaceAll("&","&amp;").replaceAll("<","&lt;").replaceAll(">","&gt;").replaceAll('"',"&quot;").replaceAll("'","&#039;")}
+    function num(...values){for(const value of values){if(value===null||value===undefined||value==="")continue;const parsed=Number(String(value).replace(/[’']/g,"").replace(/[^0-9.-]/g,""));if(Number.isFinite(parsed))return parsed}return null}
+    function text(...values){return values.find(value=>value!==null&&value!==undefined&&String(value).trim()!=="")??null}
+    function bool(value){return value===true||value===1||value==="1"||String(value).toLowerCase()==="true"}
+    function slug(value){return String(value||"").toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g,"").replace(/[^a-z0-9]+/g,"-").replace(/^-|-$/g,"").slice(0,100)}
+    function price(value){return num(value)==null?"Preis offen":new Intl.NumberFormat("de-CH",{style:"currency",currency:"CHF",maximumFractionDigits:0}).format(num(value))}
+    function shortPrice(value){const n=num(value);return n==null?"–":n>=1000000?`${(n/1000000).toLocaleString("de-CH",{maximumFractionDigits:2})} Mio.`:`${Math.round(n/1000).toLocaleString("de-CH")}k`}
+    function date(value){if(!value)return "";const d=new Date(value);return Number.isNaN(d.getTime())?String(value):new Intl.DateTimeFormat("de-CH",{day:"2-digit",month:"2-digit",year:"numeric"}).format(d)}
+    function array(value){if(Array.isArray(value))return value.filter(Boolean);if(typeof value==="string"&&value.trim())return value.split(/\n|;/).map(x=>x.trim()).filter(Boolean);return []}
+    function totalPrice(raw){const explicit=num(raw.total_price_chf,raw.price_chf,raw.estimated_price_chf);if(explicit!=null)return explicit;const purchase=num(raw.purchase_price_chf,raw.estimated_price_from_chf,raw.price);const parking=num(raw.mandatory_parking_price_chf,raw.parking_price_chf);return purchase==null?null:purchase+(parking||0)}
+    function categoryFor(raw,total){if(total!=null)return total<=1000000?"maxmio":"homedeluxe";return raw.category==="homedeluxe"?"homedeluxe":"maxmio"}
+    function normalize(raw,entryType="listing"){
+      const total=totalPrice(raw);
+      const listingUrl=text(raw.source_url,raw.listing_url,raw.url,raw.link);
+      const projectUrl=text(raw.project_url,entryType==="pipeline"?listingUrl:null);
+      const title=text(raw.title,raw.project_name,entryType==="pipeline"?"Kommendes Wohnprojekt":"Wohnung ohne Titel");
+      const city=text(raw.city,raw.municipality,raw.location,raw.ort);
+      const address=text(raw.address,raw.adresse);
+      const externalId=text(raw.external_id,raw.source_listing_id,raw.source_project_id,listingUrl?`url-${slug(listingUrl)}`:`item-${slug(`${title}-${city}-${address}`)}`);
       return {
-        othmarsingen:firstPositiveNumber(item,[
-          "_drive_minutes_othmarsingen",
-          "drive_minutes_othmarsingen",
-          "othmarsingen_minutes",
-          "travel_time_othmarsingen_minutes",
-          "travel_time_luca_minutes"
-        ]),
-        duebendorf:firstPositiveNumber(item,[
-          "_drive_minutes_duebendorf",
-          "drive_minutes_duebendorf",
-          "duebendorf_minutes",
-          "travel_time_duebendorf_minutes",
-          "travel_time_gessi_minutes"
-        ])
+        external_id:String(externalId),category:categoryFor(raw,total),entry_type:entryType,
+        source:text(raw.source),source_listing_id:text(raw.source_listing_id,raw.source_project_id),source_url:listingUrl,project_url:projectUrl,project_name:text(raw.project_name),
+        title:String(title),description:text(raw.description,raw.status_details),address,zip:text(raw.zip,raw.postal_code),city,canton:text(raw.canton),
+        latitude:num(raw.latitude,raw.lat),longitude:num(raw.longitude,raw.lng,raw.lon),rooms:num(raw.rooms,raw.zimmer,String(raw.expected_rooms||"").match(/\d+(?:[.,]\d+)?/)?.[0]?.replace(",",".")),
+        living_area_m2:num(raw.living_area_m2,raw.area_m2,raw.expected_living_area_from_m2),purchase_price_chf:num(raw.purchase_price_chf,raw.estimated_price_from_chf,raw.price_chf),mandatory_parking_price_chf:num(raw.mandatory_parking_price_chf,raw.parking_price_chf),total_price_chf:total,
+        year_built:num(raw.year_built,raw.construction_year,raw.baujahr,raw.expected_construction_start),availability:text(raw.availability,raw.move_in,raw.expected_move_in),floor:text(raw.floor),
+        developer:text(raw.developer),marketer:text(raw.marketer),project_status:text(raw.project_status),minergie:raw.minergie==null?null:bool(raw.minergie),building_right:bool(raw.building_right??raw.baurecht??raw.leasehold),
+        drive_minutes_duebendorf:num(raw.drive_minutes_duebendorf,raw.duebendorf_minutes,raw.travel_time_duebendorf_minutes,raw.travel_time_gessi_minutes),drive_minutes_wohlen:num(raw.drive_minutes_wohlen,raw.wohlen_minutes,raw.travel_time_wohlen_minutes),drive_minutes_othmarsingen:num(raw.drive_minutes_othmarsingen,raw.othmarsingen_minutes,raw.travel_time_othmarsingen_minutes,raw.travel_time_luca_minutes),
+        ai_rating:num(raw.ai_rating),ai_summary:text(raw.ai_summary),ai_recommendation_reason:text(raw.ai_recommendation_reason,raw.recommendation_reason),advantages:array(raw.advantages),disadvantages:array(raw.disadvantages),
+        discovered_at:text(raw.discovered_at,raw.imported_at,raw.created_at,new Date().toISOString()),last_seen_at:text(raw.last_seen_at,raw.updated_at,new Date().toISOString())
       };
     }
-
-    function commuteHtml(item){
-      const times=commuteValues(item);
-      const a=times.othmarsingen;
-      const b=times.duebendorf;
-      const validA=Number.isFinite(a)&&a>0;
-      const validB=Number.isFinite(b)&&b>0;
-      const pending=item._route_failed ? "nicht verfügbar" : "wird berechnet …";
-      const ratio=validA&&validB ? Math.max(10,Math.min(90,(a/(a+b))*100)) : 50;
-
-      return `
-        <div class="commute-box">
-          <div class="commute-head">
-            <span>🚗 Fahrzeit mit dem Auto</span>
-            <span>Richtwert</span>
-          </div>
-          <div class="commute-labels">
-            <span>Othmarsingen</span>
-            <span>Dübendorf</span>
-          </div>
-          <div class="commute-track">
-            <div class="commute-line"></div>
-            <span class="commute-middle" style="left:${ratio}%">WOHNUNG</span>
-            <span class="commute-dot" style="left:${ratio}%"></span>
-          </div>
-          <div class="commute-times">
-            <span>${validA ? `${a} Min.` : pending}</span>
-            <span>${validB ? `${b} Min.` : pending}</span>
-          </div>
-        </div>`;
-    }
-
-    function initMap(){
-      if(!window.L){
-        document.querySelector(".map-shell")?.classList.add("no-points");
-        el.mapCaption.textContent="Karte konnte nicht geladen werden";
-        return;
+    function dedupe(items){
+      const result=new Map(),aliases=new Map();
+      for(const item of items){
+        if(!item?.external_id)continue;
+        const keys=[`id:${item.external_id}`,item.source_url?`url:${slug(item.source_url)}`:null,`place:${slug(`${item.address||""}-${item.city||""}-${item.title||""}`)}`].filter(Boolean);
+        const existingKey=keys.map(key=>aliases.get(key)).find(Boolean);
+        const key=existingKey||item.external_id;
+        const previous=result.get(key);
+        const merged=previous?{...previous,...Object.fromEntries(Object.entries(item).filter(([,v])=>v!==null&&v!==""&&!(Array.isArray(v)&&!v.length)))}:item;
+        if(previous&&existingKey)merged.external_id=previous.external_id;
+        merged.category=categoryFor(merged,totalPrice(merged));
+        result.set(key,merged);keys.forEach(alias=>aliases.set(alias,key));
       }
-      state.map=L.map("map",{zoomControl:true,preferCanvas:true}).setView([47.39,8.43],10);
-      L.tileLayer("https://tile.openstreetmap.org/{z}/{x}/{y}.png",{
-        maxZoom:19,
-        attribution:'&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
-      }).addTo(state.map);
-      state.markerLayer=L.layerGroup().addTo(state.map);
+      return [...result.values()];
     }
-
-    function renderMap(){
-      if(!state.map||!state.markerLayer) return;
-      state.markerLayer.clearLayers();
-      state.markers.clear();
-
-      const entries=state.filtered.map(item=>({item,coordinates:coordinatesFor(item)})).filter(x=>x.coordinates);
-      const used=new Map();
-
-      for(const entry of entries){
-        const item=entry.item;
-        const isProject=item._item_type==="pipeline";
-        const base=entry.coordinates;
-        const key=`${base[0].toFixed(5)},${base[1].toFixed(5)}`;
-        const index=used.get(key)||0;
-        used.set(key,index+1);
-        const angle=index*2.3999632297;
-        const radius=index===0?0:.00044*Math.ceil(index/6+1);
-        const point=[base[0]+Math.sin(angle)*radius,base[1]+Math.cos(angle)*radius];
-
-        const marker=L.marker(point);
-        marker.bindPopup(`
-          <div class="popup-title">${escapeHtml(isProject?item.project_name:item.title)}</div>
-          <div class="popup-meta">${escapeHtml(item.municipality||item.location||item.address||"Ort offen")}</div>
-          <button class="popup-btn" type="button" data-scroll-item="${item.id}">Anzeigen</button>
-        `);
-        marker.on("popupopen",()=>setTimeout(()=>{
-          document.querySelector(`[data-scroll-item="${item.id}"]`)?.addEventListener("click",()=>focusItem(item.id));
-        },0));
-        marker.addTo(state.markerLayer);
-        state.markers.set(item.id,marker);
-      }
-
-      el.mapCaption.textContent=`${entries.length} von ${state.filtered.length} Einträgen auf der Karte`;
-      document.querySelector(".map-shell")?.classList.toggle("no-points",entries.length===0);
-      if(entries.length) fitMapToVisible();
-      else state.map.setView([47.39,8.43],10);
-      setTimeout(()=>state.map.invalidateSize(),50);
+    function preference(id){return state.preferences.get(String(id))||{external_id:String(id),status:"new",luca_vote:null,gessi_vote:null,luca_favorite:false,gessi_favorite:false,luca_note:"",gessi_note:""}}
+    function isFavorite(pref){return !!(pref.luca_favorite||pref.gessi_favorite)}
+    function coordinates(item){
+      if(Number.isFinite(item.latitude)&&Number.isFinite(item.longitude))return [item.latitude,item.longitude];
+      const haystack=slug(`${item.city||""} ${item.address||""}`).replaceAll("-"," ");
+      const key=Object.keys(PLACE_COORDINATES).find(place=>haystack.includes(slug(place).replaceAll("-"," ")));
+      return key?PLACE_COORDINATES[key]:null;
     }
-
-    function fitMapToVisible(){
-      if(!state.map) return;
-      const markers=[...state.markers.values()];
-      if(!markers.length) return;
-      if(markers.length===1){
-        state.map.setView(markers[0].getLatLng(),14);
-        return;
-      }
-      state.map.fitBounds(L.featureGroup(markers).getBounds().pad(.17));
+    function listingLink(item){return item.source_url||item.project_url||null}
+    function showToast(message,error=false){els.toast.textContent=message;els.toast.classList.toggle("error",error);els.toast.classList.add("show");clearTimeout(showToast.timer);showToast.timer=setTimeout(()=>els.toast.classList.remove("show"),2800)}
+    function showNotice(message){els.dbNotice.textContent=message;els.dbNotice.classList.toggle("show",!!message)}
+    function setProfile(profile){if(!["luca","gessi"].includes(profile))return;state.profile=profile;localStorage.setItem("euses_dihei_profile",profile);els.profileGate.classList.remove("open");document.querySelectorAll("[data-profile]").forEach(btn=>btn.classList.toggle("active",btn.dataset.profile===profile));render();showToast(`Profil ${profile==="luca"?"Luca":"Gessi"} aktiv`)}
+    function setCategory(category){if(!["maxmio","homedeluxe"].includes(category))return;state.category=category;document.body.dataset.category=category;document.querySelectorAll("[data-category]").forEach(btn=>btn.classList.toggle("active",btn.dataset.category===category));const deluxe=category==="homedeluxe";els.heroTitle.textContent=deluxe?"HomeDeluxe":"MaxMio";els.heroCopy.textContent=deluxe?"Aussergewöhnliche Wohnungen über CHF 1 Mio. – grosszügig, hochwertig und kompromisslos geprüft.":"Smarte Wohnungen bis CHF 1 Mio. – ab 3.5 Zimmern, sorgfältig geprüft und gemeinsam bewertet.";els.insightTitle.textContent=deluxe?"HomeDeluxe im Blick":"MaxMio im Blick";fillPriceOptions();render()}
+    function setView(view){if(!VIEW_COPY[view])return;state.view=view;document.querySelectorAll("[data-view]").forEach(btn=>btn.classList.toggle("active",btn.dataset.view===view));render()}
+    function fillPriceOptions(){const options=state.category==="maxmio"?[[800000,"bis CHF 800’000"],[900000,"bis CHF 900’000"],[1000000,"bis CHF 1 Mio."]]:[[1200000,"bis CHF 1.2 Mio."],[1400000,"bis CHF 1.4 Mio."],[1600000,"bis CHF 1.6 Mio."],[2000000,"bis CHF 2 Mio."]];const current=els.price.value;els.price.innerHTML='<option value="">Preis: alle</option>'+options.map(([v,l])=>`<option value="${v}">${l}</option>`).join("");if(options.some(([v])=>String(v)===current))els.price.value=current}
+    function eligible(item){
+      if(item.rooms==null)return true;
+      return item.category==="maxmio"?item.rooms>=3.5:item.rooms>=4.5;
     }
-
-    function focusItem(id){
-      const card=document.getElementById(`property-${id}`);
-      if(card){
-        card.scrollIntoView({behavior:"smooth",block:"center"});
-        card.classList.add("highlight");
-        setTimeout(()=>card.classList.remove("highlight"),1800);
-      }
-      const marker=state.markers.get(id);
-      if(marker){
-        state.map.setView(marker.getLatLng(),Math.max(state.map.getZoom(),14));
-        marker.openPopup();
-      }
-    }
-
-    function applyFilters(){
-      const query=el.searchInput.value.trim().toLowerCase();
-      const maxPrice=Number(el.priceFilter.value||0);
-      const minRooms=Number(el.roomsFilter.value||0);
-      const isPipeline=state.view==="pipeline";
-
-      const source=isPipeline
-        ? state.pipelineProjects.map(x=>({...x,_item_type:"pipeline"}))
-        : state.properties;
-
-      let items=source.filter(item=>{
-        if(!isPipeline){
-          if(state.view==="main"&&item.is_archived) return false;
-          if(state.view==="archive"&&!item.is_archived) return false;
-          if(state.view==="favorites"&&(item.is_archived||!isFavoriteByAnyone(item.id))) return false;
-        }else if(item.is_archived) return false;
-
-        const haystack=isPipeline
-          ? [item.project_name,item.description,item.municipality,item.address,item.developer,item.marketer,item.project_status]
-          : [item.title,item.location,item.address,item.municipality,item.canton];
-
-        if(query&&!haystack.filter(Boolean).join(" ").toLowerCase().includes(query)) return false;
-
-        if(isPipeline){
-          const price=Number(item.estimated_price_from_chf||item.estimated_price_to_chf||0);
-          const rooms=(String(item.expected_rooms||"").match(/\d+(?:[.,]\d+)?/g)||[]).map(v=>Number(v.replace(",",".")));
-          const maxRooms=rooms.length?Math.max(...rooms):0;
-          if(maxPrice&&price&&price>maxPrice) return false;
-          if(minRooms&&maxRooms&&maxRooms<minRooms) return false;
-        }else{
-          if(maxPrice&&Number(item.price_chf||Infinity)>maxPrice) return false;
-          if(minRooms&&Number(item.rooms||0)<minRooms) return false;
-        }
+    function filteredItems(){
+      const query=els.search.value.trim().toLowerCase();const maxPrice=num(els.price.value);const minRooms=num(els.rooms.value);
+      let items=state.items.filter(item=>item.category===state.category&&eligible(item)).filter(item=>{
+        const pref=preference(item.external_id);if(state.view==="favorites"){if(pref.status==="archive"||!isFavorite(pref))return false}else if(pref.status!==state.view)return false;
+        if(query&&!`${item.title} ${item.city||""} ${item.address||""} ${item.project_name||""} ${item.source||""}`.toLowerCase().includes(query))return false;
+        if(maxPrice!=null&&item.total_price_chf!=null&&item.total_price_chf>maxPrice)return false;
+        if(minRooms!=null&&item.rooms!=null&&item.rooms<minRooms)return false;
         return true;
       });
-
-      switch(el.sortFilter.value){
-        case "priceAsc":
-          items.sort((a,b)=>Number((isPipeline?a.estimated_price_from_chf:a.price_chf)||Infinity)-Number((isPipeline?b.estimated_price_from_chf:b.price_chf)||Infinity));
-          break;
-        case "priceDesc":
-          items.sort((a,b)=>Number((isPipeline?b.estimated_price_to_chf:b.price_chf)||0)-Number((isPipeline?a.estimated_price_to_chf:a.price_chf)||0));
-          break;
-        case "ratingDesc":
-          items.sort((a,b)=>Number(b.ai_rating||0)-Number(a.ai_rating||0));
-          break;
-        default:
-          items.sort((a,b)=>new Date(b.imported_at||b.updated_at||b.created_at||0)-new Date(a.imported_at||a.updated_at||a.created_at||0));
+      const value=item=>item.total_price_chf??Infinity;
+      if(els.sort.value==="priceAsc")items.sort((a,b)=>value(a)-value(b));else if(els.sort.value==="priceDesc")items.sort((a,b)=>(b.total_price_chf||0)-(a.total_price_chf||0));else if(els.sort.value==="rating")items.sort((a,b)=>(b.ai_rating||0)-(a.ai_rating||0));else if(els.sort.value==="year")items.sort((a,b)=>(b.year_built||0)-(a.year_built||0));else items.sort((a,b)=>new Date(b.discovered_at||0)-new Date(a.discovered_at||0));
+      return items;
+    }
+    function commuteValue(item,key){const direct=num(item[`drive_minutes_${key}`]);if(direct!=null)return Math.round(direct);const cache=JSON.parse(localStorage.getItem(`route_${item.external_id}`)||"null");return num(cache?.[key])}
+    function commuteHtml(item){return `<div class="commutes"><div class="commute-head"><span>Fahrzeit ab Wohnung</span><span>Auto · Richtwert</span></div><div class="commute-grid">${["duebendorf","wohlen","othmarsingen"].map(key=>{const value=commuteValue(item,key);return `<div class="commute"><strong data-route="${esc(item.external_id)}-${key}">${value!=null?`${value} Min.`:"…"}</strong><span>${CONFIG.destinations[key].label}</span></div>`}).join("")}</div></div>`}
+    function listHtml(items,positive){if(!items.length)return "";return `<ul>${items.slice(0,4).map(value=>`<li>${esc(value)}</li>`).join("")}</ul>`}
+    function propertyCard(item){
+      const pref=preference(item.external_id),favorite=state.profile?pref[`${state.profile}_favorite`]:isFavorite(pref),score=Math.max(0,Math.min(10,num(item.ai_rating)||0));const link=listingLink(item);const isProject=item.entry_type==="pipeline";
+      const year=item.year_built?Math.round(item.year_built):isProject?"Projekt":"offen";const rooms=item.rooms!=null?item.rooms.toLocaleString("de-CH"):"–";const area=item.living_area_m2!=null?`${Math.round(item.living_area_m2)} m²`:"–";
+      return `<article class="property-card ${isProject?"pipeline":""}" id="card-${esc(item.external_id)}">
+        <div class="card-top"><div><div class="card-kickers"><span class="badge">${state.category==="maxmio"?"MaxMio":"HomeDeluxe"}</span>${isProject?'<span class="badge project">Projektvorschau</span>':""}<span class="badge year">Baujahr ${esc(year)}</span></div><h3 class="card-title">${esc(item.title)}</h3><div class="location">${esc([item.address,[item.zip,item.city].filter(Boolean).join(" ")].filter(Boolean).join(" · ")||"Ort noch offen")}</div></div><div class="top-actions"><button class="round-btn ${favorite?"favorite":""}" type="button" data-action="favorite" data-id="${esc(item.external_id)}" aria-label="Favorit">${favorite?"★":"☆"}</button><button class="round-btn" type="button" data-action="expand" data-id="${esc(item.external_id)}" aria-label="Details">＋</button></div></div>
+        <div class="price-row"><div class="price"><small>${item.mandatory_parking_price_chf?"Gesamtpreis inkl. Parkplatz":"Gesamtpreis"}</small><strong>${esc(price(item.total_price_chf))}</strong></div>${item.ai_rating!=null?`<div class="ai-score"><div class="score-ring" style="--score:${score}"><strong>${score.toFixed(1)}</strong></div><span>KI<br>Score</span></div>`:""}</div>
+        <div class="facts"><div class="fact"><strong>${esc(rooms)}</strong><span>Zimmer</span></div><div class="fact"><strong>${esc(area)}</strong><span>Wohnfläche</span></div><div class="fact"><strong>${esc(year)}</strong><span>Baujahr</span></div><div class="fact"><strong>${esc(item.availability||"offen")}</strong><span>Bezug</span></div></div>
+        ${commuteHtml(item)}
+        ${(item.ai_recommendation_reason||item.ai_summary)?`<div class="ai-note"><strong>Unsere KI-Einschätzung</strong>${esc(item.ai_recommendation_reason||item.ai_summary)}</div>`:""}
+        <div class="details">
+          ${(item.description||item.project_status)?`<div class="ai-note"><strong>${isProject?"Projektstand":"Details"}</strong>${esc(item.project_status?[item.project_status,item.description].filter(Boolean).join(" · "):item.description)}</div>`:""}
+          ${(item.advantages.length||item.disadvantages.length)?`<div class="pros-cons"><div><strong>Das spricht dafür</strong>${listHtml(item.advantages,true)||"Noch keine Angaben."}</div><div><strong>Darauf achten</strong>${listHtml(item.disadvantages,false)||"Noch keine Angaben."}</div></div>`:""}
+          <div class="votes">${["luca","gessi"].map(person=>{const label=person==="luca"?"Luca":"Gessi",vote=pref[`${person}_vote`],locked=state.profile!==person;return `<div class="person-box"><div class="person-head"><span>${label}</span><span>${vote===1?"gefällt":vote===-1?"passt nicht":"offen"}</span></div><div class="vote-actions"><button class="like ${vote===1?"active":""}" type="button" data-action="vote" data-person="${person}" data-vote="1" data-id="${esc(item.external_id)}" ${locked?"disabled":""}>👍</button><button class="dislike ${vote===-1?"active":""}" type="button" data-action="vote" data-person="${person}" data-vote="-1" data-id="${esc(item.external_id)}" ${locked?"disabled":""}>👎</button></div></div>`}).join("")}</div>
+          <label class="note-label" for="note-${esc(item.external_id)}">${state.profile==="gessi"?"Gessis":"Lucas"} Notiz</label><textarea id="note-${esc(item.external_id)}" class="note" data-action="note" data-id="${esc(item.external_id)}" placeholder="Gedanken zu dieser Wohnung …">${esc(pref[`${state.profile||"luca"}_note`]||"")}</textarea>
+        </div>
+        <div class="card-actions">${pref.status!=="interesting"?`<button class="action-btn primary" type="button" data-action="status" data-status="interesting" data-id="${esc(item.external_id)}">Interessant</button>`:`<button class="action-btn" type="button" data-action="status" data-status="new" data-id="${esc(item.external_id)}">Zurück zu Neu</button>`}<button class="action-btn archive" type="button" data-action="status" data-status="${pref.status==="archive"?"new":"archive"}" data-id="${esc(item.external_id)}">${pref.status==="archive"?"Wiederherstellen":"Archiv"}</button>${link?`<a class="link-btn" href="${esc(link)}" target="_blank" rel="noopener noreferrer">${isProject?"Projekt öffnen":"Inserat öffnen"} ↗</a>`:""}</div>
+        <div class="source-line">${esc(item.source||"Quelle nicht angegeben")}${item.discovered_at?` · Gefunden am ${esc(date(item.discovered_at))}`:""}${item.building_right?" · Baurecht":""}${item.minergie?" · Minergie":""}</div>
+      </article>`;
+    }
+    function emptyHtml(){const copy={new:["Noch nichts Neues","Beim nächsten Datenupdate erscheinen neue Treffer automatisch hier."],interesting:["Noch nichts markiert","Verschiebe gute Treffer mit „Interessant“ in diese Auswahl."],favorites:["Noch keine Favoriten","Luca oder Gessi können Wohnungen mit dem Stern markieren."],archive:["Das Archiv ist leer","Ausgeschlossene Wohnungen landen gesammelt hier."]}[state.view];return `<div class="empty"><div class="empty-icon">⌂</div><h3>${copy[0]}</h3><p>${copy[1]}</p></div>`}
+    function renderStats(){
+      const categoryItems=state.items.filter(item=>item.category===state.category&&eligible(item));const counts={new:0,interesting:0,favorites:0};for(const item of categoryItems){const pref=preference(item.external_id);if(pref.status==="new")counts.new++;if(pref.status==="interesting")counts.interesting++;if(pref.status!=="archive"&&isFavorite(pref))counts.favorites++}
+      els.statNew.textContent=counts.new;els.statInteresting.textContent=counts.interesting;els.statFavorite.textContent=counts.favorites;els.countMaxmio.textContent=state.items.filter(x=>x.category==="maxmio"&&eligible(x)).length;els.countDeluxe.textContent=state.items.filter(x=>x.category==="homedeluxe"&&eligible(x)).length;
+      const prices=state.filtered.map(x=>x.total_price_chf).filter(Number.isFinite);els.visibleCount.textContent=state.filtered.length;els.avgPrice.textContent=prices.length?shortPrice(prices.reduce((a,b)=>a+b,0)/prices.length):"–";els.bothLike.textContent=state.filtered.filter(item=>{const pref=preference(item.external_id);return pref.luca_vote===1&&pref.gessi_vote===1}).length;els.projectsCount.textContent=state.filtered.filter(x=>x.entry_type==="pipeline").length;
+    }
+    function render(){
+      state.filtered=filteredItems();const [title,subtitle]=VIEW_COPY[state.view];els.viewTitle.textContent=title;els.viewSubtitle.textContent=subtitle;els.resultCount.textContent=`${state.filtered.length} Treffer`;els.propertyList.innerHTML=state.filtered.length?state.filtered.map(propertyCard).join(""):emptyHtml();renderStats();renderMap();queueVisibleRoutes();
+    }
+    function initMap(){if(!window.L)return;state.map=L.map("map",{zoomControl:true,preferCanvas:true}).setView([47.4,8.43],10);L.tileLayer("https://tile.openstreetmap.org/{z}/{x}/{y}.png",{maxZoom:19,attribution:'&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'}).addTo(state.map);state.markerLayer=L.layerGroup().addTo(state.map)}
+    function renderMap(){if(!state.map||!state.markerLayer)return;state.markerLayer.clearLayers();state.markers.clear();const positions=[];for(const item of state.filtered){const point=coordinates(item);if(!point)continue;const marker=L.marker(point).bindPopup(`<strong>${esc(item.title)}</strong><br><span>${esc(item.city||item.address||"")}</span>`).addTo(state.markerLayer);marker.on("click",()=>document.getElementById(`card-${CSS.escape(item.external_id)}`)?.scrollIntoView({behavior:"smooth",block:"center"}));state.markers.set(item.external_id,marker);positions.push(point)}els.mapCaption.textContent=`${positions.length} von ${state.filtered.length} Treffern auf der Karte`;if(positions.length===1)state.map.setView(positions[0],13);else if(positions.length>1)state.map.fitBounds(positions,{padding:[24,24],maxZoom:13});else state.map.setView([47.4,8.43],10);setTimeout(()=>state.map.invalidateSize(),40)}
+    async function calculateRoute(item){
+      if(state.routing.has(item.external_id)||["duebendorf","wohlen","othmarsingen"].every(key=>commuteValue(item,key)!=null))return;const point=coordinates(item);if(!point)return;state.routing.add(item.external_id);
+      try{const coords=[[point[1],point[0]],...Object.values(CONFIG.destinations).map(x=>[x.lng,x.lat])].map(x=>x.join(",")).join(";");const response=await fetch(`https://router.project-osrm.org/table/v1/driving/${coords}?sources=0&destinations=1;2;3`,{signal:AbortSignal.timeout(9000)});if(!response.ok)throw new Error("Routing");const data=await response.json();const values=data.durations?.[0]?.map(seconds=>seconds==null?null:Math.round(seconds/60));const cache={duebendorf:values?.[0],wohlen:values?.[1],othmarsingen:values?.[2],savedAt:Date.now()};localStorage.setItem(`route_${item.external_id}`,JSON.stringify(cache));for(const key of Object.keys(CONFIG.destinations)){const target=document.querySelector(`[data-route="${CSS.escape(item.external_id)}-${key}"]`);if(target&&cache[key]!=null)target.textContent=`${cache[key]} Min.`}}
+      catch(error){console.debug("Fahrzeit nicht verfügbar",error)}finally{state.routing.delete(item.external_id)}
+    }
+    function queueVisibleRoutes(){state.filtered.slice(0,16).forEach((item,index)=>setTimeout(()=>calculateRoute(item),index*170))}
+    function localPreferences(){try{return JSON.parse(localStorage.getItem("euses_dihei_state")||"[]")}catch{return []}}
+    function saveLocalPreferences(){localStorage.setItem("euses_dihei_state",JSON.stringify([...state.preferences.values()]))}
+    async function savePreference(id,patch){const current=preference(id),next={...current,...patch,external_id:String(id),updated_at:new Date().toISOString()};state.preferences.set(String(id),next);saveLocalPreferences();render();if(!state.dbReady)return;const {error}=await db.from(CONFIG.stateTable).upsert(next,{onConflict:"external_id"});if(error){showToast("Änderung lokal gespeichert – Cloud-Sync fehlgeschlagen",true);console.error(error)}else showToast("Gespeichert")}
+    async function syncFeed(rows){if(!state.dbReady||!rows.length)return;const clean=rows.map(item=>({...item,advantages:item.advantages||[],disadvantages:item.disadvantages||[]}));const {error}=await db.from(CONFIG.propertyTable).upsert(clean,{onConflict:"external_id"});if(error)console.error("Feed-Sync",error)}
+    async function loadLegacyData(){
+      const configurations=[
+        {properties:"properties",pipeline:"pipeline_projects",votes:"property_votes",notes:"property_notes",favorites:"property_favorites",category:"homedeluxe"},
+        {properties:"properties_search2",pipeline:"pipeline_projects_search2",votes:"property_votes_search2",notes:"property_notes_search2",favorites:"property_favorites_search2",pipelineNotes:"pipeline_project_comments_search2",category:"maxmio"},
+        {properties:"hf35_properties",pipeline:"hf35_pipeline_projects",votes:"hf35_property_votes",notes:"hf35_property_notes",favorites:"hf35_property_favorites",category:"maxmio"}
+      ];
+      const read=async name=>{if(!name)return [];const result=await db.from(name).select("*");return result.error?[]:(result.data||[])};
+      const bundles=await Promise.all(configurations.map(async config=>{const [properties,pipeline,votes,notes,favorites,pipelineNotes]=await Promise.all([read(config.properties),read(config.pipeline),read(config.votes),read(config.notes),read(config.favorites),read(config.pipelineNotes)]);return {config,properties,pipeline,votes,notes,favorites,pipelineNotes}}));
+      const items=[],preferences=new Map(),legacyIds=new Map();
+      const ensure=id=>{const key=String(id);if(!preferences.has(key))preferences.set(key,{external_id:key,status:"interesting",luca_vote:null,gessi_vote:null,luca_favorite:false,gessi_favorite:false,luca_note:"",gessi_note:""});return preferences.get(key)};
+      for(const bundle of bundles){
+        for(const row of bundle.properties){const item=normalize({...row,category:bundle.config.category},"listing");items.push(item);legacyIds.set(`${bundle.config.properties}:${row.id}`,item.external_id);const pref=ensure(item.external_id);if(bool(row.is_archived)||["archived","archive","rejected"].includes(String(row.status||"").toLowerCase()))pref.status="archive"}
+        for(const row of bundle.pipeline){const item=normalize({...row,category:bundle.config.category},"pipeline");items.push(item);legacyIds.set(`${bundle.config.pipeline}:${row.id}`,item.external_id);ensure(item.external_id)}
+        for(const row of bundle.votes){const externalId=legacyIds.get(`${bundle.config.properties}:${row.property_id}`);if(!externalId)continue;const person=String(row.person||"luca").toLowerCase()==="gessi"?"gessi":"luca";const vote=num(row.vote);if(vote===1||vote===-1)ensure(externalId)[`${person}_vote`]=vote}
+        for(const row of bundle.favorites){const externalId=legacyIds.get(`${bundle.config.properties}:${row.property_id}`);if(!externalId)continue;const person=String(row.person||"luca").toLowerCase()==="gessi"?"gessi":"luca";if(row.is_favorite!==false)ensure(externalId)[`${person}_favorite`]=true}
+        for(const row of bundle.notes){const externalId=legacyIds.get(`${bundle.config.properties}:${row.property_id}`);if(!externalId)continue;const person=String(row.person||"luca").toLowerCase()==="gessi"?"gessi":"luca";ensure(externalId)[`${person}_note`]=text(row.note,row.comment)||""}
+        for(const row of bundle.pipelineNotes){const externalId=legacyIds.get(`${bundle.config.pipeline}:${row.project_id}`);if(!externalId)continue;const person=String(row.person||"luca").toLowerCase()==="gessi"?"gessi":"luca";ensure(externalId)[`${person}_note`]=text(row.comment,row.note)||""}
       }
-
-      state.filtered=items;
-      renderAll();
+      return {items,preferences:[...preferences.values()]};
     }
-
-    function renderAll(){
-      renderSummary();
-      renderProperties();
-      renderMap();
-      const titles={main:"Alle Wohnungen",favorites:"Unsere Favoriten",pipeline:"Projekt-Pipeline",archive:"Archiv"};
-      el.viewTitle.textContent=titles[state.view]||"Wohnungen";
-      el.resultCount.textContent=`${state.filtered.length} Treffer`;
-    }
-
-    function renderSummary(){
-      if(state.view==="pipeline"){
-        const priced=state.filtered.map(p=>Number(p.estimated_price_from_chf)).filter(v=>Number.isFinite(v)&&v>0);
-        const avg=priced.length?priced.reduce((a,b)=>a+b,0)/priced.length:null;
-        el.metricVisible.textContent=state.filtered.length;
-        el.metricBothLike.textContent=state.filtered.filter(p=>/bewilligt|approved/i.test(String(p.project_status||""))).length;
-        el.metricFavorites.textContent=state.filtered.filter(p=>/vermarkt|marketing|reservation|verkauf/i.test(String(p.project_status||""))).length;
-        el.metricAvgPrice.textContent=avg?`${Math.round(avg/1000).toLocaleString("de-CH")}k`:"–";
-        el.metricBothLike.nextElementSibling.textContent="bewilligt";
-        el.metricFavorites.nextElementSibling.textContent="nahe Vermarktung";
-        el.metricAvgPrice.nextElementSibling.textContent="Ø ab Preis";
-        return;
-      }
-
-      el.metricBothLike.nextElementSibling.textContent="beide mögen";
-      el.metricFavorites.nextElementSibling.textContent="Favoriten";
-      el.metricAvgPrice.nextElementSibling.textContent="Ø Preis";
-      const prices=state.filtered.map(p=>Number(p.price_chf)).filter(Number.isFinite);
-      const avg=prices.length?prices.reduce((a,b)=>a+b,0)/prices.length:null;
-      el.metricVisible.textContent=state.filtered.length;
-      el.metricBothLike.textContent=state.filtered.filter(p=>isLikedByBoth(p.id)).length;
-      el.metricFavorites.textContent=state.filtered.filter(p=>isFavoriteByAnyone(p.id)).length;
-      el.metricAvgPrice.textContent=avg?`${Math.round(avg/1000).toLocaleString("de-CH")}k`:"–";
-    }
-
-    function voteBlockHtml(person,label,id,vote){
-      const locked=state.profile!==person;
-      return `
-        <div class="person-vote ${locked?"locked":""}">
-          <div class="person-vote-label"><span>${label}</span><span>${vote===1?"👍":vote===-1?"👎":"–"}</span></div>
-          <div class="vote-buttons">
-            <button class="vote-btn up ${vote===1?"active":""}" type="button" data-action="vote" data-id="${id}" data-person="${person}" data-vote="1" ${locked?"disabled":""}>👍</button>
-            <button class="vote-btn down ${vote===-1?"active":""}" type="button" data-action="vote" data-id="${id}" data-person="${person}" data-vote="-1" ${locked?"disabled":""}>👎</button>
-          </div>
-          ${locked?`<div class="locked-hint">Nur ${label} kann hier bewerten 🔒</div>`:""}
-        </div>`;
-    }
-
-    function propertyCardHtml(property){
-      const ownFavorite=isFavorite(property.id,state.profile);
-      const bothFavorite=isFavorite(property.id,"luca")&&isFavorite(property.id,"gessi");
-      const aiRating=property.ai_rating!=null?`${Number(property.ai_rating).toFixed(1)}/10`:"offen";
-      const aiText=property.ai_recommendation_reason||property.ai_summary||"Noch keine KI-Einschätzung.";
-      const listing=property.listing_url
-        ? `<a class="link-btn" href="${escapeHtml(property.listing_url)}" target="_blank" rel="noopener noreferrer">Inserat ↗</a>`
-        : `<span class="link-btn" aria-disabled="true">Kein Link</span>`;
-
-      return `
-        <article class="property-card" id="property-${property.id}">
-          <div class="card-top">
-            <div>
-              <h3 class="card-title">${escapeHtml(property.title||"Wohnung ohne Titel")}</h3>
-              <div class="location">${escapeHtml(property.location||property.address||"Ort offen")}</div>
-            </div>
-            <div class="top-actions">
-              <button class="favorite-btn ${ownFavorite?"active":""}" type="button" data-action="favorite" data-id="${property.id}" aria-label="Favorit">${bothFavorite?"💛":ownFavorite?"⭐":"☆"}</button>
-              <button class="icon-danger" type="button" data-action="delete-property" data-id="${property.id}" data-title="${escapeHtml(property.title||"diese Wohnung")}" aria-label="Dauerhaft löschen">🗑</button>
-            </div>
-          </div>
-
-          <div class="price">${escapeHtml(formatPrice(property.price_chf))}</div>
-
-          <div class="facts">
-            ${property.rooms!=null?`<span class="chip">${property.rooms} Zimmer</span>`:""}
-            ${property.living_area_m2!=null?`<span class="chip">${property.living_area_m2} m²</span>`:""}
-            ${property.move_in?`<span class="chip">Bezug: ${escapeHtml(property.move_in)}</span>`:""}
-            ${property.minergie===true?'<span class="chip good">Minergie</span>':property.minergie===false?'<span class="chip">Kein Minergie</span>':""}
-            ${property.building_right?'<span class="chip warn">Baurecht</span>':'<span class="chip good">Kein Baurecht</span>'}
-            ${property.is_archived?'<span class="chip bad">Archiviert</span>':""}
-          </div>
-
-          <div class="ai-box"><strong>KI-Bewertung: ${escapeHtml(aiRating)}</strong>${escapeHtml(aiText)}</div>
-          ${commuteHtml(property)}
-
-          <div class="voting">
-            ${voteBlockHtml("luca","Luca",property.id,getVote(property.id,"luca"))}
-            ${voteBlockHtml("gessi","Gessi",property.id,getVote(property.id,"gessi"))}
-          </div>
-
-          <div class="notes">
-            ${["luca","gessi"].map(person=>{
-              const label=person==="luca"?"Lucas":"Gessis";
-              const locked=state.profile!==person;
-              return `<div class="note-wrap">
-                <label>${label} Notiz</label>
-                <textarea class="note" data-action="note" data-person="${person}" data-id="${property.id}" ${locked?"disabled":""} placeholder="${label} Gedanken …">${escapeHtml(getNote(property.id,person))}</textarea>
-                ${locked?`<div class="locked-hint">Nur ${person==="luca"?"Luca":"Gessi"} kann diese Notiz bearbeiten 🔒</div>`:""}
-              </div>`;
-            }).join("")}
-          </div>
-
-          <div class="card-actions">
-            <select class="control status-select" data-action="status" data-id="${property.id}">
-              ${Object.entries(STATUS_LABELS).map(([value,label])=>`<option value="${value}" ${property.status===value?"selected":""}>${label}</option>`).join("")}
-            </select>
-            <button class="secondary-btn" type="button" data-action="locate" data-id="${property.id}">Karte</button>
-            ${listing}
-          </div>
-
-          <div class="source-line">Quelle: ${escapeHtml(property.source||"nicht angegeben")} · Importiert: ${escapeHtml(formatDate(property.imported_at||property.created_at))}</div>
-        </article>`;
-    }
-
-    function formatRange(from,to,formatter=v=>v){
-      const a=from!==null&&from!==undefined&&from!==""?formatter(from):null;
-      const b=to!==null&&to!==undefined&&to!==""?formatter(to):null;
-      if(a&&b&&a!==b) return `${a} – ${b}`;
-      return a||b||"offen";
-    }
-
-    function pipelineCardHtml(project){
-      const aiRating=project.ai_rating!=null?`${Number(project.ai_rating).toFixed(1)}/10`:"offen";
-      const aiText=project.ai_recommendation_reason||project.ai_summary||"Noch keine KI-Einschätzung.";
-      const projectLink=project.project_url?`<a class="link-btn" href="${escapeHtml(project.project_url)}" target="_blank" rel="noopener noreferrer">Projektseite ↗</a>`:"";
-      const sourceLink=project.source_url&&project.source_url!==project.project_url?`<a class="link-btn" href="${escapeHtml(project.source_url)}" target="_blank" rel="noopener noreferrer">Quelle ↗</a>`:"";
-
-      return `
-        <article class="pipeline-card" id="property-${project.id}">
-          <div class="card-top">
-            <div>
-              <h3 class="card-title">${escapeHtml(project.project_name||"Projekt ohne Namen")}</h3>
-              <div class="location">${escapeHtml(project.municipality||project.address||"Ort offen")}</div>
-            </div>
-            <div class="top-actions">
-              <span class="pipeline-status">${escapeHtml(project.project_status||"Status offen")}</span>
-              <button class="icon-danger" type="button" data-action="delete-project" data-id="${project.id}" data-title="${escapeHtml(project.project_name||"dieses Projekt")}" aria-label="Dauerhaft löschen">🗑</button>
-            </div>
-          </div>
-
-          ${project.status_details?`<div class="ai-box"><strong>Statusdetails</strong>${escapeHtml(project.status_details)}</div>`:""}
-          ${project.description?`<p class="pipeline-description">${escapeHtml(project.description)}</p>`:""}
-
-          <div class="facts">
-            ${project.property_type?`<span class="chip pipeline-badge">${escapeHtml(project.property_type)}</span>`:""}
-            ${project.expected_units?`<span class="chip">ca. ${escapeHtml(project.expected_units)} Einheiten</span>`:""}
-            ${project.expected_rooms?`<span class="chip">${escapeHtml(project.expected_rooms)} Zimmer</span>`:""}
-            ${project.minergie===true?'<span class="chip good">Minergie</span>':""}
-            ${project.energy_standard?`<span class="chip good">${escapeHtml(project.energy_standard)}</span>`:""}
-            ${project.building_right?'<span class="chip warn">Baurecht</span>':""}
-          </div>
-
-          <div class="pipeline-meta">
-            <div><small>Preisrahmen</small><strong>${escapeHtml(formatRange(project.estimated_price_from_chf,project.estimated_price_to_chf,formatPrice))}</strong></div>
-            <div><small>Wohnfläche</small><strong>${escapeHtml(formatRange(project.expected_living_area_from_m2,project.expected_living_area_to_m2,v=>`${v} m²`))}</strong></div>
-            <div><small>Vermarktungsstart</small><strong>${escapeHtml(project.expected_marketing_start||"offen")}</strong></div>
-            <div><small>Bezug</small><strong>${escapeHtml(project.expected_move_in||"offen")}</strong></div>
-            <div><small>Entwickler</small><strong>${escapeHtml(project.developer||"offen")}</strong></div>
-            <div><small>Vermarktung</small><strong>${escapeHtml(project.marketer||"offen")}</strong></div>
-          </div>
-
-          <div class="ai-box"><strong>KI-Bewertung: ${escapeHtml(aiRating)}</strong>${escapeHtml(aiText)}</div>
-          ${commuteHtml(project)}
-
-          <div class="project-links">
-            <button class="secondary-btn" type="button" data-action="locate" data-id="${project.id}">Karte</button>
-            ${projectLink}${sourceLink}
-          </div>
-
-          <div class="source-line">Quelle: ${escapeHtml(project.source||"nicht angegeben")} · Importiert: ${escapeHtml(formatDate(project.imported_at||project.created_at))}</div>
-        </article>`;
-    }
-
-    function renderProperties(){
-      if(!state.filtered.length){
-        el.propertyList.innerHTML=`<div class="empty"><strong>Keine Treffer gefunden.</strong><br>Filter anpassen oder neue Daten importieren.</div>`;
-        return;
-      }
-      el.propertyList.innerHTML=state.filtered.map(item=>item._item_type==="pipeline"?pipelineCardHtml(item):propertyCardHtml(item)).join("");
-    }
-
-    async function fetchJsonWithTimeout(url,timeoutMs=7000){
-      const controller=new AbortController();
-      const timer=setTimeout(()=>controller.abort(),timeoutMs);
-      try{
-        const response=await fetch(url,{signal:controller.signal,headers:{Accept:"application/json"}});
-        if(!response.ok) throw new Error(`Routing ${response.status}`);
-        return await response.json();
-      }finally{clearTimeout(timer)}
-    }
-
-    async function routeTimes(from){
-      const destinations=[ROUTE_DESTINATIONS.othmarsingen,ROUTE_DESTINATIONS.duebendorf];
-      const hosts=["https://router.project-osrm.org","https://routing.openstreetmap.de/routed-car"];
-      let lastError=null;
-      for(const host of hosts){
-        try{
-          const minutes=[];
-          for(const destination of destinations){
-            const points=`${from[1]},${from[0]};${destination[1]},${destination[0]}`;
-            const data=await fetchJsonWithTimeout(`${host}/route/v1/driving/${points}?overview=false&alternatives=false&steps=false`);
-            const seconds=data?.routes?.[0]?.duration;
-            if(!Number.isFinite(seconds)) throw new Error("Keine Routendaten");
-            minutes.push(Math.max(1,Math.round(seconds/60)));
-          }
-          return {othmarsingen:minutes[0],duebendorf:minutes[1]};
-        }catch(error){lastError=error}
-      }
-      throw lastError||new Error("Routing nicht verfügbar");
-    }
-
-    async function calculateCommutes(){
-      const items=[...state.properties,...state.pipelineProjects];
-      for(const item of items){
-        const existing=commuteValues(item);
-        if(existing.othmarsingen&&existing.duebendorf){
-          item._drive_minutes_othmarsingen=existing.othmarsingen;
-          item._drive_minutes_duebendorf=existing.duebendorf;
-          item._route_failed=false;
-          continue;
-        }
-
-        const coordinates=coordinatesFor(item);
-        if(!coordinates){
-          item._route_failed=true;
-          continue;
-        }
-
-        const cacheKey=`wohnung_route_v3_${coordinates[0].toFixed(4)}_${coordinates[1].toFixed(4)}`;
-        try{
-          const cached=JSON.parse(localStorage.getItem(cacheKey)||"null");
-          if(cached&&Date.now()-cached.savedAt<14*24*60*60*1000){
-            item._drive_minutes_othmarsingen=existing.othmarsingen||cached.othmarsingen;
-            item._drive_minutes_duebendorf=existing.duebendorf||cached.duebendorf;
-            item._route_failed=false;
-            continue;
-          }
-        }catch{}
-
-        try{
-          const times=await routeTimes(coordinates);
-          item._drive_minutes_othmarsingen=existing.othmarsingen||times.othmarsingen;
-          item._drive_minutes_duebendorf=existing.duebendorf||times.duebendorf;
-          item._route_failed=false;
-          localStorage.setItem(cacheKey,JSON.stringify({...times,savedAt:Date.now()}));
-        }catch(error){
-          console.warn("Fahrzeit konnte nicht berechnet werden",item.title||item.project_name,error);
-          item._route_failed=true;
-        }
-        renderProperties();
-      }
-      renderProperties();
-    }
-
     async function loadData(){
-      setLoading(true);
-      try{
-        const [propertiesResult,pipelineResult,votesResult,notesResult,favoritesResult]=await Promise.all([
-          db.from("properties").select("*"),
-          db.from("pipeline_projects").select("*"),
-          db.from("property_votes").select("*"),
-          db.from("property_notes").select("*"),
-          db.from("property_favorites").select("*")
-        ]);
-
-        for(const result of [propertiesResult,votesResult,notesResult,favoritesResult]){
-          if(result.error) throw result.error;
-        }
-
-        state.properties=propertiesResult.data||[];
-        state.pipelineProjects=pipelineResult.error?[]:(pipelineResult.data||[]);
-        state.votes=votesResult.data||[];
-        state.notes=notesResult.data||[];
-        state.favorites=favoritesResult.data||[];
-
-        applyFilters();
-        calculateCommutes();
-      }catch(error){
-        console.error(error);
-        showToast(`Daten konnten nicht geladen werden: ${error.message}`,true);
-      }finally{setLoading(false)}
-    }
-
-    async function saveVote(propertyId,person,desiredVote){
-      if(!state.profile||person!==state.profile){
-        showToast("Du kannst nur in deinem eigenen Profil bewerten.",true);
-        return;
+      els.loadingBar.classList.add("active");let feed=[],databaseItems=[],databasePrefs=[],databaseError=null;
+      try{const response=await fetch(`${CONFIG.dataUrl}?v=${Date.now()}`,{cache:"no-store"});if(response.ok){const payload=await response.json();const rawListings=Array.isArray(payload)?payload:Array.isArray(payload.properties)?payload.properties:[];const rawProjects=!Array.isArray(payload)&&Array.isArray(payload.pipeline_projects)?payload.pipeline_projects:[];feed=[...rawListings.map(x=>normalize(x,x.entry_type==="pipeline"?"pipeline":"listing")),...rawProjects.map(x=>normalize(x,"pipeline"))]}}
+      catch(error){console.error("JSON",error)}
+      if(db){
+        const [propertiesResult,stateResult]=await Promise.all([db.from(CONFIG.propertyTable).select("*"),db.from(CONFIG.stateTable).select("*")]);
+        if(propertiesResult.error||stateResult.error)databaseError=propertiesResult.error||stateResult.error;else{state.dbReady=true;databaseItems=(propertiesResult.data||[]).map(x=>normalize(x,x.entry_type||"listing"));databasePrefs=stateResult.data||[]}
       }
-
-      const current=getVote(propertyId,person);
-      const nextVote=current===desiredVote?null:desiredVote;
-      const existing=state.votes.find(v=>v.property_id===propertyId&&v.person===person);
-
-      if(existing&&nextVote===null){
-        const {error}=await db.from("property_votes").delete().eq("id",existing.id);
-        if(error) throw error;
-        state.votes=state.votes.filter(v=>v.id!==existing.id);
-      }else{
-        const {data,error}=await db.from("property_votes")
-          .upsert({property_id:propertyId,person,vote:nextVote},{onConflict:"property_id,person"})
-          .select().single();
-        if(error) throw error;
-        state.votes=state.votes.filter(v=>!(v.property_id===propertyId&&v.person===person));
-        state.votes.push(data);
-      }
-      applyFilters();
-    }
-
-    async function saveFavorite(propertyId){
-      const person=state.profile;
-      if(!person){el.profileGate.classList.add("open");return}
-      const existing=state.favorites.find(f=>f.property_id===propertyId&&f.person===person);
-
-      if(existing){
-        const {error}=await db.from("property_favorites").delete().eq("id",existing.id);
-        if(error) throw error;
-        state.favorites=state.favorites.filter(f=>f.id!==existing.id);
-      }else{
-        const {data,error}=await db.from("property_favorites")
-          .insert({property_id:propertyId,person,is_favorite:true})
-          .select().single();
-        if(error) throw error;
-        state.favorites.push(data);
-      }
-      applyFilters();
-    }
-
-    async function saveNote(propertyId,person,note){
-      if(!state.profile||person!==state.profile){
-        showToast("Du kannst nur deine eigene Notiz bearbeiten.",true);
-        return;
-      }
-      const {data,error}=await db.from("property_notes")
-        .upsert({property_id:propertyId,person,note},{onConflict:"property_id,person"})
-        .select().single();
-      if(error) throw error;
-      state.notes=state.notes.filter(n=>!(n.property_id===propertyId&&n.person===person));
-      state.notes.push(data);
-      showToast("Notiz gespeichert");
-    }
-
-    async function saveStatus(propertyId,status){
-      const patch=status==="archived"?{status,is_archived:true}:{status,is_archived:false};
-      const {data,error}=await db.from("properties").update(patch).eq("id",propertyId).select().single();
-      if(error) throw error;
-      state.properties=state.properties.map(p=>p.id===propertyId?data:p);
-      applyFilters();
-      showToast("Status gespeichert");
-    }
-
-    async function deleteProperty(propertyId,title){
-      const confirmed=confirm(`"${title}" wirklich dauerhaft löschen?\n\nBewertungen, Notizen und Favoriten zu diesem Eintrag werden ebenfalls gelöscht.`);
-      if(!confirmed) return;
-
-      setLoading(true);
-      try{
-        await Promise.all([
-          db.from("property_votes").delete().eq("property_id",propertyId),
-          db.from("property_notes").delete().eq("property_id",propertyId),
-          db.from("property_favorites").delete().eq("property_id",propertyId)
-        ]);
-
-        const {error}=await db.from("properties").delete().eq("id",propertyId);
-        if(error) throw error;
-
-        state.properties=state.properties.filter(p=>p.id!==propertyId);
-        state.votes=state.votes.filter(v=>v.property_id!==propertyId);
-        state.notes=state.notes.filter(n=>n.property_id!==propertyId);
-        state.favorites=state.favorites.filter(f=>f.property_id!==propertyId);
-        applyFilters();
-        showToast("Wohnung dauerhaft gelöscht");
-      }finally{setLoading(false)}
-    }
-
-    async function deleteProject(projectId,title){
-      const confirmed=confirm(`"${title}" wirklich dauerhaft aus der Pipeline löschen?`);
-      if(!confirmed) return;
-
-      setLoading(true);
-      try{
-        const {error}=await db.from("pipeline_projects").delete().eq("id",projectId);
-        if(error) throw error;
-        state.pipelineProjects=state.pipelineProjects.filter(p=>p.id!==projectId);
-        applyFilters();
-        showToast("Projekt dauerhaft gelöscht");
-      }finally{setLoading(false)}
-    }
-
-    function slugify(value){
-      return String(value||"").toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g,"")
-        .replace(/[^a-z0-9]+/g,"-").replace(/^-|-$/g,"").slice(0,90);
-    }
-
-    function normalizeImportItem(item){
-      const listingUrl=item.listing_url||item.url||item.link||null;
-      const externalId=item.external_id||item.source_listing_id||
-        (listingUrl?`url-${slugify(listingUrl)}`:`manual-${slugify(`${item.title}-${item.location}-${item.address}`)}`);
-
-      return {
-        external_id:externalId,
-        source:item.source||null,
-        source_listing_id:item.source_listing_id||null,
-        title:item.title||"Wohnung ohne Titel",
-        location:item.location||item.ort||null,
-        municipality:item.municipality||null,
-        canton:item.canton||null,
-        postal_code:item.postal_code?String(item.postal_code):null,
-        address:item.address||item.adresse||null,
-        latitude:item.latitude??item.lat??null,
-        longitude:item.longitude??item.lng??item.lon??null,
-        price_chf:item.price_chf??item.price??null,
-        rooms:item.rooms??item.zimmer??null,
-        living_area_m2:item.living_area_m2??item.area_m2??item.flaeche??null,
-        move_in:item.move_in||item.einzug||null,
-        listing_url:listingUrl,
-        minergie:item.minergie??null,
-        minergie_details:item.minergie_details||null,
-        building_right:Boolean(item.building_right??item.baurecht??false),
-        building_right_details:item.building_right_details||null,
-        building_right_cost_chf_monthly:item.building_right_cost_chf_monthly??null,
-        drive_minutes_othmarsingen:
-          item.drive_minutes_othmarsingen??
-          item.othmarsingen_minutes??
-          item.travel_time_othmarsingen_minutes??
-          item.travel_time_luca_minutes??
-          null,
-        drive_minutes_duebendorf:
-          item.drive_minutes_duebendorf??
-          item.duebendorf_minutes??
-          item.travel_time_duebendorf_minutes??
-          item.travel_time_gessi_minutes??
-          null,
-        travel_time_gessi_minutes:item.travel_time_gessi_minutes??null,
-        ai_rating:item.ai_rating??null,
-        ai_summary:item.ai_summary||null,
-        ai_recommendation_reason:item.ai_recommendation_reason||item.recommendation_reason||null,
-        advantages:Array.isArray(item.advantages)?item.advantages:null,
-        disadvantages:Array.isArray(item.disadvantages)?item.disadvantages:null,
-        status:item.status||"interesting",
-        is_archived:Boolean(item.is_archived??false),
-        archive_reason:item.archive_reason||null,
-        last_seen_at:new Date().toISOString(),
-        imported_at:new Date().toISOString()
-      };
-    }
-
-    function normalizePipelineItem(item){
-      const sourceUrl=item.source_url||item.url||item.link||null;
-      const projectUrl=item.project_url||null;
-      const externalId=item.external_id||item.source_project_id||
-        (projectUrl?`url-${slugify(projectUrl)}`:`project-${slugify(`${item.project_name}-${item.municipality}-${item.address}`)}`);
-
-      return {
-        external_id:externalId,
-        source:item.source||null,
-        source_project_id:item.source_project_id||null,
-        source_url:sourceUrl,
-        project_url:projectUrl,
-        project_name:item.project_name||item.title||"Projekt ohne Namen",
-        description:item.description||null,
-        municipality:item.municipality||item.location||null,
-        canton:item.canton||null,
-        postal_code:item.postal_code?String(item.postal_code):null,
-        address:item.address||null,
-        latitude:item.latitude??item.lat??null,
-        longitude:item.longitude??item.lng??item.lon??null,
-        developer:item.developer||null,
-        marketer:item.marketer||null,
-        architect:item.architect||null,
-        project_status:item.project_status||"unknown",
-        status_details:item.status_details||null,
-        property_type:item.property_type||null,
-        expected_units:item.expected_units??null,
-        expected_rooms:item.expected_rooms||null,
-        expected_living_area_from_m2:item.expected_living_area_from_m2??null,
-        expected_living_area_to_m2:item.expected_living_area_to_m2??null,
-        estimated_price_from_chf:item.estimated_price_from_chf??null,
-        estimated_price_to_chf:item.estimated_price_to_chf??null,
-        expected_marketing_start:item.expected_marketing_start||null,
-        expected_construction_start:item.expected_construction_start||null,
-        expected_move_in:item.expected_move_in||null,
-        minergie:item.minergie??null,
-        minergie_details:item.minergie_details||null,
-        energy_standard:item.energy_standard||null,
-        building_right:Boolean(item.building_right??false),
-        building_right_details:item.building_right_details||null,
-        drive_minutes_othmarsingen:
-          item.drive_minutes_othmarsingen??
-          item.othmarsingen_minutes??
-          item.travel_time_othmarsingen_minutes??
-          item.travel_time_luca_minutes??
-          null,
-        drive_minutes_duebendorf:
-          item.drive_minutes_duebendorf??
-          item.duebendorf_minutes??
-          item.travel_time_duebendorf_minutes??
-          item.travel_time_gessi_minutes??
-          null,
-        ai_rating:item.ai_rating??null,
-        ai_summary:item.ai_summary||null,
-        ai_recommendation_reason:item.ai_recommendation_reason||null,
-        advantages:Array.isArray(item.advantages)?item.advantages:null,
-        disadvantages:Array.isArray(item.disadvantages)?item.disadvantages:null,
-        is_archived:Boolean(item.is_archived??false),
-        last_seen_at:new Date().toISOString(),
-        imported_at:new Date().toISOString()
-      };
-    }
-
-    async function importProperties(){
-      let parsed;
-      try{parsed=JSON.parse(el.importText.value.trim())}
-      catch{showToast("Der eingefügte Text ist kein gültiges JSON.",true);return}
-
-      const rawProperties=Array.isArray(parsed)?parsed:(Array.isArray(parsed.properties)?parsed.properties:[]);
-      const rawProjects=!Array.isArray(parsed)&&Array.isArray(parsed.pipeline_projects)?parsed.pipeline_projects:[];
-
-      if(!rawProperties.length&&!rawProjects.length){
-        showToast("Keine Wohnungen oder Projekte im JSON gefunden.",true);
-        return;
-      }
-
-      const properties=rawProperties.map(normalizeImportItem);
-      const projects=rawProjects.map(normalizePipelineItem);
-      setLoading(true);
-
-      try{
-        if(properties.length){
-          const ids=properties.map(x=>x.external_id);
-          const {data:existingRows,error:existingError}=await db.from("properties")
-            .select("external_id,status,is_archived").in("external_id",ids);
-          if(existingError) throw existingError;
-          const existingMap=new Map((existingRows||[]).map(row=>[row.external_id,row]));
-          const safe=properties.map(item=>{
-            const old=existingMap.get(item.external_id);
-            return old?{...item,status:old.status,is_archived:old.is_archived}:{...item,is_archived:false};
-          });
-          const {error}=await db.from("properties").upsert(safe,{onConflict:"external_id"});
-          if(error) throw error;
-        }
-
-        if(projects.length){
-          const ids=projects.map(x=>x.external_id);
-          const {data:existingRows,error:existingError}=await db.from("pipeline_projects")
-            .select("external_id,is_archived").in("external_id",ids);
-          if(existingError) throw existingError;
-          const existingMap=new Map((existingRows||[]).map(row=>[row.external_id,row]));
-          const safe=projects.map(item=>{
-            const old=existingMap.get(item.external_id);
-            return old?{...item,is_archived:old.is_archived}:{...item,is_archived:false};
-          });
-          const {error}=await db.from("pipeline_projects").upsert(safe,{onConflict:"external_id"});
-          if(error) throw error;
-        }
-
-        await db.from("import_logs").insert({
-          imported_by:state.profile,
-          new_properties:properties.length,
-          import_note:`${properties.length} Wohnungen und ${projects.length} Pipeline-Projekte importiert`
-        });
-
-        el.importModal.classList.remove("open");
-        el.importText.value="";
-        showToast(`${properties.length} Wohnung(en), ${projects.length} Projekt(e) importiert`);
-        await loadData();
-      }catch(error){
-        console.error(error);
-        showToast(`Import fehlgeschlagen: ${error.message}`,true);
-      }finally{setLoading(false)}
-    }
-
-    let noteTimer;
-
-    function wiggleButton(button){
-      if(!button) return;
-      button.classList.remove("wiggle");
-      void button.offsetWidth;
-      button.classList.add("wiggle");
-      setTimeout(()=>button.classList.remove("wiggle"),500);
+      if(!state.dbReady&&db){const legacy=await loadLegacyData();databaseItems=legacy.items;databasePrefs=legacy.preferences}
+      state.items=dedupe([...databaseItems,...feed]);
+      const preferenceMap=new Map(databasePrefs.map(row=>[String(row.external_id),row]));
+      if(!state.dbReady)for(const row of localPreferences())preferenceMap.set(String(row.external_id),{...(preferenceMap.get(String(row.external_id))||{}),...row});
+      state.preferences=preferenceMap;
+      if(state.dbReady){await syncFeed(feed);showNotice("")}else showNotice("Die neue gemeinsame Datenbank ist noch nicht aktiviert. Die Website funktioniert bereits; Änderungen werden bis zur Einrichtung lokal auf diesem Gerät gespeichert.");
+      render();els.loadingBar.classList.remove("active");if(databaseError)console.info("Datenbank wird noch eingerichtet",databaseError.message);
     }
 
     document.addEventListener("click",event=>{
-      const button=event.target.closest("button,.link-btn");
-      if(button) wiggleButton(button);
-    },true);
-
-    el.propertyList.addEventListener("click",async event=>{
-      const target=event.target.closest("[data-action]");
-      if(!target) return;
-      const action=target.dataset.action;
-      const id=target.dataset.id;
-
-      try{
-        if(action==="vote") await saveVote(id,target.dataset.person,Number(target.dataset.vote));
-        else if(action==="favorite") await saveFavorite(id);
-        else if(action==="locate"){
-          focusItem(id);
-          window.scrollTo({top:0,behavior:"smooth"});
-        }
-        else if(action==="delete-property") await deleteProperty(id,target.dataset.title||"diese Wohnung");
-        else if(action==="delete-project") await deleteProject(id,target.dataset.title||"dieses Projekt");
-      }catch(error){
-        console.error(error);
-        showToast(error.message,true);
-      }
+      const profile=event.target.closest("[data-profile]")?.dataset.profile;if(profile){setProfile(profile);return}
+      const category=event.target.closest("[data-category]")?.dataset.category;if(category){setCategory(category);return}
+      const view=event.target.closest("[data-view]")?.dataset.view;if(view){setView(view);return}
+      const button=event.target.closest("[data-action]");if(!button)return;const {action,id}=button.dataset;if(!state.profile&&["favorite","vote","note"].includes(action)){els.profileGate.classList.add("open");return}
+      if(action==="expand"){const card=document.getElementById(`card-${CSS.escape(id)}`);card?.classList.toggle("expanded");button.textContent=card?.classList.contains("expanded")?"−":"＋"}
+      if(action==="favorite"){const pref=preference(id),key=`${state.profile}_favorite`;savePreference(id,{[key]:!pref[key]})}
+      if(action==="vote"){if(button.dataset.person!==state.profile){showToast("Du kannst nur dein eigenes Profil bewerten",true);return}const pref=preference(id),key=`${state.profile}_vote`,desired=Number(button.dataset.vote);savePreference(id,{[key]:pref[key]===desired?null:desired})}
+      if(action==="status")savePreference(id,{status:button.dataset.status})
     });
-
-    el.propertyList.addEventListener("change",async event=>{
-      const target=event.target;
-      try{
-        if(target.dataset.action==="status") await saveStatus(target.dataset.id,target.value);
-      }catch(error){
-        console.error(error);
-        showToast(error.message,true);
-      }
-    });
-
-    el.propertyList.addEventListener("input",event=>{
-      const target=event.target;
-      if(target.dataset.action!=="note") return;
-      if(target.dataset.person!==state.profile){
-        target.blur();
-        return;
-      }
-
-      clearTimeout(noteTimer);
-      noteTimer=setTimeout(async()=>{
-        try{await saveNote(target.dataset.id,target.dataset.person,target.value.trim())}
-        catch(error){console.error(error);showToast(error.message,true)}
-      },700);
-    });
-
-    function selectProfile(profile){
-      if(!["luca","gessi"].includes(profile)) return;
-      state.profile=profile;
-      localStorage.setItem("wohnung_profile",profile);
-      document.querySelectorAll(".profile-btn").forEach(btn=>btn.classList.toggle("active",btn.dataset.profile===profile));
-      el.profileGate.classList.remove("open");
-      renderProperties();
-      showToast(`Profil: ${profile==="luca"?"Luca":"Gessi"}`);
-    }
-
-    document.querySelectorAll(".profile-btn,.profile-choice").forEach(button=>{
-      button.addEventListener("click",()=>selectProfile(button.dataset.profile));
-    });
-
-    document.querySelectorAll(".nav-btn").forEach(button=>{
-      button.addEventListener("click",()=>{
-        if(button.dataset.view==="import"){
-          el.importModal.classList.add("open");
-          return;
-        }
-        state.view=button.dataset.view;
-        document.querySelectorAll(".nav-btn").forEach(btn=>btn.classList.toggle("active",btn.dataset.view===state.view));
-        applyFilters();
-        window.scrollTo({top:0,behavior:"smooth"});
-      });
-    });
-
-    [el.searchInput,el.priceFilter,el.roomsFilter,el.sortFilter].forEach(control=>control.addEventListener("input",applyFilters));
-
-    el.resetFiltersBtn.addEventListener("click",()=>{
-      el.searchInput.value="";
-      el.priceFilter.value="";
-      el.roomsFilter.value="";
-      el.sortFilter.value="newest";
-      applyFilters();
-    });
-
-    el.fitMapBtn.addEventListener("click",fitMapToVisible);
-    el.closeImportBtn.addEventListener("click",()=>el.importModal.classList.remove("open"));
-    el.importModal.addEventListener("click",event=>{if(event.target===el.importModal)el.importModal.classList.remove("open")});
-    el.runImportBtn.addEventListener("click",importProperties);
-
-    el.sampleBtn.addEventListener("click",()=>{
-      el.importText.value=JSON.stringify({
-        properties:[{
-          external_id:"sample-wilhalde-42",
-          source:"Beispiel",
-          title:"4.5-Zimmer-Wohnung Wilhalde 42",
-          location:"Othmarsingen",
-          address:"Wilhalde 42, 5504 Othmarsingen",
-          latitude:47.4013,
-          longitude:8.2136,
-          price_chf:1040000,
-          rooms:4.5,
-          living_area_m2:119,
-          move_in:"April 2027",
-          listing_url:"https://example.com",
-          minergie:true,
-          building_right:false,
-          drive_minutes_othmarsingen:18,
-          drive_minutes_duebendorf:22,
-          ai_rating:9.1,
-          ai_recommendation_reason:"Sehr gutes Verhältnis aus Preis, Fläche und Energiestandard."
-        }],
-        pipeline_projects:[]
-      },null,2);
-    });
-
-    if(state.profile){
-      document.querySelectorAll(".profile-btn").forEach(btn=>btn.classList.toggle("active",btn.dataset.profile===state.profile));
-      el.profileGate.classList.remove("open");
-    }else{
-      el.profileGate.classList.add("open");
-    }
-
-    initMap();
-    loadData();
+    document.addEventListener("change",event=>{if([els.price,els.rooms,els.sort].includes(event.target))render()});
+    els.search.addEventListener("input",()=>render());
+    els.fitMap.addEventListener("click",()=>renderMap());
+    document.addEventListener("focusout",event=>{const note=event.target.closest('[data-action="note"]');if(!note)return;if(!state.profile){els.profileGate.classList.add("open");return}savePreference(note.dataset.id,{[`${state.profile}_note`]:note.value})});
+    window.addEventListener("unhandledrejection",event=>{console.error(event.reason);showToast("Etwas hat nicht geklappt",true)});
+    fillPriceOptions();initMap();document.querySelectorAll("[data-profile]").forEach(btn=>btn.classList.toggle("active",btn.dataset.profile===state.profile));if(!state.profile)els.profileGate.classList.add("open");loadData();
   </script>
 </body>
 </html>
