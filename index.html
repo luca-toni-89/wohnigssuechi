@@ -739,6 +739,8 @@ svg.leaflet-image-layer.leaflet-interactive path {
     .map-empty strong{display:block;font-family:Georgia,"Times New Roman",serif;font-size:22px;font-weight:500;letter-spacing:-.035em}
     .map-empty span{display:block;margin-top:5px;color:var(--muted);font-size:11px;font-weight:700}
     .property-pin{display:grid;place-items:center;width:32px;height:32px;border:3px solid #fff;border-radius:11px 11px 11px 3px;background:var(--accent);color:#fff;box-shadow:0 7px 18px rgba(20,32,51,.28);font-size:11px;font-weight:900;transform:rotate(-45deg)}
+    .property-pin.approx{background:#526273}
+    .property-pin.group{width:38px;height:38px;border-radius:14px 14px 14px 4px;background:var(--hero);font-size:12px}
     .property-pin span{transform:rotate(45deg)}
     .map-foot{display:flex;justify-content:space-between;align-items:center;gap:12px;min-height:50px;padding:11px 15px;background:#fff;color:var(--muted);font-size:11px;font-weight:750}
     .ghost-btn{border:1px solid rgba(var(--accent-rgb),.13);background:var(--accent-soft);color:var(--accent);border-radius:11px;padding:8px 11px;font-size:11px;font-weight:900}
@@ -796,9 +798,15 @@ svg.leaflet-image-layer.leaflet-interactive path {
     .commute{padding:9px 8px;text-align:center;border-right:1px solid var(--line)}
     .commute:last-child{border-right:0}
     .commute strong{display:block;font-size:12px}
+    .commute strong.approx{color:#596677}
+    .commute strong.missing{color:#9aa3af;font-size:10px}
     .commute span{display:block;color:var(--muted);font-size:8px;font-weight:800}
     .ai-note{margin:13px 0 0;padding:11px 12px;border-radius:14px;background:linear-gradient(120deg,var(--accent-soft),#fff);font-size:11px;color:#3d4959}
     .ai-note strong{display:block;margin-bottom:3px;color:var(--accent);font-size:9px;text-transform:uppercase;letter-spacing:.07em}
+    .collaboration{margin-top:13px;padding:12px;border:1px solid rgba(var(--accent-rgb),.17);border-radius:17px;background:linear-gradient(135deg,rgba(var(--accent-rgb),.055),#fff 62%)}
+    .collaboration-head{display:flex;align-items:flex-end;justify-content:space-between;gap:10px;margin-bottom:9px}
+    .collaboration-title{font-size:10px;font-weight:950;letter-spacing:.075em;text-transform:uppercase;color:var(--accent)}
+    .collaboration-hint{color:var(--muted);font-size:8px;font-weight:800;text-align:right}
     .details{display:none;margin-top:13px;padding-top:13px;border-top:1px solid var(--line)}
     .property-card.expanded .details{display:block}
     .pros-cons{display:grid;grid-template-columns:1fr 1fr;gap:8px}
@@ -806,16 +814,23 @@ svg.leaflet-image-layer.leaflet-interactive path {
     .pros-cons strong{display:block;margin-bottom:5px;font-size:9px;text-transform:uppercase;letter-spacing:.05em}
     .pros-cons ul{margin:0;padding-left:15px}
     .pros-cons li+li{margin-top:3px}
-    .votes{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:10px}
+    .votes{display:grid;grid-template-columns:1fr 1fr;gap:8px}
     .person-box{border:1px solid var(--line);border-radius:14px;padding:9px}
+    .person-box.active-person{border-color:rgba(var(--accent-rgb),.38);box-shadow:inset 0 0 0 1px rgba(var(--accent-rgb),.08);background:#fff}
     .person-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:7px;font-size:10px;font-weight:900}
     .vote-actions{display:flex;gap:5px}
-    .vote-actions button{flex:1;border:1px solid var(--line);border-radius:9px;background:#fff;padding:6px}
+    .vote-actions button{flex:1;min-height:34px;border:1px solid var(--line);border-radius:9px;background:#fff;padding:6px;transition:transform .15s ease,border-color .15s ease,background .15s ease}
+    .vote-actions button:not(:disabled):hover{transform:translateY(-1px);border-color:var(--accent)}
+    .vote-actions button:disabled{cursor:not-allowed;opacity:.72}
     .vote-actions button.active.like{background:#e3f4ec;border-color:#a9dbc8}
     .vote-actions button.active.dislike{background:#fde9ec;border-color:#efb8c1}
-    .note-label{display:block;margin:10px 0 5px;color:var(--muted);font-size:9px;font-weight:900;text-transform:uppercase;letter-spacing:.05em}
-    .note{width:100%;min-height:64px;resize:vertical;border:1px solid var(--line);border-radius:12px;padding:9px;background:#fafbfc;color:var(--ink);font-size:11px;outline:none}
+    .notes-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:8px}
+    .note-card{display:block;min-width:0}
+    .note-label{display:flex;align-items:center;justify-content:space-between;gap:8px;margin:0 2px 5px;color:var(--muted);font-size:8px;font-weight:900;text-transform:uppercase;letter-spacing:.05em}
+    .note-label em{border-radius:99px;padding:2px 5px;background:var(--accent-soft);color:var(--accent);font-style:normal;font-size:7px}
+    .note{width:100%;min-height:58px;resize:vertical;border:1px solid var(--line);border-radius:12px;padding:9px;background:#fff;color:var(--ink);font-size:11px;line-height:1.35;outline:none}
     .note:focus{border-color:var(--accent)}
+    .note[readonly]{resize:none;background:#f7f8fa;color:#667181;cursor:default}
     .card-actions{display:grid;grid-template-columns:1fr auto auto;gap:7px;margin-top:13px}
     .action-btn,.link-btn{display:inline-flex;align-items:center;justify-content:center;gap:6px;min-height:38px;border-radius:12px;padding:0 12px;font-size:10px;font-weight:900;text-decoration:none}
     .action-btn{border:1px solid var(--line);background:#fff;color:var(--ink)}
@@ -853,6 +868,7 @@ svg.leaflet-image-layer.leaflet-interactive path {
     @keyframes load{to{transform:translateX(400%)}}
     @media(max-width:1040px){.dashboard{grid-template-columns:1fr}.side-panel{position:static;grid-template-columns:1fr}.properties{grid-template-columns:repeat(2,1fr)}.hero-main{grid-template-columns:1fr}.hero-stats{max-width:620px}.toolbar{grid-template-columns:1fr 1fr}.field{grid-column:1/-1}}
     @media(max-width:720px){body{padding-bottom:calc(var(--nav-h) + env(safe-area-inset-bottom) + 18px)}.shell{width:min(100% - 20px,1380px)}.hero{padding-top:15px;padding-bottom:78px}.wordmark{font-size:15px}.mark{width:37px;height:37px}.profile-switch button{padding:7px 10px}.hero-main{margin-top:36px;gap:28px}h1{font-size:44px}.hero-copy{font-size:13px}.hero-stats{gap:7px}.hero-stat{padding:12px}.hero-stat strong{font-size:19px}.workspace{margin-top:-47px}.category-panel{border-radius:24px;padding:7px}.category-btn{padding:11px;border-radius:18px}.cat-symbol{width:37px;height:37px}.category-btn small{display:none}.cat-count{display:none}.dashboard{margin-top:13px}.insight-card{padding:18px}.map-card{border-radius:22px}#map{height:250px}.toolbar{padding:10px;border-radius:18px}.properties{grid-template-columns:1fr}.property-card{border-radius:22px;padding:17px}.section-head{margin-top:22px}.bottom-nav{position:fixed;left:50%;bottom:max(8px,env(safe-area-inset-bottom));transform:translateX(-50%);width:min(620px,calc(100% - 20px));height:62px;min-height:62px;margin:0}.nav-btn{display:grid;place-items:center;align-content:center;gap:1px;padding:5px}.nav-label{font-size:9px}.nav-count{position:absolute;right:9px;top:6px;min-width:18px;padding:2px 4px;font-size:8px}.pros-cons{grid-template-columns:1fr}.facts{gap:5px}.fact{padding:8px 4px}.commute{padding:8px 3px}.card-actions{grid-template-columns:1fr auto}.card-actions .link-btn{grid-column:1/-1}.hero:after{display:none}}
+    @media(max-width:460px){.notes-grid{grid-template-columns:1fr}.collaboration-head{align-items:flex-start;flex-direction:column}.collaboration-hint{text-align:left}}
     @media(max-width:420px){.category-btn{padding:9px}.cat-symbol{display:none}.hero-stats{grid-template-columns:repeat(3,1fr)}.hero-stat span{font-size:8px}.toolbar{grid-template-columns:1fr}.field{grid-column:auto}.facts{grid-template-columns:repeat(2,1fr)}.fact:nth-child(3),.fact:nth-child(4){margin-top:0}.votes{grid-template-columns:1fr}.profile-switch{margin-left:auto}}
   </style>
 </head>
@@ -964,6 +980,7 @@ svg.leaflet-image-layer.leaflet-interactive path {
       propertyTable:"home_finder_properties",
       stateTable:"home_finder_state",
       dataUrl:"data.json",
+      placeDataUrl:"place-coordinates.json",
       destinations:{
         duebendorf:{label:"Dübendorf",lat:47.3971,lng:8.6187},
         wohlen:{label:"Wohlen",lat:47.3507,lng:8.2779},
@@ -972,7 +989,7 @@ svg.leaflet-image-layer.leaflet-interactive path {
     };
     const db=window.supabase?.createClient(CONFIG.supabaseUrl,CONFIG.supabaseKey,{auth:{persistSession:false,autoRefreshToken:false,detectSessionInUrl:false}});
     const savedProfile=localStorage.getItem("euses_dihei_profile");
-    const state={profile:["luca","gessi"].includes(savedProfile)?savedProfile:null,category:"maxmio",view:"new",items:[],preferences:new Map(),filtered:[],map:null,markerLayer:null,markers:new Map(),dbReady:false,routing:new Set()};
+    const state={profile:["luca","gessi"].includes(savedProfile)?savedProfile:null,category:"maxmio",view:"new",items:[],preferences:new Map(),filtered:[],map:null,markerLayer:null,markers:new Map(),dbReady:false,placeLookup:{by_zip_city:{},by_city:{},by_zip:{}}};
     const $=id=>document.getElementById(id);
     const els=Object.fromEntries(["loadingBar","heroTitle","heroCopy","statNew","statInteresting","statFavorite","countMaxmio","countDeluxe","navCountNew","navCountInteresting","navCountFavorites","navCountArchive","dbNotice","mapCaption","mapEmpty","fitMap","search","price","rooms","sort","viewTitle","viewSubtitle","resultCount","propertyList","insightTitle","visibleCount","avgPrice","bothLike","projectsCount","profileGate","toast"].map(id=>[id,$(id)]));
     const VIEW_COPY={
@@ -998,21 +1015,23 @@ svg.leaflet-image-layer.leaflet-interactive path {
     function categoryFor(raw,total){if(total!=null)return total<=1000000?"maxmio":"homedeluxe";return raw.category==="homedeluxe"?"homedeluxe":"maxmio"}
     function normalize(raw,entryType="listing"){
       const total=totalPrice(raw);
+      const locationObject=raw.location&&typeof raw.location==="object"&&!Array.isArray(raw.location)?raw.location:{};
+      const coordinateObject=raw.coordinates&&typeof raw.coordinates==="object"&&!Array.isArray(raw.coordinates)?raw.coordinates:{};
       const listingUrl=text(raw.source_url,raw.listing_url,raw.url,raw.link);
       const projectUrl=text(raw.project_url,entryType==="pipeline"?listingUrl:null);
       const title=text(raw.title,raw.project_name,entryType==="pipeline"?"Kommendes Wohnprojekt":"Wohnung ohne Titel");
-      const city=text(raw.city,raw.municipality,raw.location,raw.ort);
+      const city=text(raw.city,raw.municipality,typeof raw.location==="string"?raw.location:null,raw.ort,locationObject.city,locationObject.municipality);
       const address=text(raw.address,raw.adresse);
       const externalId=text(raw.external_id,raw.source_listing_id,raw.source_project_id,listingUrl?`url-${slug(listingUrl)}`:`item-${slug(`${title}-${city}-${address}`)}`);
       return {
         external_id:String(externalId),category:categoryFor(raw,total),entry_type:entryType,
         source:text(raw.source),source_listing_id:text(raw.source_listing_id,raw.source_project_id),source_url:listingUrl,project_url:projectUrl,project_name:text(raw.project_name),
         title:String(title),description:text(raw.description,raw.status_details),address,zip:text(raw.zip,raw.postal_code),city,canton:text(raw.canton),
-        latitude:num(raw.latitude,raw.lat),longitude:num(raw.longitude,raw.lng,raw.lon),rooms:num(raw.rooms,raw.zimmer,String(raw.expected_rooms||"").match(/\d+(?:[.,]\d+)?/)?.[0]?.replace(",",".")),
+        latitude:num(raw.latitude,raw.lat,locationObject.latitude,locationObject.lat,coordinateObject.latitude,coordinateObject.lat),longitude:num(raw.longitude,raw.lng,raw.lon,locationObject.longitude,locationObject.lng,locationObject.lon,coordinateObject.longitude,coordinateObject.lng,coordinateObject.lon),rooms:num(raw.rooms,raw.zimmer,String(raw.expected_rooms||"").match(/\d+(?:[.,]\d+)?/)?.[0]?.replace(",",".")),
         living_area_m2:num(raw.living_area_m2,raw.area_m2,raw.expected_living_area_from_m2),purchase_price_chf:num(raw.purchase_price_chf,raw.estimated_price_from_chf,raw.price_chf),mandatory_parking_price_chf:num(raw.mandatory_parking_price_chf,raw.parking_price_chf),total_price_chf:total,
         year_built:num(raw.year_built,raw.construction_year,raw.baujahr,raw.expected_construction_start),availability:text(raw.availability,raw.move_in,raw.expected_move_in),floor:text(raw.floor),
         developer:text(raw.developer),marketer:text(raw.marketer),project_status:text(raw.project_status),minergie:raw.minergie==null?null:bool(raw.minergie),building_right:bool(raw.building_right??raw.baurecht??raw.leasehold),
-        drive_minutes_duebendorf:num(raw.drive_minutes_duebendorf,raw.duebendorf_minutes,raw.travel_time_duebendorf_minutes,raw.travel_time_gessi_minutes),drive_minutes_wohlen:num(raw.drive_minutes_wohlen,raw.wohlen_minutes,raw.travel_time_wohlen_minutes),drive_minutes_othmarsingen:num(raw.drive_minutes_othmarsingen,raw.othmarsingen_minutes,raw.travel_time_othmarsingen_minutes,raw.travel_time_luca_minutes),
+        drive_minutes_duebendorf:num(raw.drive_minutes_duebendorf,raw.duebendorf_minutes,raw.travel_time_duebendorf_minutes,raw.travel_time_gessi_minutes,raw.commute_minutes?.duebendorf),drive_minutes_wohlen:num(raw.drive_minutes_wohlen,raw.wohlen_minutes,raw.travel_time_wohlen_minutes,raw.commute_minutes?.wohlen),drive_minutes_othmarsingen:num(raw.drive_minutes_othmarsingen,raw.othmarsingen_minutes,raw.travel_time_othmarsingen_minutes,raw.travel_time_luca_minutes,raw.commute_minutes?.othmarsingen),
         ai_rating:num(raw.ai_rating),ai_summary:text(raw.ai_summary),ai_recommendation_reason:text(raw.ai_recommendation_reason,raw.recommendation_reason),advantages:array(raw.advantages),disadvantages:array(raw.disadvantages),
         discovered_at:text(raw.discovered_at,raw.imported_at,raw.created_at,new Date().toISOString()),last_seen_at:text(raw.last_seen_at,raw.updated_at,new Date().toISOString())
       };
@@ -1034,17 +1053,23 @@ svg.leaflet-image-layer.leaflet-interactive path {
     }
     function preference(id){return state.preferences.get(String(id))||{external_id:String(id),status:"new",luca_vote:null,gessi_vote:null,luca_favorite:false,gessi_favorite:false,luca_note:"",gessi_note:""}}
     function isFavorite(pref){return !!(pref.luca_favorite||pref.gessi_favorite)}
-    function coordinates(item){
-      if(Number.isFinite(item.latitude)&&Number.isFinite(item.longitude))return [item.latitude,item.longitude];
-      const haystack=slug(`${item.city||""} ${item.address||""}`).replaceAll("-"," ");
-      const key=Object.keys(PLACE_COORDINATES).find(place=>haystack.includes(slug(place).replaceAll("-"," ")));
-      return key?PLACE_COORDINATES[key]:null;
+    function validPoint(point){return Array.isArray(point)&&Number.isFinite(Number(point[0]))&&Number.isFinite(Number(point[1]))&&Number(point[0])>=45.7&&Number(point[0])<=47.9&&Number(point[1])>=5.8&&Number(point[1])<=10.7}
+    function coordinatesInfo(item){
+      const exact=[num(item.latitude),num(item.longitude)];
+      if(validPoint(exact))return {point:exact.map(Number),precision:"exact"};
+      const cityKey=slug(item.city);const zip=String(item.zip||"").match(/\b\d{4}\b/)?.[0]||String(item.address||"").match(/\b\d{4}\b/)?.[0];
+      const candidates=[zip&&cityKey?state.placeLookup.by_zip_city?.[`${zip}|${cityKey}`]:null,cityKey?state.placeLookup.by_city?.[cityKey]:null,zip?state.placeLookup.by_zip?.[zip]:null];
+      const lookupPoint=candidates.find(validPoint);if(lookupPoint)return {point:lookupPoint.map(Number),precision:"place"};
+      const staticPoint=PLACE_COORDINATES[cityKey];if(validPoint(staticPoint))return {point:staticPoint.map(Number),precision:"place"};
+      return null;
     }
-    function listingLink(item){return item.source_url||item.project_url||null}
+    function coordinates(item){return coordinatesInfo(item)?.point||null}
+    function safeHttpUrl(value){if(!value)return null;try{const url=new URL(String(value),window.location.href);return ["http:","https:"].includes(url.protocol)?url.href:null}catch{return null}}
+    function listingLink(item){return safeHttpUrl(item.source_url)||safeHttpUrl(item.project_url)}
     function showToast(message,error=false){els.toast.textContent=message;els.toast.classList.toggle("error",error);els.toast.classList.add("show");clearTimeout(showToast.timer);showToast.timer=setTimeout(()=>els.toast.classList.remove("show"),2800)}
     function showNotice(message){els.dbNotice.textContent=message;els.dbNotice.classList.toggle("show",!!message)}
     function setProfile(profile){if(!["luca","gessi"].includes(profile))return;state.profile=profile;localStorage.setItem("euses_dihei_profile",profile);els.profileGate.classList.remove("open");document.querySelectorAll("[data-profile]").forEach(btn=>btn.classList.toggle("active",btn.dataset.profile===profile));render();showToast(`Profil ${profile==="luca"?"Luca":"Gessi"} aktiv`)}
-    function setCategory(category){if(!["maxmio","homedeluxe"].includes(category))return;state.category=category;document.body.dataset.category=category;document.querySelectorAll("[data-category]").forEach(btn=>btn.classList.toggle("active",btn.dataset.category===category));const deluxe=category==="homedeluxe";els.heroTitle.textContent=deluxe?"HomeDeluxe":"MaxMio";els.heroCopy.textContent=deluxe?"Aussergewöhnliche Wohnungen über CHF 1 Mio. – grosszügig, hochwertig und kompromisslos geprüft.":"Smarte Wohnungen bis CHF 1 Mio. – ab 3.5 Zimmern, sorgfältig geprüft und gemeinsam bewertet.";els.insightTitle.textContent=deluxe?"HomeDeluxe im Blick":"MaxMio im Blick";fillPriceOptions();render()}
+    function setCategory(category){if(!["maxmio","homedeluxe"].includes(category))return;state.category=category;document.body.dataset.category=category;document.querySelectorAll(".category-btn[data-category]").forEach(btn=>btn.classList.toggle("active",btn.dataset.category===category));const deluxe=category==="homedeluxe";els.heroTitle.textContent=deluxe?"HomeDeluxe":"MaxMio";els.heroCopy.textContent=deluxe?"Aussergewöhnliche Wohnungen über CHF 1 Mio. – grosszügig, hochwertig und kompromisslos geprüft.":"Smarte Wohnungen bis CHF 1 Mio. – ab 3.5 Zimmern, sorgfältig geprüft und gemeinsam bewertet.";els.insightTitle.textContent=deluxe?"HomeDeluxe im Blick":"MaxMio im Blick";fillPriceOptions();render()}
     function setView(view){if(!VIEW_COPY[view])return;state.view=view;document.querySelectorAll("[data-view]").forEach(btn=>{const active=btn.dataset.view===view;btn.classList.toggle("active",active);btn.setAttribute("aria-pressed",String(active))});render()}
     function fillPriceOptions(){const options=state.category==="maxmio"?[[800000,"bis CHF 800’000"],[900000,"bis CHF 900’000"],[1000000,"bis CHF 1 Mio."]]:[[1200000,"bis CHF 1.2 Mio."],[1400000,"bis CHF 1.4 Mio."],[1600000,"bis CHF 1.6 Mio."],[2000000,"bis CHF 2 Mio."]];const current=els.price.value;els.price.innerHTML='<option value="">Preis: alle</option>'+options.map(([v,l])=>`<option value="${v}">${l}</option>`).join("");if(options.some(([v])=>String(v)===current))els.price.value=current}
     function eligible(item){
@@ -1064,23 +1089,27 @@ svg.leaflet-image-layer.leaflet-interactive path {
       if(els.sort.value==="priceAsc")items.sort((a,b)=>value(a)-value(b));else if(els.sort.value==="priceDesc")items.sort((a,b)=>(b.total_price_chf||0)-(a.total_price_chf||0));else if(els.sort.value==="rating")items.sort((a,b)=>(b.ai_rating||0)-(a.ai_rating||0));else if(els.sort.value==="year")items.sort((a,b)=>(b.year_built||0)-(a.year_built||0));else items.sort((a,b)=>new Date(b.discovered_at||0)-new Date(a.discovered_at||0));
       return items;
     }
-    function commuteValue(item,key){const direct=num(item[`drive_minutes_${key}`]);if(direct!=null)return Math.round(direct);const cache=JSON.parse(localStorage.getItem(`route_${item.external_id}`)||"null");return num(cache?.[key])}
-    function commuteHtml(item){return `<div class="commutes"><div class="commute-head"><span>Fahrzeit ab Wohnung</span><span>Auto · Richtwert</span></div><div class="commute-grid">${["duebendorf","wohlen","othmarsingen"].map(key=>{const value=commuteValue(item,key);return `<div class="commute"><strong data-route="${esc(item.external_id)}-${key}">${value!=null?`${value} Min.`:"…"}</strong><span>${CONFIG.destinations[key].label}</span></div>`}).join("")}</div></div>`}
+    function distanceKm(a,b){const radius=6371,toRad=value=>value*Math.PI/180;const dLat=toRad(b[0]-a[0]),dLon=toRad(b[1]-a[1]);const lat1=toRad(a[0]),lat2=toRad(b[0]);const value=Math.sin(dLat/2)**2+Math.cos(lat1)*Math.cos(lat2)*Math.sin(dLon/2)**2;return radius*2*Math.atan2(Math.sqrt(value),Math.sqrt(1-value))}
+    function estimatedDriveMinutes(point,destination){const km=distanceKm(point,[destination.lat,destination.lng]);const speed=km<8?34:km<20?48:km<55?65:75;const roadFactor=km<8?1.38:1.3;return Math.max(4,Math.round((km*roadFactor/speed)*60+4))}
+    function commuteInfo(item,key){const direct=num(item[`drive_minutes_${key}`]);if(direct!=null)return {value:Math.round(direct),approx:false};const point=coordinates(item);return point?{value:estimatedDriveMinutes(point,CONFIG.destinations[key]),approx:true}:null}
+    function commuteHtml(item){const routes=["duebendorf","wohlen","othmarsingen"].map(key=>[key,commuteInfo(item,key)]);const estimated=routes.some(([,info])=>info?.approx),missing=routes.some(([,info])=>!info),source=estimated?"lokale Schätzung":missing?"Position fehlt":"aus Datensatz";return `<div class="commutes"><div class="commute-head"><span>Fahrzeit ab Wohnung</span><span>Auto · ${source}</span></div><div class="commute-grid">${routes.map(([key,info])=>`<div class="commute"><strong class="${info?.approx?"approx":info?"":"missing"}" title="${info?.approx?"Schätzung ab Ortsmittelpunkt oder Koordinate":""}">${info?`${info.approx?"≈ ":""}${info.value} Min.`:"Position fehlt"}</strong><span>${CONFIG.destinations[key].label}</span></div>`).join("")}</div></div>`}
     function listHtml(items,positive){if(!items.length)return "";return `<ul>${items.slice(0,4).map(value=>`<li>${esc(value)}</li>`).join("")}</ul>`}
     function propertyCard(item){
       const pref=preference(item.external_id),favorite=state.profile?pref[`${state.profile}_favorite`]:isFavorite(pref),score=Math.max(0,Math.min(10,num(item.ai_rating)||0));const link=listingLink(item);const isProject=item.entry_type==="pipeline";
       const year=item.year_built?Math.round(item.year_built):isProject?"Projekt":"offen";const rooms=item.rooms!=null?item.rooms.toLocaleString("de-CH"):"–";const area=item.living_area_m2!=null?`${Math.round(item.living_area_m2)} m²`:"–";
+      const people=["luca","gessi"];const activeLabel=state.profile==="gessi"?"Gessi":state.profile==="luca"?"Luca":"niemand";
+      const votes=people.map(person=>{const label=person==="luca"?"Luca":"Gessi",vote=pref[`${person}_vote`],locked=state.profile!==person;return `<div class="person-box ${locked?"":"active-person"}"><div class="person-head"><span>${label}</span><span>${vote===1?"gefällt":vote===-1?"passt nicht":"offen"}</span></div><div class="vote-actions"><button class="like ${vote===1?"active":""}" type="button" data-action="vote" data-person="${person}" data-vote="1" data-id="${esc(item.external_id)}" aria-label="${label}: gefällt mir" aria-pressed="${vote===1}" ${locked?"disabled":""}>👍</button><button class="dislike ${vote===-1?"active":""}" type="button" data-action="vote" data-person="${person}" data-vote="-1" data-id="${esc(item.external_id)}" aria-label="${label}: passt nicht" aria-pressed="${vote===-1}" ${locked?"disabled":""}>👎</button></div></div>`}).join("");
+      const notes=people.map(person=>{const label=person==="luca"?"Lucas":"Gessis",locked=state.profile!==person,value=pref[`${person}_note`]||"";return `<label class="note-card" for="note-${esc(item.external_id)}-${person}"><span class="note-label"><span>${label} Kommentar</span>${locked?"":'<em>Du</em>'}</span><textarea id="note-${esc(item.external_id)}-${person}" class="note" data-action="note" data-person="${person}" data-id="${esc(item.external_id)}" aria-label="${label} Kommentar" placeholder="Noch kein Kommentar …" ${locked?'readonly aria-readonly="true"':""}>${esc(value)}</textarea></label>`}).join("");
       return `<article class="property-card ${isProject?"pipeline":""}" id="card-${esc(item.external_id)}">
-        <div class="card-top"><div><div class="card-kickers"><span class="badge">${state.category==="maxmio"?"MaxMio":"HomeDeluxe"}</span>${isProject?'<span class="badge project">Projektvorschau</span>':""}<span class="badge year">Baujahr ${esc(year)}</span></div><h3 class="card-title">${esc(item.title)}</h3><div class="location">${esc([item.address,[item.zip,item.city].filter(Boolean).join(" ")].filter(Boolean).join(" · ")||"Ort noch offen")}</div></div><div class="top-actions"><button class="round-btn ${favorite?"favorite":""}" type="button" data-action="favorite" data-id="${esc(item.external_id)}" aria-label="Favorit">${favorite?"★":"☆"}</button><button class="round-btn" type="button" data-action="expand" data-id="${esc(item.external_id)}" aria-label="Details">＋</button></div></div>
+        <div class="card-top"><div><div class="card-kickers"><span class="badge">${state.category==="maxmio"?"MaxMio":"HomeDeluxe"}</span>${isProject?'<span class="badge project">Projektvorschau</span>':""}<span class="badge year">Baujahr ${esc(year)}</span></div><h3 class="card-title">${esc(item.title)}</h3><div class="location">${esc([item.address,[item.zip,item.city].filter(Boolean).join(" ")].filter(Boolean).join(" · ")||"Ort noch offen")}</div></div><div class="top-actions"><button class="round-btn ${favorite?"favorite":""}" type="button" data-action="favorite" data-id="${esc(item.external_id)}" aria-label="${favorite?"Favorit entfernen":"Als Favorit markieren"}" aria-pressed="${favorite}">${favorite?"★":"☆"}</button><button class="round-btn" type="button" data-action="expand" data-id="${esc(item.external_id)}" aria-label="Details anzeigen" aria-expanded="false" aria-controls="details-${esc(item.external_id)}">＋</button></div></div>
         <div class="price-row"><div class="price"><small>${item.mandatory_parking_price_chf?"Gesamtpreis inkl. Parkplatz":"Gesamtpreis"}</small><strong>${esc(price(item.total_price_chf))}</strong></div>${item.ai_rating!=null?`<div class="ai-score"><div class="score-ring" style="--score:${score}"><strong>${score.toFixed(1)}</strong></div><span>KI<br>Score</span></div>`:""}</div>
         <div class="facts"><div class="fact"><strong>${esc(rooms)}</strong><span>Zimmer</span></div><div class="fact"><strong>${esc(area)}</strong><span>Wohnfläche</span></div><div class="fact"><strong>${esc(year)}</strong><span>Baujahr</span></div><div class="fact"><strong>${esc(item.availability||"offen")}</strong><span>Bezug</span></div></div>
         ${commuteHtml(item)}
         ${(item.ai_recommendation_reason||item.ai_summary)?`<div class="ai-note"><strong>Unsere KI-Einschätzung</strong>${esc(item.ai_recommendation_reason||item.ai_summary)}</div>`:""}
-        <div class="details">
+        <section class="collaboration" aria-label="Gemeinsame Bewertung"><div class="collaboration-head"><div class="collaboration-title">Gemeinsam entscheiden</div><div class="collaboration-hint">Aktiv: ${activeLabel} · Profil oben wechseln</div></div><div class="votes">${votes}</div><div class="notes-grid">${notes}</div></section>
+        <div class="details" id="details-${esc(item.external_id)}">
           ${(item.description||item.project_status)?`<div class="ai-note"><strong>${isProject?"Projektstand":"Details"}</strong>${esc(item.project_status?[item.project_status,item.description].filter(Boolean).join(" · "):item.description)}</div>`:""}
           ${(item.advantages.length||item.disadvantages.length)?`<div class="pros-cons"><div><strong>Das spricht dafür</strong>${listHtml(item.advantages,true)||"Noch keine Angaben."}</div><div><strong>Darauf achten</strong>${listHtml(item.disadvantages,false)||"Noch keine Angaben."}</div></div>`:""}
-          <div class="votes">${["luca","gessi"].map(person=>{const label=person==="luca"?"Luca":"Gessi",vote=pref[`${person}_vote`],locked=state.profile!==person;return `<div class="person-box"><div class="person-head"><span>${label}</span><span>${vote===1?"gefällt":vote===-1?"passt nicht":"offen"}</span></div><div class="vote-actions"><button class="like ${vote===1?"active":""}" type="button" data-action="vote" data-person="${person}" data-vote="1" data-id="${esc(item.external_id)}" ${locked?"disabled":""}>👍</button><button class="dislike ${vote===-1?"active":""}" type="button" data-action="vote" data-person="${person}" data-vote="-1" data-id="${esc(item.external_id)}" ${locked?"disabled":""}>👎</button></div></div>`}).join("")}</div>
-          <label class="note-label" for="note-${esc(item.external_id)}">${state.profile==="gessi"?"Gessis":"Lucas"} Notiz</label><textarea id="note-${esc(item.external_id)}" class="note" data-action="note" data-id="${esc(item.external_id)}" placeholder="Gedanken zu dieser Wohnung …">${esc(pref[`${state.profile||"luca"}_note`]||"")}</textarea>
         </div>
         <div class="card-actions">${pref.status!=="interesting"?`<button class="action-btn primary" type="button" data-action="status" data-status="interesting" data-id="${esc(item.external_id)}">Interessant</button>`:`<button class="action-btn" type="button" data-action="status" data-status="new" data-id="${esc(item.external_id)}">Zurück zu Neu</button>`}<button class="action-btn archive" type="button" data-action="status" data-status="${pref.status==="archive"?"new":"archive"}" data-id="${esc(item.external_id)}">${pref.status==="archive"?"Wiederherstellen":"Archiv"}</button>${link?`<a class="link-btn" href="${esc(link)}" target="_blank" rel="noopener noreferrer">${isProject?"Projekt öffnen":"Inserat öffnen"} ↗</a>`:""}</div>
         <div class="source-line">${esc(item.source||"Quelle nicht angegeben")}${item.discovered_at?` · Gefunden am ${esc(date(item.discovered_at))}`:""}${item.building_right?" · Baurecht":""}${item.minergie?" · Minergie":""}</div>
@@ -1094,20 +1123,35 @@ svg.leaflet-image-layer.leaflet-interactive path {
       const prices=state.filtered.map(x=>x.total_price_chf).filter(Number.isFinite);els.visibleCount.textContent=state.filtered.length;els.avgPrice.textContent=prices.length?shortPrice(prices.reduce((a,b)=>a+b,0)/prices.length):"–";els.bothLike.textContent=state.filtered.filter(item=>{const pref=preference(item.external_id);return pref.luca_vote===1&&pref.gessi_vote===1}).length;els.projectsCount.textContent=state.filtered.filter(x=>x.entry_type==="pipeline").length;
     }
     function render(){
-      state.filtered=filteredItems();const [title,subtitle]=VIEW_COPY[state.view];els.viewTitle.textContent=title;els.viewSubtitle.textContent=subtitle;els.resultCount.textContent=`${state.filtered.length} Treffer`;els.propertyList.innerHTML=state.filtered.length?state.filtered.map(propertyCard).join(""):emptyHtml();renderStats();renderMap();queueVisibleRoutes();
+      state.filtered=filteredItems();const [title,subtitle]=VIEW_COPY[state.view];els.viewTitle.textContent=title;els.viewSubtitle.textContent=subtitle;els.resultCount.textContent=`${state.filtered.length} Treffer`;els.propertyList.innerHTML=state.filtered.length?state.filtered.map(propertyCard).join(""):emptyHtml();renderStats();renderMap();
     }
     function initMap(){if(!window.L)return;state.map=L.map("map",{zoomControl:true,preferCanvas:true,zoomAnimation:false,fadeAnimation:false}).setView([47.4,8.43],9);L.tileLayer("https://tile.openstreetmap.org/{z}/{x}/{y}.png",{maxZoom:18,attribution:'&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'}).addTo(state.map);state.markerLayer=L.layerGroup().addTo(state.map);new ResizeObserver(()=>state.map?.invalidateSize({pan:false})).observe($("map"))}
-    function renderMap(){if(!state.map||!state.markerLayer)return;state.markerLayer.clearLayers();state.markers.clear();const positions=[];for(const item of state.filtered){const point=coordinates(item);if(!point)continue;const markerIcon=L.divIcon({className:"",html:`<div class="property-pin"><span>${item.entry_type==="pipeline"?"P":"⌂"}</span></div>`,iconSize:[32,32],iconAnchor:[16,30],popupAnchor:[0,-30]});const marker=L.marker(point,{icon:markerIcon}).bindPopup(`<strong>${esc(item.title)}</strong><br><span>${esc(item.city||item.address||"")}</span>`).addTo(state.markerLayer);marker.on("click",()=>document.getElementById(`card-${CSS.escape(item.external_id)}`)?.scrollIntoView({behavior:"smooth",block:"center"}));state.markers.set(item.external_id,marker);positions.push(point)}const hasPositions=positions.length>0;els.mapEmpty.hidden=hasPositions;els.fitMap.disabled=!hasPositions;els.mapCaption.textContent=hasPositions?`${positions.length} von ${state.filtered.length} Treffern mit Kartenposition`:`Keine Kartenpunkte in ${state.filtered.length} Treffern`;requestAnimationFrame(()=>{state.map.invalidateSize({pan:false});if(positions.length===1)state.map.setView(positions[0],13,{animate:false});else if(positions.length>1)state.map.fitBounds(positions,{padding:[36,36],maxZoom:12,animate:false});else state.map.setView([47.4,8.43],9,{animate:false})})}
-    async function calculateRoute(item){
-      if(state.routing.has(item.external_id)||["duebendorf","wohlen","othmarsingen"].every(key=>commuteValue(item,key)!=null))return;const point=coordinates(item);if(!point)return;state.routing.add(item.external_id);
-      try{const coords=[[point[1],point[0]],...Object.values(CONFIG.destinations).map(x=>[x.lng,x.lat])].map(x=>x.join(",")).join(";");const response=await fetch(`https://router.project-osrm.org/table/v1/driving/${coords}?sources=0&destinations=1;2;3`,{signal:AbortSignal.timeout(9000)});if(!response.ok)throw new Error("Routing");const data=await response.json();const values=data.durations?.[0]?.map(seconds=>seconds==null?null:Math.round(seconds/60));const cache={duebendorf:values?.[0],wohlen:values?.[1],othmarsingen:values?.[2],savedAt:Date.now()};localStorage.setItem(`route_${item.external_id}`,JSON.stringify(cache));for(const key of Object.keys(CONFIG.destinations)){const target=document.querySelector(`[data-route="${CSS.escape(item.external_id)}-${key}"]`);if(target&&cache[key]!=null)target.textContent=`${cache[key]} Min.`}}
-      catch(error){console.debug("Fahrzeit nicht verfügbar",error)}finally{state.routing.delete(item.external_id)}
+    function renderMap(){
+      if(!state.map||!state.markerLayer)return;
+      state.markerLayer.clearLayers();state.markers.clear();
+      const groups=new Map();let mapped=0,exact=0;
+      for(const item of state.filtered){
+        const info=coordinatesInfo(item);if(!info)continue;mapped++;if(info.precision==="exact")exact++;
+        const key=info.point.map(value=>Number(value).toFixed(5)).join(",");const group=groups.get(key)||{point:info.point,items:[],exact:true};group.items.push(item);group.exact=group.exact&&info.precision==="exact";groups.set(key,group);
+      }
+      const positions=[];
+      for(const group of groups.values()){
+        const count=group.items.length,size=count>1?38:32,label=count>1?count:(group.items[0].entry_type==="pipeline"?"P":"⌂");
+        const markerIcon=L.divIcon({className:"",html:`<div class="property-pin ${group.exact?"":"approx"} ${count>1?"group":""}"><span>${label}</span></div>`,iconSize:[size,size],iconAnchor:[size/2,size-2],popupAnchor:[0,-size+3]});
+        const names=group.items.slice(0,6).map(item=>`<div>• ${esc(item.title)}</div>`).join("");const more=count>6?`<div>+ ${count-6} weitere</div>`:"";const place=group.items[0].city||group.items[0].address||"";
+        const marker=L.marker(group.point,{icon:markerIcon}).bindPopup(`<strong>${count>1?`${count} Treffer`:esc(group.items[0].title)}</strong>${count>1?names+more:`<br><span>${esc(place)}</span>`}<br><small>${group.exact?"Exakte Koordinate":"Ortsmittelpunkt"}</small>`).addTo(state.markerLayer);
+        if(count===1)marker.on("click",()=>document.getElementById(`card-${CSS.escape(group.items[0].external_id)}`)?.scrollIntoView({behavior:"smooth",block:"center"}));
+        for(const item of group.items)state.markers.set(item.external_id,marker);positions.push(group.point);
+      }
+      const hasPositions=mapped>0,approx=mapped-exact;els.mapEmpty.hidden=hasPositions;els.fitMap.disabled=!hasPositions;
+      els.mapCaption.textContent=hasPositions?`${mapped} von ${state.filtered.length} Treffern · ${exact} exakt${approx?` · ${approx} Ortsmitte`:""}`:`Keine Kartenposition in ${state.filtered.length} Treffern`;
+      requestAnimationFrame(()=>{state.map.invalidateSize({pan:false});if(positions.length===1)state.map.setView(positions[0],13,{animate:false});else if(positions.length>1)state.map.fitBounds(positions,{padding:[36,36],maxZoom:12,animate:false});else state.map.setView([47.4,8.43],9,{animate:false})});
     }
-    function queueVisibleRoutes(){state.filtered.slice(0,16).forEach((item,index)=>setTimeout(()=>calculateRoute(item),index*170))}
     function localPreferences(){try{return JSON.parse(localStorage.getItem("euses_dihei_state")||"[]")}catch{return []}}
     function saveLocalPreferences(){localStorage.setItem("euses_dihei_state",JSON.stringify([...state.preferences.values()]))}
-    async function savePreference(id,patch){const current=preference(id),next={...current,...patch,external_id:String(id),updated_at:new Date().toISOString()};state.preferences.set(String(id),next);saveLocalPreferences();render();if(!state.dbReady)return;const {error}=await db.from(CONFIG.stateTable).upsert(next,{onConflict:"external_id"});if(error){showToast("Änderung lokal gespeichert – Cloud-Sync fehlgeschlagen",true);console.error(error)}else showToast("Gespeichert")}
-    async function syncFeed(rows){if(!state.dbReady||!rows.length)return;const clean=rows.map(item=>({...item,advantages:item.advantages||[],disadvantages:item.disadvantages||[]}));const {error}=await db.from(CONFIG.propertyTable).upsert(clean,{onConflict:"external_id"});if(error)console.error("Feed-Sync",error)}
+    async function savePreference(id,patch,options={}){const {rerender=true,toast=true}=options,current=preference(id),next={...current,...patch,external_id:String(id),updated_at:new Date().toISOString()};state.preferences.set(String(id),next);saveLocalPreferences();if(rerender)render();if(!state.dbReady){if(toast)showToast("Lokal gespeichert");return}const {error}=await db.from(CONFIG.stateTable).upsert(next,{onConflict:"external_id"});if(error){if(toast)showToast("Änderung lokal gespeichert – Cloud-Sync fehlgeschlagen",true);console.error(error)}else if(toast)showToast("Gespeichert")}
+    async function syncFeed(rows,existingRows=[]){if(!state.dbReady||!rows.length)return;const existing=new Map(existingRows.map(item=>[String(item.external_id),item]));const clean=rows.map(item=>{const supplied=Object.fromEntries(Object.entries(item).filter(([,value])=>value!==null&&value!==""&&!(Array.isArray(value)&&!value.length)));const merged={...(existing.get(String(item.external_id))||{}),...supplied};return {...merged,advantages:merged.advantages||[],disadvantages:merged.disadvantages||[]}});const {error}=await db.from(CONFIG.propertyTable).upsert(clean,{onConflict:"external_id"});if(error)console.error("Feed-Sync",error)}
+    async function loadPlaceLookup(){try{const response=await fetch(`${CONFIG.placeDataUrl}?v=20260811`,{cache:"force-cache"});if(!response.ok)throw new Error(`Ortsdaten ${response.status}`);const payload=await response.json();if(!payload?.by_city||!payload?.by_zip)throw new Error("Ungültige Ortsdaten");return payload}catch(error){console.info("Amtliche Ortsdaten nicht verfügbar; statische Notfallliste aktiv",error);return {by_zip_city:{},by_city:{},by_zip:{}}}}
     async function loadLegacyData(){
       const configurations=[
         {properties:"properties",pipeline:"pipeline_projects",votes:"property_votes",notes:"property_notes",favorites:"property_favorites",category:"homedeluxe"},
@@ -1129,7 +1173,7 @@ svg.leaflet-image-layer.leaflet-interactive path {
       return {items,preferences:[...preferences.values()]};
     }
     async function loadData(){
-      els.loadingBar.classList.add("active");let feed=[],databaseItems=[],databasePrefs=[],databaseError=null;
+      els.loadingBar.classList.add("active");const placePromise=loadPlaceLookup();let feed=[],databaseItems=[],databasePrefs=[],databaseError=null;
       try{const response=await fetch(`${CONFIG.dataUrl}?v=${Date.now()}`,{cache:"no-store"});if(response.ok){const payload=await response.json();const rawListings=Array.isArray(payload)?payload:Array.isArray(payload.properties)?payload.properties:[];const rawProjects=!Array.isArray(payload)&&Array.isArray(payload.pipeline_projects)?payload.pipeline_projects:[];feed=[...rawListings.map(x=>normalize(x,x.entry_type==="pipeline"?"pipeline":"listing")),...rawProjects.map(x=>normalize(x,"pipeline"))]}}
       catch(error){console.error("JSON",error)}
       if(db){
@@ -1137,12 +1181,12 @@ svg.leaflet-image-layer.leaflet-interactive path {
         if(propertiesResult.error||stateResult.error)databaseError=propertiesResult.error||stateResult.error;else{state.dbReady=true;databaseItems=(propertiesResult.data||[]).map(x=>normalize(x,x.entry_type||"listing"));databasePrefs=stateResult.data||[]}
       }
       if(!state.dbReady&&db){const legacy=await loadLegacyData();databaseItems=legacy.items;databasePrefs=legacy.preferences}
-      state.items=dedupe([...databaseItems,...feed]);
+      state.placeLookup=await placePromise;state.items=dedupe([...databaseItems,...feed]);
       const preferenceMap=new Map(databasePrefs.map(row=>[String(row.external_id),row]));
       if(!state.dbReady)for(const row of localPreferences())preferenceMap.set(String(row.external_id),{...(preferenceMap.get(String(row.external_id))||{}),...row});
       state.preferences=preferenceMap;
       if(!state.items.some(item=>item.category===state.category&&eligible(item)&&preference(item.external_id).status==="new")&&state.items.some(item=>item.category===state.category&&eligible(item)&&preference(item.external_id).status==="interesting"))state.view="interesting";
-      if(state.dbReady){await syncFeed(feed);showNotice("")}else showNotice("Die neue gemeinsame Datenbank ist noch nicht aktiviert. Die Website funktioniert bereits; Änderungen werden bis zur Einrichtung lokal auf diesem Gerät gespeichert.");
+      if(state.dbReady){await syncFeed(feed,databaseItems);showNotice("")}else showNotice("Die neue gemeinsame Datenbank ist noch nicht aktiviert. Die Website funktioniert bereits; Änderungen werden bis zur Einrichtung lokal auf diesem Gerät gespeichert.");
       setView(state.view);els.loadingBar.classList.remove("active");if(databaseError)console.info("Datenbank wird noch eingerichtet",databaseError.message);
     }
 
@@ -1150,7 +1194,7 @@ svg.leaflet-image-layer.leaflet-interactive path {
       const profile=event.target.closest("[data-profile]")?.dataset.profile;if(profile){setProfile(profile);return}
       const category=event.target.closest(".category-btn[data-category]")?.dataset.category;if(category){setCategory(category);return}
       const button=event.target.closest("[data-action]");if(!button)return;const {action,id}=button.dataset;if(!state.profile&&["favorite","vote","note"].includes(action)){els.profileGate.classList.add("open");return}
-      if(action==="expand"){const card=document.getElementById(`card-${CSS.escape(id)}`);card?.classList.toggle("expanded");button.textContent=card?.classList.contains("expanded")?"−":"＋"}
+      if(action==="expand"){const card=document.getElementById(`card-${CSS.escape(id)}`);card?.classList.toggle("expanded");const expanded=!!card?.classList.contains("expanded");button.textContent=expanded?"−":"＋";button.setAttribute("aria-expanded",String(expanded));button.setAttribute("aria-label",expanded?"Details ausblenden":"Details anzeigen")}
       if(action==="favorite"){const pref=preference(id),key=`${state.profile}_favorite`;savePreference(id,{[key]:!pref[key]})}
       if(action==="vote"){if(button.dataset.person!==state.profile){showToast("Du kannst nur dein eigenes Profil bewerten",true);return}const pref=preference(id),key=`${state.profile}_vote`,desired=Number(button.dataset.vote);savePreference(id,{[key]:pref[key]===desired?null:desired})}
       if(action==="status")savePreference(id,{status:button.dataset.status})
@@ -1159,7 +1203,7 @@ svg.leaflet-image-layer.leaflet-interactive path {
     document.querySelectorAll("[data-view]").forEach(button=>button.addEventListener("click",event=>{event.preventDefault();setView(button.dataset.view)}));
     els.search.addEventListener("input",()=>render());
     els.fitMap.addEventListener("click",()=>renderMap());
-    document.addEventListener("focusout",event=>{const note=event.target.closest('[data-action="note"]');if(!note)return;if(!state.profile){els.profileGate.classList.add("open");return}savePreference(note.dataset.id,{[`${state.profile}_note`]:note.value})});
+    document.addEventListener("focusout",event=>{const note=event.target.closest('[data-action="note"]');if(!note||note.readOnly)return;if(!state.profile){els.profileGate.classList.add("open");return}const person=note.dataset.person;if(person!==state.profile)return;const key=`${person}_note`;if((preference(note.dataset.id)[key]||"")===note.value)return;savePreference(note.dataset.id,{[key]:note.value},{rerender:false})});
     window.addEventListener("unhandledrejection",event=>{console.error(event.reason);showToast("Etwas hat nicht geklappt",true)});
     fillPriceOptions();initMap();document.querySelectorAll("[data-profile]").forEach(btn=>btn.classList.toggle("active",btn.dataset.profile===state.profile));if(!state.profile)els.profileGate.classList.add("open");loadData();
   </script>
