@@ -448,3 +448,38 @@ on conflict (external_id) do nothing;
 
 -- Hilfsfunktionen bleiben absichtlich bestehen, damit die Migration gefahrlos
 -- erneut ausgeführt werden kann, falls später noch alte Daten ergänzt werden.
+
+-- Datenbankobjekte härten: deterministischer search_path, keine unnötigen RPCs
+-- und RLS des Aufrufers auch für das bestehende Dashboard-View respektieren.
+do $hardening$
+declare
+  function_signature text;
+begin
+  foreach function_signature in array array[
+    'public.home_finder_touch_state()',
+    'public.home_finder_set_category()',
+    'public.hf_json_text(jsonb,text[])',
+    'public.hf_json_number(jsonb,text[])',
+    'public.hf_json_boolean(jsonb,text[])',
+    'public.hf_json_array(jsonb,text)',
+    'public.hf_json_timestamp(jsonb,text[])',
+    'public.hf_migrate_property_table(text,text,text)',
+    'public.hf_migrate_votes(text,text)',
+    'public.hf_migrate_favorites(text,text)',
+    'public.hf_migrate_notes(text,text)',
+    'public.set_updated_at()',
+    'public.set_property_archive_data()',
+    'public.set_pipeline_projects_updated_at()',
+    'public.record_property_price()'
+  ] loop
+    if to_regprocedure(function_signature) is not null then
+      execute format('alter function %s set search_path = public, pg_temp', function_signature);
+      execute format('revoke execute on function %s from public, anon, authenticated', function_signature);
+    end if;
+  end loop;
+
+  if to_regclass('public.property_dashboard') is not null then
+    execute 'alter view public.property_dashboard set (security_invoker = true)';
+  end if;
+end;
+$hardening$;
