@@ -699,6 +699,14 @@ svg.leaflet-image-layer.leaflet-interactive path {
     .wordmark{display:flex;align-items:center;gap:13px;font-weight:900;letter-spacing:-.04em;font-size:19px}
     .mark{display:grid;place-items:center;width:42px;height:42px;border-radius:15px;background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.18);box-shadow:inset 0 1px rgba(255,255,255,.2)}
     .mark svg{width:24px;height:24px;fill:none;stroke:var(--gold);stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+    .hero-actions{display:flex;align-items:center;gap:9px}
+    .refresh-btn{min-height:42px;border:1px solid rgba(255,255,255,.16);border-radius:999px;background:rgba(255,255,255,.09);color:#fff;padding:0 13px;display:inline-flex;align-items:center;justify-content:center;gap:7px;font-size:11px;font-weight:850;backdrop-filter:blur(14px);transition:background .18s ease,transform .18s ease,opacity .18s ease}
+    .refresh-btn:hover{background:rgba(255,255,255,.16)}
+    .refresh-btn:active{transform:scale(.97)}
+    .refresh-btn:disabled{cursor:wait;opacity:.72}
+    .refresh-btn svg{width:16px;height:16px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+    .refresh-btn.loading svg{animation:refresh-spin .8s linear infinite}
+    @keyframes refresh-spin{to{transform:rotate(360deg)}}
     .profile-switch{display:flex;padding:4px;background:rgba(255,255,255,.09);border:1px solid rgba(255,255,255,.14);border-radius:999px;backdrop-filter:blur(14px)}
     .profile-switch button{border:0;background:transparent;color:var(--hero-muted);padding:8px 14px;border-radius:999px;font-size:12px;font-weight:850}
     .profile-switch button.active{background:#fff;color:var(--hero);box-shadow:0 5px 18px rgba(0,0,0,.16)}
@@ -867,7 +875,7 @@ svg.leaflet-image-layer.leaflet-interactive path {
     .loading-bar.active:after{animation:load 1.1s ease-in-out infinite}
     @keyframes load{to{transform:translateX(400%)}}
     @media(max-width:1040px){.dashboard{grid-template-columns:1fr}.side-panel{position:static;grid-template-columns:1fr}.properties{grid-template-columns:repeat(2,1fr)}.hero-main{grid-template-columns:1fr}.hero-stats{max-width:620px}.toolbar{grid-template-columns:1fr 1fr}.field{grid-column:1/-1}}
-    @media(max-width:720px){body{padding-bottom:calc(var(--nav-h) + env(safe-area-inset-bottom) + 18px)}.shell{width:min(100% - 20px,1380px)}.hero{padding-top:15px;padding-bottom:78px}.wordmark{font-size:15px}.mark{width:37px;height:37px}.profile-switch button{padding:7px 10px}.hero-main{margin-top:36px;gap:28px}h1{font-size:44px}.hero-copy{font-size:13px}.hero-stats{gap:7px}.hero-stat{padding:12px}.hero-stat strong{font-size:19px}.workspace{margin-top:-47px}.category-panel{border-radius:24px;padding:7px}.category-btn{padding:11px;border-radius:18px}.cat-symbol{width:37px;height:37px}.category-btn small{display:none}.cat-count{display:none}.dashboard{margin-top:13px}.insight-card{padding:18px}.map-card{border-radius:22px}#map{height:250px}.toolbar{padding:10px;border-radius:18px}.properties{grid-template-columns:1fr}.property-card{border-radius:22px;padding:17px}.section-head{margin-top:22px}.bottom-nav{position:fixed;left:50%;bottom:max(8px,env(safe-area-inset-bottom));transform:translateX(-50%);width:min(620px,calc(100% - 20px));height:62px;min-height:62px;margin:0}.nav-btn{display:grid;place-items:center;align-content:center;gap:1px;padding:5px}.nav-label{font-size:9px}.nav-count{position:absolute;right:9px;top:6px;min-width:18px;padding:2px 4px;font-size:8px}.pros-cons{grid-template-columns:1fr}.facts{gap:5px}.fact{padding:8px 4px}.commute{padding:8px 3px}.card-actions{grid-template-columns:1fr auto}.card-actions .link-btn{grid-column:1/-1}.hero:after{display:none}}
+    @media(max-width:720px){body{padding-bottom:calc(var(--nav-h) + env(safe-area-inset-bottom) + 18px)}.shell{width:min(100% - 20px,1380px)}.hero{padding-top:15px;padding-bottom:78px}.wordmark{font-size:15px}.mark{width:37px;height:37px}.refresh-btn{width:37px;min-height:37px;padding:0}.refresh-label{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}.profile-switch button{padding:7px 10px}.hero-main{margin-top:36px;gap:28px}h1{font-size:44px}.hero-copy{font-size:13px}.hero-stats{gap:7px}.hero-stat{padding:12px}.hero-stat strong{font-size:19px}.workspace{margin-top:-47px}.category-panel{border-radius:24px;padding:7px}.category-btn{padding:11px;border-radius:18px}.cat-symbol{width:37px;height:37px}.category-btn small{display:none}.cat-count{display:none}.dashboard{margin-top:13px}.insight-card{padding:18px}.map-card{border-radius:22px}#map{height:250px}.toolbar{padding:10px;border-radius:18px}.properties{grid-template-columns:1fr}.property-card{border-radius:22px;padding:17px}.section-head{margin-top:22px}.bottom-nav{position:fixed;left:50%;bottom:max(8px,env(safe-area-inset-bottom));transform:translateX(-50%);width:min(620px,calc(100% - 20px));height:62px;min-height:62px;margin:0}.nav-btn{display:grid;place-items:center;align-content:center;gap:1px;padding:5px}.nav-label{font-size:9px}.nav-count{position:absolute;right:9px;top:6px;min-width:18px;padding:2px 4px;font-size:8px}.pros-cons{grid-template-columns:1fr}.facts{gap:5px}.fact{padding:8px 4px}.commute{padding:8px 3px}.card-actions{grid-template-columns:1fr auto}.card-actions .link-btn{grid-column:1/-1}.hero:after{display:none}}
     @media(max-width:460px){.notes-grid{grid-template-columns:1fr}.collaboration-head{align-items:flex-start;flex-direction:column}.collaboration-hint{text-align:left}}
     @media(max-width:420px){.category-btn{padding:9px}.cat-symbol{display:none}.hero-stats{grid-template-columns:repeat(3,1fr)}.hero-stat span{font-size:8px}.toolbar{grid-template-columns:1fr}.field{grid-column:auto}.facts{grid-template-columns:repeat(2,1fr)}.fact:nth-child(3),.fact:nth-child(4){margin-top:0}.votes{grid-template-columns:1fr}.profile-switch{margin-left:auto}}
   </style>
@@ -881,9 +889,15 @@ svg.leaflet-image-layer.leaflet-interactive path {
           <span class="mark" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M3 11.5 12 4l9 7.5"></path><path d="M5.5 10.5V20h13v-9.5M9.5 20v-6h5v6"></path></svg></span>
           <span>Euses Dihei</span>
         </div>
-        <div class="profile-switch" aria-label="Aktives Profil">
-          <button type="button" data-profile="luca">Luca</button>
-          <button type="button" data-profile="gessi">Gessi</button>
+        <div class="hero-actions">
+          <button id="refreshButton" class="refresh-btn" type="button" aria-label="Daten aktualisieren" title="Daten aktualisieren">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20 11a8 8 0 1 0-2.34 5.66"></path><path d="M20 4v7h-7"></path></svg>
+            <span class="refresh-label">Aktualisieren</span>
+          </button>
+          <div class="profile-switch" aria-label="Aktives Profil">
+            <button type="button" data-profile="luca">Luca</button>
+            <button type="button" data-profile="gessi">Gessi</button>
+          </div>
         </div>
       </div>
       <div class="hero-main">
@@ -989,9 +1003,9 @@ svg.leaflet-image-layer.leaflet-interactive path {
     };
     const db=window.supabase?.createClient(CONFIG.supabaseUrl,CONFIG.supabaseKey,{auth:{persistSession:false,autoRefreshToken:false,detectSessionInUrl:false}});
     const savedProfile=localStorage.getItem("euses_dihei_profile");
-    const state={profile:["luca","gessi"].includes(savedProfile)?savedProfile:null,category:"maxmio",view:"new",items:[],preferences:new Map(),filtered:[],map:null,markerLayer:null,markers:new Map(),dbReady:false,placeLookup:{by_zip_city:{},by_city:{},by_zip:{}}};
+    const state={profile:["luca","gessi"].includes(savedProfile)?savedProfile:null,category:"maxmio",view:"new",items:[],preferences:new Map(),filtered:[],map:null,markerLayer:null,markers:new Map(),dbReady:false,refreshing:false,pendingWrites:new Set(),placeLookup:{by_zip_city:{},by_city:{},by_zip:{}}};
     const $=id=>document.getElementById(id);
-    const els=Object.fromEntries(["loadingBar","heroTitle","heroCopy","statNew","statInteresting","statFavorite","countMaxmio","countDeluxe","navCountNew","navCountInteresting","navCountFavorites","navCountArchive","dbNotice","mapCaption","mapEmpty","fitMap","search","price","rooms","sort","viewTitle","viewSubtitle","resultCount","propertyList","insightTitle","visibleCount","avgPrice","bothLike","projectsCount","profileGate","toast"].map(id=>[id,$(id)]));
+    const els=Object.fromEntries(["loadingBar","refreshButton","heroTitle","heroCopy","statNew","statInteresting","statFavorite","countMaxmio","countDeluxe","navCountNew","navCountInteresting","navCountFavorites","navCountArchive","dbNotice","mapCaption","mapEmpty","fitMap","search","price","rooms","sort","viewTitle","viewSubtitle","resultCount","propertyList","insightTitle","visibleCount","avgPrice","bothLike","projectsCount","profileGate","toast"].map(id=>[id,$(id)]));
     const VIEW_COPY={
       new:["Neu entdeckt","Frische Treffer, die ihr noch nicht eingeordnet habt."],
       interesting:["Interessant","Die Wohnungen, die ihr genauer verfolgen möchtet."],
@@ -1160,9 +1174,16 @@ svg.leaflet-image-layer.leaflet-interactive path {
     }
     function localPreferences(){try{return JSON.parse(localStorage.getItem("euses_dihei_state")||"[]")}catch{return []}}
     function saveLocalPreferences(){localStorage.setItem("euses_dihei_state",JSON.stringify([...state.preferences.values()]))}
-    async function savePreference(id,patch,options={}){const {rerender=true,toast=true}=options,current=preference(id),next={...current,...patch,external_id:String(id),updated_at:new Date().toISOString()};state.preferences.set(String(id),next);saveLocalPreferences();if(rerender)render();if(!state.dbReady){if(toast)showToast("Lokal gespeichert");return}const {error}=await db.from(CONFIG.stateTable).upsert(next,{onConflict:"external_id"});if(error){if(toast)showToast("Änderung lokal gespeichert – Cloud-Sync fehlgeschlagen",true);console.error(error)}else if(toast)showToast("Gespeichert")}
+    async function savePreference(id,patch,options={}){
+      const {rerender=true,toast=true}=options,current=preference(id),next={...current,...patch,external_id:String(id),updated_at:new Date().toISOString()};
+      state.preferences.set(String(id),next);saveLocalPreferences();if(rerender)render();
+      if(!state.dbReady){if(toast)showToast("Lokal gespeichert");return}
+      const write=db.from(CONFIG.stateTable).upsert(next,{onConflict:"external_id"});state.pendingWrites.add(write);
+      try{const {error}=await write;if(error){if(toast)showToast("Änderung lokal gespeichert – Cloud-Sync fehlgeschlagen",true);console.error(error)}else if(toast)showToast("Gespeichert")}
+      finally{state.pendingWrites.delete(write)}
+    }
     async function syncFeed(rows,existingRows=[]){if(!state.dbReady||!rows.length)return;const existing=new Map(existingRows.map(item=>[String(item.external_id),item]));const clean=rows.map(item=>{const supplied=Object.fromEntries(Object.entries(item).filter(([,value])=>value!==null&&value!==""&&!(Array.isArray(value)&&!value.length)));const merged={...(existing.get(String(item.external_id))||{}),...supplied};return {...merged,advantages:merged.advantages||[],disadvantages:merged.disadvantages||[]}});const {error}=await db.from(CONFIG.propertyTable).upsert(clean,{onConflict:"external_id"});if(error)console.error("Feed-Sync",error)}
-    async function loadPlaceLookup(){try{const response=await fetch(`${CONFIG.placeDataUrl}?v=20260811`,{cache:"force-cache"});if(!response.ok)throw new Error(`Ortsdaten ${response.status}`);const payload=await response.json();if(!payload?.by_city||!payload?.by_zip)throw new Error("Ungültige Ortsdaten");return payload}catch(error){console.info("Amtliche Ortsdaten nicht verfügbar; statische Notfallliste aktiv",error);return {by_zip_city:{},by_city:{},by_zip:{}}}}
+    async function loadPlaceLookup(forceRefresh=false){try{const version=forceRefresh?Date.now():"20260811";const response=await fetch(`${CONFIG.placeDataUrl}?v=${version}`,{cache:forceRefresh?"no-store":"force-cache"});if(!response.ok)throw new Error(`Ortsdaten ${response.status}`);const payload=await response.json();if(!payload?.by_city||!payload?.by_zip)throw new Error("Ungültige Ortsdaten");return payload}catch(error){console.info("Amtliche Ortsdaten nicht verfügbar; statische Notfallliste aktiv",error);return {by_zip_city:{},by_city:{},by_zip:{}}}}
     async function loadLegacyData(){
       const configurations=[
         {properties:"properties",pipeline:"pipeline_projects",votes:"property_votes",notes:"property_notes",favorites:"property_favorites",category:"homedeluxe"},
@@ -1183,22 +1204,39 @@ svg.leaflet-image-layer.leaflet-interactive path {
       }
       return {items,preferences:[...preferences.values()]};
     }
-    async function loadData(){
-      els.loadingBar.classList.add("active");const placePromise=loadPlaceLookup();let feed=[],databaseItems=[],databasePrefs=[],databaseError=null;
-      try{const response=await fetch(`${CONFIG.dataUrl}?v=${Date.now()}`,{cache:"no-store"});if(response.ok){const payload=await response.json();const rawListings=Array.isArray(payload)?payload:Array.isArray(payload.properties)?payload.properties:[];const rawProjects=!Array.isArray(payload)&&Array.isArray(payload.pipeline_projects)?payload.pipeline_projects:[];const normalizedFeed=[...rawListings.map(x=>normalize(x,x.entry_type==="pipeline"?"pipeline":"listing")),...rawProjects.map(x=>normalize(x,"pipeline"))];feed=normalizedFeed.filter(meetsCurrentRules);const rejected=normalizedFeed.length-feed.length;if(rejected)console.warn(`${rejected} Feed-Einträge wegen harter Suchregeln verworfen`)}}
-      catch(error){console.error("JSON",error)}
-      if(db){
-        const [propertiesResult,stateResult]=await Promise.all([db.from(CONFIG.propertyTable).select("*"),db.from(CONFIG.stateTable).select("*")]);
-        if(propertiesResult.error||stateResult.error)databaseError=propertiesResult.error||stateResult.error;else{state.dbReady=true;databaseItems=(propertiesResult.data||[]).map(x=>normalize(x,x.entry_type||"listing"));databasePrefs=stateResult.data||[]}
-      }
-      if(!state.dbReady&&db){const legacy=await loadLegacyData();databaseItems=legacy.items;databasePrefs=legacy.preferences}
-      state.placeLookup=await placePromise;state.items=dedupe([...databaseItems,...feed]);
-      const preferenceMap=new Map(databasePrefs.map(row=>[String(row.external_id),row]));
-      if(!state.dbReady)for(const row of localPreferences())preferenceMap.set(String(row.external_id),{...(preferenceMap.get(String(row.external_id))||{}),...row});
-      state.preferences=preferenceMap;
-      if(!state.items.some(item=>item.category===state.category&&eligible(item)&&preference(item.external_id).status==="new")&&state.items.some(item=>item.category===state.category&&eligible(item)&&preference(item.external_id).status==="interesting"))state.view="interesting";
-      if(state.dbReady){await syncFeed(feed,databaseItems);showNotice("")}else showNotice("Die neue gemeinsame Datenbank ist noch nicht aktiviert. Die Website funktioniert bereits; Änderungen werden bis zur Einrichtung lokal auf diesem Gerät gespeichert.");
-      setView(state.view);els.loadingBar.classList.remove("active");if(databaseError)console.info("Datenbank wird noch eingerichtet",databaseError.message);
+    async function loadData({manual=false,forceRefresh=false}={}){
+      els.loadingBar.classList.add("active");const placePromise=loadPlaceLookup(forceRefresh);let feed=[],databaseItems=[],databasePrefs=[],databaseError=null,feedError=null;
+      try{
+        const response=await fetch(`${CONFIG.dataUrl}?v=${Date.now()}`,{cache:"no-store"});if(!response.ok)throw new Error(`JSON ${response.status}`);
+        const payload=await response.json();const rawListings=Array.isArray(payload)?payload:Array.isArray(payload.properties)?payload.properties:[];const rawProjects=!Array.isArray(payload)&&Array.isArray(payload.pipeline_projects)?payload.pipeline_projects:[];const normalizedFeed=[...rawListings.map(x=>normalize(x,x.entry_type==="pipeline"?"pipeline":"listing")),...rawProjects.map(x=>normalize(x,"pipeline"))];feed=normalizedFeed.filter(meetsCurrentRules);const rejected=normalizedFeed.length-feed.length;if(rejected)console.warn(`${rejected} Feed-Einträge wegen harter Suchregeln verworfen`)
+      }catch(error){feedError=error;console.error("JSON",error)}
+      try{
+        if(db){
+          const [propertiesResult,stateResult]=await Promise.all([db.from(CONFIG.propertyTable).select("*"),db.from(CONFIG.stateTable).select("*")]);
+          if(propertiesResult.error||stateResult.error)databaseError=propertiesResult.error||stateResult.error;else{state.dbReady=true;databaseItems=(propertiesResult.data||[]).map(x=>normalize(x,x.entry_type||"listing"));databasePrefs=stateResult.data||[]}
+        }
+        if(databaseError&&state.items.length){databaseItems=state.items;databasePrefs=[...state.preferences.values()]}
+        else if(!state.dbReady&&db){const legacy=await loadLegacyData();databaseItems=legacy.items;databasePrefs=legacy.preferences}
+        state.placeLookup=await placePromise;state.items=dedupe([...databaseItems,...feed]);
+        const preferenceMap=new Map(databasePrefs.map(row=>[String(row.external_id),row]));
+        if(!state.dbReady)for(const row of localPreferences())preferenceMap.set(String(row.external_id),{...(preferenceMap.get(String(row.external_id))||{}),...row});
+        state.preferences=preferenceMap;
+        if(!manual&&!state.items.some(item=>item.category===state.category&&eligible(item)&&preference(item.external_id).status==="new")&&state.items.some(item=>item.category===state.category&&eligible(item)&&preference(item.external_id).status==="interesting"))state.view="interesting";
+        if(state.dbReady){await syncFeed(feed,databaseItems);showNotice("")}else showNotice("Die neue gemeinsame Datenbank ist noch nicht aktiviert. Die Website funktioniert bereits; Änderungen werden bis zur Einrichtung lokal auf diesem Gerät gespeichert.");
+        setView(state.view);if(databaseError)console.info("Datenbank vorübergehend nicht erreichbar; bisherige Ansicht bleibt erhalten",databaseError.message);
+        return {databaseError,feedError};
+      }finally{els.loadingBar.classList.remove("active")}
+    }
+    async function refreshData(){
+      if(state.refreshing)return;state.refreshing=true;els.refreshButton.disabled=true;els.refreshButton.classList.add("loading");els.refreshButton.setAttribute("aria-busy","true");
+      try{
+        if(document.activeElement instanceof HTMLElement)document.activeElement.blur();
+        if(state.pendingWrites.size)await Promise.allSettled([...state.pendingWrites]);
+        const {databaseError,feedError}=await loadData({manual:true,forceRefresh:true});
+        if(databaseError||feedError)showToast("Teilweise aktualisiert – Verbindung prüfen",true);
+        else showToast(`Aktualisiert · ${new Intl.DateTimeFormat("de-CH",{hour:"2-digit",minute:"2-digit"}).format(new Date())}`);
+      }catch(error){console.error("Aktualisieren",error);showToast("Aktualisieren fehlgeschlagen – bitte nochmals versuchen",true)}
+      finally{state.refreshing=false;els.refreshButton.disabled=false;els.refreshButton.classList.remove("loading");els.refreshButton.removeAttribute("aria-busy")}
     }
 
     document.addEventListener("click",event=>{
@@ -1214,6 +1252,7 @@ svg.leaflet-image-layer.leaflet-interactive path {
     document.querySelectorAll("[data-view]").forEach(button=>button.addEventListener("click",event=>{event.preventDefault();setView(button.dataset.view)}));
     els.search.addEventListener("input",()=>render());
     els.fitMap.addEventListener("click",()=>renderMap());
+    els.refreshButton.addEventListener("click",refreshData);
     document.addEventListener("focusout",event=>{const note=event.target.closest('[data-action="note"]');if(!note||note.readOnly)return;if(!state.profile){els.profileGate.classList.add("open");return}const person=note.dataset.person;if(person!==state.profile)return;const key=`${person}_note`;if((preference(note.dataset.id)[key]||"")===note.value)return;savePreference(note.dataset.id,{[key]:note.value},{rerender:false})});
     window.addEventListener("unhandledrejection",event=>{console.error(event.reason);showToast("Etwas hat nicht geklappt",true)});
     fillPriceOptions();initMap();document.querySelectorAll("[data-profile]").forEach(btn=>btn.classList.toggle("active",btn.dataset.profile===state.profile));if(!state.profile)els.profileGate.classList.add("open");loadData();
