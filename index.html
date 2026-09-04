@@ -890,7 +890,7 @@ svg.leaflet-image-layer.leaflet-interactive path {
         <div>
           <div class="eyebrow">Unsere Wohnungssuche</div>
           <h1 id="heroTitle">MaxMio</h1>
-          <p id="heroCopy" class="hero-copy">Smarte Wohnungen bis CHF 1 Mio. – ab 3.5 Zimmern, sorgfältig geprüft und gemeinsam bewertet.</p>
+          <p id="heroCopy" class="hero-copy">Wohnungen bis CHF 1 Mio. – ab 3.5 Zimmern und Baujahr ab 1990, sorgfältig geprüft.</p>
         </div>
         <div class="hero-stats" aria-label="Übersicht">
           <div class="hero-stat"><strong id="statNew">0</strong><span>Neu</span></div>
@@ -904,11 +904,11 @@ svg.leaflet-image-layer.leaflet-interactive path {
   <main class="shell workspace">
     <section class="category-panel" aria-label="Suchkategorie">
       <button class="category-btn active" type="button" data-category="maxmio">
-        <span class="cat-copy"><span class="cat-symbol">◆</span><span><strong>MaxMio</strong><small>Bis CHF 1 Mio. · ab 3.5 Zimmer</small></span></span>
+        <span class="cat-copy"><span class="cat-symbol">◆</span><span><strong>MaxMio</strong><small>Bis CHF 1 Mio. · ab 3.5 Zimmer · Baujahr ≥ 1990</small></span></span>
         <span id="countMaxmio" class="cat-count">0</span>
       </button>
       <button class="category-btn" type="button" data-category="homedeluxe">
-        <span class="cat-copy"><span class="cat-symbol">✦</span><span><strong>HomeDeluxe</strong><small>Über CHF 1 Mio. · ab 4.5 Zimmer</small></span></span>
+        <span class="cat-copy"><span class="cat-symbol">✦</span><span><strong>HomeDeluxe</strong><small>Über CHF 1 Mio. · ab 4.5 Zimmer · Neubau ≥ 2027</small></span></span>
         <span id="countDeluxe" class="cat-count">0</span>
       </button>
     </section>
@@ -1069,12 +1069,14 @@ svg.leaflet-image-layer.leaflet-interactive path {
     function showToast(message,error=false){els.toast.textContent=message;els.toast.classList.toggle("error",error);els.toast.classList.add("show");clearTimeout(showToast.timer);showToast.timer=setTimeout(()=>els.toast.classList.remove("show"),2800)}
     function showNotice(message){els.dbNotice.textContent=message;els.dbNotice.classList.toggle("show",!!message)}
     function setProfile(profile){if(!["luca","gessi"].includes(profile))return;state.profile=profile;localStorage.setItem("euses_dihei_profile",profile);els.profileGate.classList.remove("open");document.querySelectorAll("[data-profile]").forEach(btn=>btn.classList.toggle("active",btn.dataset.profile===profile));render();showToast(`Profil ${profile==="luca"?"Luca":"Gessi"} aktiv`)}
-    function setCategory(category){if(!["maxmio","homedeluxe"].includes(category))return;state.category=category;document.body.dataset.category=category;document.querySelectorAll(".category-btn[data-category]").forEach(btn=>btn.classList.toggle("active",btn.dataset.category===category));const deluxe=category==="homedeluxe";els.heroTitle.textContent=deluxe?"HomeDeluxe":"MaxMio";els.heroCopy.textContent=deluxe?"Aussergewöhnliche Wohnungen über CHF 1 Mio. – grosszügig, hochwertig und kompromisslos geprüft.":"Smarte Wohnungen bis CHF 1 Mio. – ab 3.5 Zimmern, sorgfältig geprüft und gemeinsam bewertet.";els.insightTitle.textContent=deluxe?"HomeDeluxe im Blick":"MaxMio im Blick";fillPriceOptions();render()}
+    function setCategory(category){if(!["maxmio","homedeluxe"].includes(category))return;state.category=category;document.body.dataset.category=category;document.querySelectorAll(".category-btn[data-category]").forEach(btn=>btn.classList.toggle("active",btn.dataset.category===category));const deluxe=category==="homedeluxe";els.heroTitle.textContent=deluxe?"HomeDeluxe":"MaxMio";els.heroCopy.textContent=deluxe?"Noch entstehende Wohnungen über CHF 1 Mio. – ab 4.5 Zimmern und Baujahr ab 2027.":"Wohnungen bis CHF 1 Mio. – ab 3.5 Zimmern und Baujahr ab 1990, sorgfältig geprüft.";els.insightTitle.textContent=deluxe?"HomeDeluxe im Blick":"MaxMio im Blick";fillPriceOptions();render()}
     function setView(view){if(!VIEW_COPY[view])return;state.view=view;document.querySelectorAll("[data-view]").forEach(btn=>{const active=btn.dataset.view===view;btn.classList.toggle("active",active);btn.setAttribute("aria-pressed",String(active))});render()}
     function fillPriceOptions(){const options=state.category==="maxmio"?[[800000,"bis CHF 800’000"],[900000,"bis CHF 900’000"],[1000000,"bis CHF 1 Mio."]]:[[1200000,"bis CHF 1.2 Mio."],[1400000,"bis CHF 1.4 Mio."],[1600000,"bis CHF 1.6 Mio."],[2000000,"bis CHF 2 Mio."]];const current=els.price.value;els.price.innerHTML='<option value="">Preis: alle</option>'+options.map(([v,l])=>`<option value="${v}">${l}</option>`).join("");if(options.some(([v])=>String(v)===current))els.price.value=current}
     function eligible(item){
-      if(item.rooms==null)return true;
-      return item.category==="maxmio"?item.rooms>=3.5:item.rooms>=4.5;
+      const rooms=num(item.rooms),total=num(item.total_price_chf),year=num(item.year_built);
+      if(rooms==null||total==null||year==null)return false;
+      if(item.category==="maxmio")return rooms>=3.5&&total<=1000000&&year>=1990;
+      return rooms>=4.5&&total>1000000&&year>=2027;
     }
     function filteredItems(){
       const query=els.search.value.trim().toLowerCase();const maxPrice=num(els.price.value);const minRooms=num(els.rooms.value);
@@ -1174,7 +1176,7 @@ svg.leaflet-image-layer.leaflet-interactive path {
     }
     async function loadData(){
       els.loadingBar.classList.add("active");const placePromise=loadPlaceLookup();let feed=[],databaseItems=[],databasePrefs=[],databaseError=null;
-      try{const response=await fetch(`${CONFIG.dataUrl}?v=${Date.now()}`,{cache:"no-store"});if(response.ok){const payload=await response.json();const rawListings=Array.isArray(payload)?payload:Array.isArray(payload.properties)?payload.properties:[];const rawProjects=!Array.isArray(payload)&&Array.isArray(payload.pipeline_projects)?payload.pipeline_projects:[];feed=[...rawListings.map(x=>normalize(x,x.entry_type==="pipeline"?"pipeline":"listing")),...rawProjects.map(x=>normalize(x,"pipeline"))]}}
+      try{const response=await fetch(`${CONFIG.dataUrl}?v=${Date.now()}`,{cache:"no-store"});if(response.ok){const payload=await response.json();const rawListings=Array.isArray(payload)?payload:Array.isArray(payload.properties)?payload.properties:[];const rawProjects=!Array.isArray(payload)&&Array.isArray(payload.pipeline_projects)?payload.pipeline_projects:[];const normalizedFeed=[...rawListings.map(x=>normalize(x,x.entry_type==="pipeline"?"pipeline":"listing")),...rawProjects.map(x=>normalize(x,"pipeline"))];feed=normalizedFeed.filter(eligible);const rejected=normalizedFeed.length-feed.length;if(rejected)console.warn(`${rejected} Feed-Einträge wegen harter Suchregeln verworfen`)}}
       catch(error){console.error("JSON",error)}
       if(db){
         const [propertiesResult,stateResult]=await Promise.all([db.from(CONFIG.propertyTable).select("*"),db.from(CONFIG.stateTable).select("*")]);
