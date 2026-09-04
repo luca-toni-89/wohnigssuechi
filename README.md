@@ -2,10 +2,10 @@
 
 Gemeinsame Wohnungssuche für Gessi und Luca mit zwei exklusiven Kategorien:
 
-- **MaxMio:** Gesamtpreis inklusive obligatorischem Parkplatz bis und mit CHF 1'000'000; Wohnungen ab 3.5 Zimmern.
-- **HomeDeluxe:** Gesamtpreis inklusive obligatorischem Parkplatz über CHF 1'000'000; Wohnungen ab 4.5 Zimmern.
+- **MaxMio:** Gesamtpreis inklusive obligatorischem Parkplatz bis und mit CHF 1'000'000; mindestens 3.5 Zimmer; bestätigtes Baujahr ab 1990.
+- **HomeDeluxe:** Gesamtpreis inklusive obligatorischem Parkplatz über CHF 1'000'000; mindestens 4.5 Zimmer; ausschliesslich noch entstehende Wohnungen mit bestätigtem Baujahr beziehungsweise Fertigstellung ab 2027.
 
-Ein Datensatz kann nur eine Kategorie besitzen. Bei bekanntem Gesamtpreis wird die Kategorie sowohl im Browser als auch in Supabase automatisch berechnet. Genau CHF 1'000'000 gehört zu MaxMio.
+Ein Datensatz kann nur eine Kategorie besitzen. Bei bekanntem Gesamtpreis wird die Kategorie sowohl im Browser als auch in Supabase automatisch berechnet. Genau CHF 1'000'000 gehört zu MaxMio. Ein Renovationsjahr gilt nie als Baujahr. Fehlende oder nicht bestätigte Baujahre erfüllen die Zulassungsregeln nicht.
 
 ## Dateien
 
