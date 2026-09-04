@@ -71,9 +71,15 @@ create table if not exists public.home_finder_state (
   gessi_favorite boolean not null default false,
   luca_note text not null default '',
   gessi_note text not null default '',
+  is_grandfathered boolean not null default false,
   created_at timestamptz not null default now(),
   updated_at timestamptz not null default now()
 );
+
+-- Bereits bewertete oder vor den aktuellen Suchregeln übernommene Wohnungen
+-- behalten ihren Platz in Neu, Interessant, Favoriten und Archiv.
+alter table public.home_finder_state
+  add column if not exists is_grandfathered boolean not null default false;
 
 create index if not exists home_finder_properties_category_idx
   on public.home_finder_properties(category);
@@ -353,10 +359,11 @@ begin
     values(source_table,legacy_id,external_key)
     on conflict (source_table,legacy_id) do update set external_id=excluded.external_id;
 
-    insert into public.home_finder_state(external_id,status)
-    values(external_key,case when archived_value then 'archive' else 'interesting' end)
+    insert into public.home_finder_state(external_id,status,is_grandfathered)
+    values(external_key,case when archived_value then 'archive' else 'interesting' end,true)
     on conflict (external_id) do update set
-      status=case when excluded.status='archive' then 'archive' else home_finder_state.status end;
+      status=case when excluded.status='archive' then 'archive' else home_finder_state.status end,
+      is_grandfathered=true;
   end loop;
 end;
 $$;
@@ -445,6 +452,24 @@ where total_price_chf is not null;
 insert into public.home_finder_state(external_id,status)
 select external_id,'new' from public.home_finder_properties
 on conflict (external_id) do nothing;
+
+-- Bestandsschutz für die ursprüngliche Sammlung und für jeden Datensatz mit
+-- Nutzerhistorie. Dadurch verschwinden alte Treffer nicht, wenn ihr Status
+-- wieder auf "new" gesetzt wird. Künftige unberührte Fehlimporte bleiben aus.
+update public.home_finder_state as state
+set is_grandfathered = true
+from public.home_finder_properties as property
+where property.external_id = state.external_id
+  and (
+    property.created_at < timestamptz '2026-09-04 00:00:00+00'
+    or state.status <> 'new'
+    or state.luca_vote is not null
+    or state.gessi_vote is not null
+    or state.luca_favorite
+    or state.gessi_favorite
+    or nullif(trim(state.luca_note), '') is not null
+    or nullif(trim(state.gessi_note), '') is not null
+  );
 
 -- Bekannte Lücken aus den Altbeständen lokal und idempotent ergänzen. Die Orte
 -- stammen aus eindeutigen Schwesterzeilen beziehungsweise dem amtlichen
