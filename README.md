@@ -7,6 +7,8 @@ Gemeinsame Wohnungssuche für Gessi und Luca mit zwei exklusiven Kategorien:
 
 Ein Datensatz kann nur eine Kategorie besitzen. Bei bekanntem Gesamtpreis wird die Kategorie sowohl im Browser als auch in Supabase automatisch berechnet. Genau CHF 1'000'000 gehört zu MaxMio. Ein Renovationsjahr gilt nie als Baujahr. Fehlende oder nicht bestätigte Baujahre erfüllen die Zulassungsregeln nicht.
 
+Diese harten Zulassungsregeln gelten für **neue Feed- und Importtreffer**. Bereits gemeinsam eingeordnete Wohnungen bleiben in `Interessant`, `Favoriten` und `Archiv` sichtbar, auch wenn sie eine später eingeführte Suchregel nicht erfüllen oder ihr Baujahr im Altbestand fehlt. Dadurch gehen bestehende Entscheidungen, Daumen, Kommentare und Favoriten nie durch eine Kriterienänderung verloren.
+
 ## Dateien
 
 - `index.html`: komplette responsive Website
