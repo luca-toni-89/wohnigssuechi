@@ -1065,7 +1065,7 @@ svg.leaflet-image-layer.leaflet-interactive path {
       }
       return [...result.values()];
     }
-    function preference(id){return state.preferences.get(String(id))||{external_id:String(id),status:"new",luca_vote:null,gessi_vote:null,luca_favorite:false,gessi_favorite:false,luca_note:"",gessi_note:""}}
+    function preference(id){return state.preferences.get(String(id))||{external_id:String(id),status:"new",luca_vote:null,gessi_vote:null,luca_favorite:false,gessi_favorite:false,luca_note:"",gessi_note:"",is_grandfathered:false}}
     function isFavorite(pref){return !!(pref.luca_favorite||pref.gessi_favorite)}
     function validPoint(point){return Array.isArray(point)&&Number.isFinite(Number(point[0]))&&Number.isFinite(Number(point[1]))&&Number(point[0])>=45.7&&Number(point[0])<=47.9&&Number(point[1])>=5.8&&Number(point[1])<=10.7}
     function coordinatesInfo(item){
@@ -1094,7 +1094,7 @@ svg.leaflet-image-layer.leaflet-interactive path {
     }
     function hasSavedHistory(item){
       const pref=state.preferences.get(String(item.external_id));
-      return !!pref&&(pref.status!=="new"||pref.luca_vote!=null||pref.gessi_vote!=null||pref.luca_favorite||pref.gessi_favorite||pref.luca_note||pref.gessi_note);
+      return !!pref&&(pref.is_grandfathered||pref.status!=="new"||pref.luca_vote!=null||pref.gessi_vote!=null||pref.luca_favorite||pref.gessi_favorite||pref.luca_note||pref.gessi_note);
     }
     function eligible(item){
       if(meetsCurrentRules(item))return true;
@@ -1175,7 +1175,7 @@ svg.leaflet-image-layer.leaflet-interactive path {
     function localPreferences(){try{return JSON.parse(localStorage.getItem("euses_dihei_state")||"[]")}catch{return []}}
     function saveLocalPreferences(){localStorage.setItem("euses_dihei_state",JSON.stringify([...state.preferences.values()]))}
     async function savePreference(id,patch,options={}){
-      const {rerender=true,toast=true}=options,current=preference(id),next={...current,...patch,external_id:String(id),updated_at:new Date().toISOString()};
+      const {rerender=true,toast=true}=options,current=preference(id),next={...current,...patch,external_id:String(id),is_grandfathered:true,updated_at:new Date().toISOString()};
       state.preferences.set(String(id),next);saveLocalPreferences();if(rerender)render();
       if(!state.dbReady){if(toast)showToast("Lokal gespeichert");return}
       const write=db.from(CONFIG.stateTable).upsert(next,{onConflict:"external_id"});state.pendingWrites.add(write);
