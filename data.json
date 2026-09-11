@@ -1,7 +1,51 @@
 {
   "schema_version": 1,
-  "generated_at": "2026-09-06T08:09:06.374Z",
+  "generated_at": "2026-09-11T06:11:28.000Z",
   "properties": [
+    {
+      "external_id": "homegate_4003457356",
+      "category": "maxmio",
+      "entry_type": "listing",
+      "source": "Homegate",
+      "source_listing_id": "4003457356",
+      "source_url": "https://www.homegate.ch/kaufen/4003457356",
+      "title": "Wohnen auf zwei Ebenen – Dachmaisonette in Bassersdorf",
+      "description": "Verifiziertes Kaufangebot mit 3.5 Zimmern und 94 m²; der Garagenplatz ist im Kaufpreis enthalten. Die genaue Adresse wurde vom Anbieter nicht veröffentlicht.",
+      "address": null,
+      "zip": "8303",
+      "city": "Bassersdorf",
+      "canton": "ZH",
+      "latitude": 47.4437828,
+      "longitude": 8.6263304,
+      "coordinate_precision": "locality",
+      "rooms": 3.5,
+      "living_area_m2": 94,
+      "purchase_price_chf": 985000,
+      "mandatory_parking_price_chf": 0,
+      "total_price_chf": 985000,
+      "year_built": 2002,
+      "availability": "Nach Vereinbarung",
+      "floor": "Dachmaisonette",
+      "minergie": null,
+      "building_right": false,
+      "drive_minutes_duebendorf": 12,
+      "drive_minutes_wohlen": 39,
+      "drive_minutes_othmarsingen": 35,
+      "ai_rating": 8.5,
+      "ai_summary": "Dachmaisonette in Bassersdorf für total CHF 985'000 inklusive Garagenplatz.",
+      "ai_recommendation_reason": "Sehr nahe bei Dübendorf, Baujahr 2002 und Gesamtpreis knapp unter der MaxMio-Grenze.",
+      "advantages": [
+        "Nur rund 12 Fahrminuten nach Dübendorf",
+        "Garagenplatz im Kaufpreis enthalten",
+        "Baujahr 2002"
+      ],
+      "disadvantages": [
+        "Genaue Adresse nicht öffentlich",
+        "Gesamtpreis nahe an der Obergrenze"
+      ],
+      "discovered_at": "2026-09-11T06:11:28.000Z",
+      "last_seen_at": "2026-09-11T06:11:28.000Z"
+    },
     {
       "external_id": "homegate_4003419421",
       "category": "maxmio",
